@@ -59,13 +59,20 @@ npm install
 ### Development
 
 ```bash
-npm run dev         # Start dev server
-npm run build       # Build for production
-npm run preview     # Preview production build
-npm run lint        # Run ESLint
-npm run format      # Format code with Prettier
-npm run test        # Run tests
-npm run test:ui     # Run tests with UI
+npm run dev              # Start dev server
+npm run build            # Build for production
+npm run preview          # Preview production build
+npm run lint             # Run ESLint
+npm run lint:fix         # Auto-fix lint issues
+npm run format           # Format code with Prettier
+npm run format:check     # Check code formatting
+npm run test             # Run unit tests
+npm run test:ui          # Run tests with UI
+npm run test:e2e         # Run E2E tests with Playwright
+npm run test:e2e:ui      # Run E2E tests with Playwright UI
+npm run test:e2e:headed  # Run E2E tests in headed mode
+npm run test:e2e:debug   # Debug E2E tests
+npm run type-check       # Run TypeScript type checking
 ```
 
 ## Environment Variables
@@ -93,6 +100,37 @@ This project uses `@jsdubzw/job-finder-shared-types` for type safety across fron
 ## Contributing
 
 See the main migration plan documentation for contribution guidelines.
+
+## Features
+
+### Core Features
+- **Job Applications:** View and manage job matches with filtering and search
+- **Job Finder:** Submit LinkedIn job URLs for automated processing
+- **Document Builder:** Generate AI-powered resumes and cover letters
+- **Document History:** Browse, download, and manage generated documents
+- **Queue Management:** Monitor job processing queue status
+
+### Configuration Features (Editor Role Required)
+- **Job Finder Config:** Configure stop lists, queue settings, and AI parameters
+- **AI Prompts:** Customize AI prompts for document generation with variable interpolation
+- **Settings:** Manage user preferences, theme, and default settings
+
+### Technical Features
+- Protected routes with Firebase Authentication
+- Role-based access control (user/editor roles)
+- Real-time Firestore updates
+- Responsive design with mobile support
+- Dark mode support
+- Comprehensive E2E test coverage
+- CI/CD pipeline with automated deployments
+
+## API Documentation
+
+See [API.md](./API.md) for detailed API client documentation.
+
+## Architecture
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for system architecture and component diagrams.
 
 ## Related Projects
 
