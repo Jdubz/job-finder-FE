@@ -20,6 +20,7 @@ const editorLinks = [
   { to: ROUTES.JOB_FINDER, label: "Job Finder" },
   { to: ROUTES.QUEUE_MANAGEMENT, label: "Queue Management" },
   { to: ROUTES.JOB_FINDER_CONFIG, label: "Config" },
+  { to: ROUTES.SYSTEM_HEALTH, label: "System Health" },
 ]
 
 export function Navigation() {
