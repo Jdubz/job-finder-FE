@@ -118,14 +118,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.AI_PROMPTS,
-            element: (
-              <LazyPage>
-                <AIPromptsPage />
-              </LazyPage>
-            ),
-          },
-          {
             path: ROUTES.SETTINGS,
             element: (
               <LazyPage>
@@ -156,6 +148,14 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute requireEditor />,
         children: [
+          {
+            path: ROUTES.AI_PROMPTS,
+            element: (
+              <LazyPage>
+                <AIPromptsPage />
+              </LazyPage>
+            ),
+          },
           {
             path: ROUTES.DOCUMENT_HISTORY,
             element: (
