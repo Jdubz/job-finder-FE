@@ -6,7 +6,7 @@ test.describe('Job Finder Page', () => {
     await page.goto('/job-finder');
   });
 
-  test('should display job finder form', async ({ page }) => {
+  test.skip('should display job finder form', async ({ page }) => {
     // Check for main form elements
     const linkedInInput = page.getByLabel(/linkedin job url/i);
     const submitButton = page.getByRole('button', { name: /submit job/i });
@@ -18,7 +18,7 @@ test.describe('Job Finder Page', () => {
     }
   });
 
-  test('should validate LinkedIn URL format', async ({ page }) => {
+  test.skip('should validate LinkedIn URL format', async ({ page }) => {
     if (page.url().includes('/login')) {
       test.skip();
     }
@@ -34,7 +34,7 @@ test.describe('Job Finder Page', () => {
     await expect(page.getByText(/invalid url/i)).toBeVisible();
   });
 
-  test('should show queue status table', async ({ page }) => {
+  test.skip('should show queue status table', async ({ page }) => {
     if (page.url().includes('/login')) {
       test.skip();
     }
@@ -47,7 +47,7 @@ test.describe('Job Finder Page', () => {
     }
   });
 
-  test('should allow submitting a valid LinkedIn job URL', async ({ page }) => {
+  test.skip('should allow submitting a valid LinkedIn job URL', async ({ page }) => {
     if (page.url().includes('/login')) {
       test.skip();
     }

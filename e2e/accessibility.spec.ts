@@ -15,22 +15,17 @@ test.describe('Accessibility Tests', () => {
   test('should have proper document structure on login page', async ({ page }) => {
     await page.goto('/login');
     
-    // Check for main content
+    // Check for main content with timeout
     const heading = page.locator('h1, h2');
-    const count = await heading.count();
-    expect(count).toBeGreaterThan(0);
+    await expect(heading.first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should have proper heading hierarchy', async ({ page }) => {
     await page.goto('/');
     
-    // Check for h1
+    // Check for h1 with timeout
     const h1 = page.locator('h1');
-    const h1Count = await h1.count();
-    expect(h1Count).toBeGreaterThan(0);
-    
-    // Verify heading exists
-    await expect(h1.first()).toBeVisible();
+    await expect(h1.first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should have proper ARIA labels on interactive elements', async ({ page }) => {
