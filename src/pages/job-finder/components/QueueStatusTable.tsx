@@ -80,10 +80,10 @@ export function QueueStatusTable({ userId, maxItems = 10 }: QueueStatusTableProp
     }
   }
 
-  const formatDate = (date: Date | any): string => {
+  const formatDate = (date: Date | string | unknown): string => {
     if (!date) return "N/A"
 
-    const d = date instanceof Date ? date : new Date(date)
+    const d = date instanceof Date ? date : new Date(date as string)
     const now = new Date()
     const diffMs = now.getTime() - d.getTime()
     const diffMins = Math.floor(diffMs / 60000)

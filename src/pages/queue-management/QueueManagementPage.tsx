@@ -16,12 +16,7 @@ import {
   RotateCcw,
   Trash2,
   AlertCircle,
-  Activity,
-  Clock,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  Pause
+  Activity
 } from "lucide-react"
 import { QueueItemCard } from "./components/QueueItemCard"
 import { QueueStatsGrid } from "./components/QueueStatsGrid"
@@ -67,6 +62,7 @@ export function QueueManagementPage() {
   // Apply filters when items or filters change
   useEffect(() => {
     applyFilters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queueItems, filters, sortBy, sortOrder])
 
   const loadQueueData = async () => {
@@ -123,7 +119,9 @@ export function QueueManagementPage() {
 
     // Apply sorting
     filtered.sort((a, b) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let aValue: any = a[sortBy as keyof QueueItem]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let bValue: any = b[sortBy as keyof QueueItem]
       
       // Handle dates
@@ -200,30 +198,11 @@ export function QueueManagementPage() {
       })
       setSelectedItems(new Set())
       await loadQueueData()
-    } catch (error) {
+    } catch {
       setAlert({
         type: "error",
         message: `Failed to ${action} selected items`
       })
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Clock className="h-4 w-4 text-yellow-500" />
-      case "processing":
-        return <Zap className="h-4 w-4 text-blue-500 animate-pulse" />
-      case "success":
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />
-      case "failed":
-        return <XCircle className="h-4 w-4 text-red-500" />
-      case "skipped":
-        return <Pause className="h-4 w-4 text-gray-500" />
-      case "filtered":
-        return <Filter className="h-4 w-4 text-purple-500" />
-      default:
-        return <AlertCircle className="h-4 w-4 text-gray-400" />
     }
   }
 
@@ -421,7 +400,7 @@ export function QueueManagementPage() {
                   key={item.id}
                   item={item}
                   selected={selectedItems.has(item.id!)}
-                  onSelect={(id, selected) => {
+                  onSelect={(id: string, selected: boolean) => {
                     const newSelected = new Set(selectedItems)
                     if (selected) {
                       newSelected.add(id)
