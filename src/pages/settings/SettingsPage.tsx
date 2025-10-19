@@ -1,124 +1,130 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
-import { Loader2, Save, User, Shield, Bell } from 'lucide-react';
-import { generatorClient, type UserDefaults } from '@/api';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Separator } from "@/components/ui/separator"
+import { Loader2, Save, User, Shield, Bell } from "lucide-react"
+import { generatorClient, type UserDefaults } from "@/api"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function SettingsPage() {
-  const { user, isEditor } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const { user, isEditor } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // User defaults state
   const [userDefaults, setUserDefaults] = useState<UserDefaults>({
-    name: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    github: '',
-    portfolio: '',
-    summary: '',
-  });
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    summary: "",
+  })
   const [originalDefaults, setOriginalDefaults] = useState<UserDefaults>({
-    name: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    github: '',
-    portfolio: '',
-    summary: '',
-  });
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    summary: "",
+  })
 
   // Theme preference (stored in localStorage)
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("system")
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    loadSettings()
+  }, [])
 
   useEffect(() => {
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | "system" | null
     if (savedTheme) {
-      setTheme(savedTheme);
-      applyTheme(savedTheme);
+      setTheme(savedTheme)
+      applyTheme(savedTheme)
     }
-  }, []);
+  }, [])
 
   const loadSettings = async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
 
     try {
-      const defaults = await generatorClient.getUserDefaults();
-      setUserDefaults(defaults);
-      setOriginalDefaults(defaults);
+      const defaults = await generatorClient.getUserDefaults()
+      setUserDefaults(defaults)
+      setOriginalDefaults(defaults)
     } catch (err) {
-      console.error('Error loading settings:', err);
+      console.error("Error loading settings:", err)
       // It's OK if defaults don't exist yet
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSaveDefaults = async () => {
-    setIsSaving(true);
-    setError(null);
-    setSuccess(null);
+    setIsSaving(true)
+    setError(null)
+    setSuccess(null)
 
     try {
-      await generatorClient.updateUserDefaults(userDefaults);
-      setOriginalDefaults(userDefaults);
-      setSuccess('Settings saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      await generatorClient.updateUserDefaults(userDefaults)
+      setOriginalDefaults(userDefaults)
+      setSuccess("Settings saved successfully!")
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to save settings');
-      console.error('Error saving settings:', err);
+      setError("Failed to save settings")
+      console.error("Error saving settings:", err)
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleResetDefaults = () => {
-    setUserDefaults(originalDefaults);
-    setError(null);
-    setSuccess(null);
-  };
+    setUserDefaults(originalDefaults)
+    setError(null)
+    setSuccess(null)
+  }
 
-  const applyTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+  const applyTheme = (newTheme: "light" | "dark" | "system") => {
+    const root = window.document.documentElement
+    root.classList.remove("light", "dark")
 
-    if (newTheme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-      root.classList.add(systemTheme);
+    if (newTheme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      root.classList.add(systemTheme)
     } else {
-      root.classList.add(newTheme);
+      root.classList.add(newTheme)
     }
-  };
+  }
 
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    applyTheme(newTheme);
-    setSuccess('Theme preference saved!');
-    setTimeout(() => setSuccess(null), 3000);
-  };
+  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
+    setTheme(newTheme)
+    localStorage.setItem("theme", newTheme)
+    applyTheme(newTheme)
+    setSuccess("Theme preference saved!")
+    setTimeout(() => setSuccess(null), 3000)
+  }
 
-  const hasChanges = JSON.stringify(userDefaults) !== JSON.stringify(originalDefaults);
+  const hasChanges = JSON.stringify(userDefaults) !== JSON.stringify(originalDefaults)
 
   if (isLoading) {
     return (
@@ -128,7 +134,7 @@ export function SettingsPage() {
           <p className="text-gray-600">Loading settings...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -159,21 +165,21 @@ export function SettingsPage() {
             <User className="h-5 w-5" />
             <CardTitle>Account Information</CardTitle>
           </div>
-          <CardDescription>
-            Your account details and authentication status
-          </CardDescription>
+          <CardDescription>Your account details and authentication status</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm text-gray-600">Email</Label>
-              <p className="font-medium">{user?.email || 'Not available'}</p>
+              <p className="font-medium">{user?.email || "Not available"}</p>
             </div>
             <div>
               <Label className="text-sm text-gray-600">Email Verified</Label>
               <div>
                 {user?.emailVerified ? (
-                  <Badge variant="default" className="bg-green-500">Verified</Badge>
+                  <Badge variant="default" className="bg-green-500">
+                    Verified
+                  </Badge>
                 ) : (
                   <Badge variant="secondary">Not Verified</Badge>
                 )}
@@ -181,7 +187,7 @@ export function SettingsPage() {
             </div>
             <div>
               <Label className="text-sm text-gray-600">User ID</Label>
-              <p className="font-mono text-xs text-gray-600">{user?.uid || 'Not available'}</p>
+              <p className="font-mono text-xs text-gray-600">{user?.uid || "Not available"}</p>
             </div>
             <div>
               <Label className="text-sm text-gray-600">Role</Label>
@@ -204,14 +210,15 @@ export function SettingsPage() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>
-            Customize how the application looks
-          </CardDescription>
+          <CardDescription>Customize how the application looks</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="theme">Theme</Label>
-            <Select value={theme} onValueChange={(value: 'light' | 'dark' | 'system') => handleThemeChange(value)}>
+            <Select
+              value={theme}
+              onValueChange={(value: "light" | "dark" | "system") => handleThemeChange(value)}
+            >
               <SelectTrigger id="theme" className="w-[200px]">
                 <SelectValue />
               </SelectTrigger>
@@ -247,11 +254,7 @@ export function SettingsPage() {
               >
                 Reset
               </Button>
-              <Button
-                onClick={handleSaveDefaults}
-                size="sm"
-                disabled={!hasChanges || isSaving}
-              >
+              <Button onClick={handleSaveDefaults} size="sm" disabled={!hasChanges || isSaving}>
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -274,7 +277,7 @@ export function SettingsPage() {
               <Input
                 id="name"
                 value={userDefaults.name}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="John Doe"
               />
             </div>
@@ -285,7 +288,7 @@ export function SettingsPage() {
                 id="email"
                 type="email"
                 value={userDefaults.email}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, email: e.target.value }))}
                 placeholder="john@example.com"
               />
             </div>
@@ -294,8 +297,8 @@ export function SettingsPage() {
               <Label htmlFor="phone">Phone</Label>
               <Input
                 id="phone"
-                value={userDefaults.phone || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, phone: e.target.value }))}
+                value={userDefaults.phone || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, phone: e.target.value }))}
                 placeholder="(123) 456-7890"
               />
             </div>
@@ -304,8 +307,8 @@ export function SettingsPage() {
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
-                value={userDefaults.location || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, location: e.target.value }))}
+                value={userDefaults.location || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, location: e.target.value }))}
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -314,8 +317,8 @@ export function SettingsPage() {
               <Label htmlFor="linkedin">LinkedIn</Label>
               <Input
                 id="linkedin"
-                value={userDefaults.linkedin || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, linkedin: e.target.value }))}
+                value={userDefaults.linkedin || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, linkedin: e.target.value }))}
                 placeholder="linkedin.com/in/johndoe"
               />
             </div>
@@ -324,8 +327,8 @@ export function SettingsPage() {
               <Label htmlFor="github">GitHub</Label>
               <Input
                 id="github"
-                value={userDefaults.github || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, github: e.target.value }))}
+                value={userDefaults.github || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, github: e.target.value }))}
                 placeholder="github.com/johndoe"
               />
             </div>
@@ -334,8 +337,10 @@ export function SettingsPage() {
               <Label htmlFor="portfolio">Portfolio Website</Label>
               <Input
                 id="portfolio"
-                value={userDefaults.portfolio || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, portfolio: e.target.value }))}
+                value={userDefaults.portfolio || ""}
+                onChange={(e) =>
+                  setUserDefaults((prev) => ({ ...prev, portfolio: e.target.value }))
+                }
                 placeholder="https://johndoe.com"
               />
             </div>
@@ -344,8 +349,8 @@ export function SettingsPage() {
               <Label htmlFor="summary">Professional Summary</Label>
               <Input
                 id="summary"
-                value={userDefaults.summary || ''}
-                onChange={(e) => setUserDefaults(prev => ({ ...prev, summary: e.target.value }))}
+                value={userDefaults.summary || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, summary: e.target.value }))}
                 placeholder="Experienced software engineer specializing in..."
               />
             </div>
@@ -360,9 +365,7 @@ export function SettingsPage() {
             <Bell className="h-5 w-5" />
             <CardTitle>Notifications</CardTitle>
           </div>
-          <CardDescription>
-            Manage your notification preferences (Coming soon)
-          </CardDescription>
+          <CardDescription>Manage your notification preferences (Coming soon)</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-500">
@@ -377,9 +380,7 @@ export function SettingsPage() {
       <Card className="border-red-200">
         <CardHeader>
           <CardTitle className="text-red-600">Danger Zone</CardTitle>
-          <CardDescription>
-            Irreversible actions that affect your account
-          </CardDescription>
+          <CardDescription>Irreversible actions that affect your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -395,11 +396,12 @@ export function SettingsPage() {
               </Button>
             </div>
             <p className="text-xs text-gray-500">
-              Account deletion is not yet available. Please contact support if you need to delete your account.
+              Account deletion is not yet available. Please contact support if you need to delete
+              your account.
             </p>
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

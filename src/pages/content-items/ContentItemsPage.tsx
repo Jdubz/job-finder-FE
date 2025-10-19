@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { contentItemsClient } from "@/api"
-import type { 
-  ContentItem, 
-  ContentItemType, 
+import type {
+  ContentItem,
+  ContentItemType,
   ContentItemWithChildren,
-  CreateContentItemData 
+  CreateContentItemData,
 } from "@/types/content-items"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
-import { 
-  Plus, 
-  Building2, 
-  FolderOpen, 
-  GraduationCap, 
-  User, 
-  FileText, 
+import {
+  Plus,
+  Building2,
+  FolderOpen,
+  GraduationCap,
+  User,
+  FileText,
   Award,
   Download,
   Upload,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react"
 import { CompanyList } from "./components/CompanyList"
 import { ContentItemDialog } from "./components/ContentItemDialog"
@@ -48,7 +48,7 @@ export function ContentItemsPage() {
     education: 0,
     profileSections: 0,
     textSections: 0,
-    total: 0
+    total: 0,
   })
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -70,10 +70,10 @@ export function ContentItemsPage() {
     try {
       setLoading(true)
       const data = await contentItemsClient.getHierarchy({
-        visibility: ["published", "draft"]
+        visibility: ["published", "draft"],
       })
       setHierarchy(data)
-      
+
       // Calculate stats
       const newStats = calculateStats(data)
       setStats(newStats)
@@ -81,7 +81,7 @@ export function ContentItemsPage() {
       console.error("Failed to load content items:", error)
       setAlert({
         type: "error",
-        message: "Failed to load content items. Please try again."
+        message: "Failed to load content items. Please try again.",
       })
     } finally {
       setLoading(false)
@@ -96,7 +96,7 @@ export function ContentItemsPage() {
       education: 0,
       profileSections: 0,
       textSections: 0,
-      total: 0
+      total: 0,
     }
 
     const countItems = (items: ContentItemWithChildren[]) => {
@@ -122,7 +122,7 @@ export function ContentItemsPage() {
             stats.textSections++
             break
         }
-        
+
         if (item.children) {
           countItems(item.children)
         }
@@ -150,19 +150,17 @@ export function ContentItemsPage() {
       await contentItemsClient.deleteItem(id, true) // Delete children too
       setAlert({
         type: "success",
-        message: "Content item deleted successfully"
+        message: "Content item deleted successfully",
       })
       await loadContentItems()
     } catch (error) {
       console.error("Failed to delete content item:", error)
       setAlert({
         type: "error",
-        message: "Failed to delete content item. Please try again."
+        message: "Failed to delete content item. Please try again.",
       })
     }
   }
-
-
 
   const handleExportItems = async () => {
     try {
@@ -175,16 +173,16 @@ export function ContentItemsPage() {
       link.download = "content-items-export.json"
       link.click()
       URL.revokeObjectURL(url)
-      
+
       setAlert({
         type: "success",
-        message: `Exported ${items.length} content items`
+        message: `Exported ${items.length} content items`,
       })
     } catch (error) {
       console.error("Failed to export content items:", error)
       setAlert({
         type: "error",
-        message: "Failed to export content items. Please try again."
+        message: "Failed to export content items. Please try again.",
       })
     }
   }
@@ -195,7 +193,7 @@ export function ContentItemsPage() {
       const input = document.createElement("input")
       input.type = "file"
       input.accept = ".json"
-      
+
       input.onchange = async (e) => {
         const file = (e.target as HTMLInputElement).files?.[0]
         if (!file) return
@@ -203,7 +201,7 @@ export function ContentItemsPage() {
         try {
           const text = await file.text()
           const items = JSON.parse(text) as CreateContentItemData[]
-          
+
           if (!Array.isArray(items)) {
             throw new Error("Invalid file format: expected array of content items")
           }
@@ -211,14 +209,14 @@ export function ContentItemsPage() {
           const imported = await contentItemsClient.importItems(items)
           setAlert({
             type: "success",
-            message: `Imported ${imported.length} content items successfully`
+            message: `Imported ${imported.length} content items successfully`,
           })
           await loadContentItems()
         } catch (error) {
           console.error("Failed to import content items:", error)
           setAlert({
             type: "error",
-            message: error instanceof Error ? error.message : "Failed to import content items"
+            message: error instanceof Error ? error.message : "Failed to import content items",
           })
         }
       }
@@ -228,7 +226,7 @@ export function ContentItemsPage() {
       console.error("Failed to create import dialog:", error)
       setAlert({
         type: "error",
-        message: "Failed to open import dialog. Please try again."
+        message: "Failed to open import dialog. Please try again.",
       })
     }
   }
@@ -238,7 +236,9 @@ export function ContentItemsPage() {
     await loadContentItems()
     setAlert({
       type: "success",
-      message: editingItem ? "Content item updated successfully" : "Content item created successfully"
+      message: editingItem
+        ? "Content item updated successfully"
+        : "Content item created successfully",
     })
   }
 
@@ -247,9 +247,7 @@ export function ContentItemsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Content Items</h1>
-          <p className="text-muted-foreground mt-2">
-            Please sign in to manage your content items
-          </p>
+          <p className="text-muted-foreground mt-2">Please sign in to manage your content items</p>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -272,9 +270,7 @@ export function ContentItemsPage() {
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You need editor permissions to manage content items.
-          </AlertDescription>
+          <AlertDescription>You need editor permissions to manage content items.</AlertDescription>
         </Alert>
       </div>
     )
@@ -432,8 +428,8 @@ export function ContentItemsPage() {
               ))}
             </div>
           ) : (
-            <CompanyList 
-              items={hierarchy.filter(item => item.type === "company")}
+            <CompanyList
+              items={hierarchy.filter((item) => item.type === "company")}
               onEdit={handleEditItem}
               onDelete={handleDeleteItem}
             />
@@ -456,14 +452,20 @@ export function ContentItemsPage() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.flatMap(item => 
-                item.children?.filter(child => child.type === "project") || []
+              {hierarchy.flatMap(
+                (item) => item.children?.filter((child) => child.type === "project") || []
               ).length === 0 ? (
                 <p>No projects found. Click "Add Project" to get started.</p>
               ) : (
-                <p>Project list component coming soon... ({hierarchy.flatMap(item => 
-                  item.children?.filter(child => child.type === "project") || []
-                ).length} items)</p>
+                <p>
+                  Project list component coming soon... (
+                  {
+                    hierarchy.flatMap(
+                      (item) => item.children?.filter((child) => child.type === "project") || []
+                    ).length
+                  }{" "}
+                  items)
+                </p>
               )}
             </div>
           )}
@@ -485,10 +487,13 @@ export function ContentItemsPage() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter(item => item.type === "skill-group").length === 0 ? (
+              {hierarchy.filter((item) => item.type === "skill-group").length === 0 ? (
                 <p>No skill groups found. Click "Add Skill Group" to get started.</p>
               ) : (
-                <p>Skill group list component coming soon... ({hierarchy.filter(item => item.type === "skill-group").length} items)</p>
+                <p>
+                  Skill group list component coming soon... (
+                  {hierarchy.filter((item) => item.type === "skill-group").length} items)
+                </p>
               )}
             </div>
           )}
@@ -510,10 +515,13 @@ export function ContentItemsPage() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter(item => item.type === "education").length === 0 ? (
+              {hierarchy.filter((item) => item.type === "education").length === 0 ? (
                 <p>No education items found. Click "Add Education" to get started.</p>
               ) : (
-                <p>Education list component coming soon... ({hierarchy.filter(item => item.type === "education").length} items)</p>
+                <p>
+                  Education list component coming soon... (
+                  {hierarchy.filter((item) => item.type === "education").length} items)
+                </p>
               )}
             </div>
           )}
@@ -535,10 +543,13 @@ export function ContentItemsPage() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter(item => item.type === "profile-section").length === 0 ? (
+              {hierarchy.filter((item) => item.type === "profile-section").length === 0 ? (
                 <p>No profile sections found. Click "Add Profile Section" to get started.</p>
               ) : (
-                <p>Profile section list component coming soon... ({hierarchy.filter(item => item.type === "profile-section").length} items)</p>
+                <p>
+                  Profile section list component coming soon... (
+                  {hierarchy.filter((item) => item.type === "profile-section").length} items)
+                </p>
               )}
             </div>
           )}
@@ -560,10 +571,13 @@ export function ContentItemsPage() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter(item => item.type === "text-section").length === 0 ? (
+              {hierarchy.filter((item) => item.type === "text-section").length === 0 ? (
                 <p>No text sections found. Click "Add Text Section" to get started.</p>
               ) : (
-                <p>Text section list component coming soon... ({hierarchy.filter(item => item.type === "text-section").length} items)</p>
+                <p>
+                  Text section list component coming soon... (
+                  {hierarchy.filter((item) => item.type === "text-section").length} items)
+                </p>
               )}
             </div>
           )}

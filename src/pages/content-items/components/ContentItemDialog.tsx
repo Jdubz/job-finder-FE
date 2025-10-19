@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react"
 import { contentItemsClient } from "@/api"
-import type { 
-  ContentItem, 
-  ContentItemType, 
+import type {
+  ContentItem,
+  ContentItemType,
   CreateContentItemData,
   UpdateContentItemData,
-  ContentItemVisibility 
+  ContentItemVisibility,
 } from "@/types/content-items"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, AlertCircle, X } from "lucide-react"
@@ -25,12 +37,12 @@ interface ContentItemDialogProps {
   onSave: () => void
 }
 
-export function ContentItemDialog({ 
-  open, 
-  onOpenChange, 
-  type, 
-  item, 
-  onSave 
+export function ContentItemDialog({
+  open,
+  onOpenChange,
+  type,
+  item,
+  onSave,
 }: ContentItemDialogProps) {
   const [loading, setLoading] = useState(false)
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
@@ -90,7 +102,7 @@ export function ContentItemDialog({
     setVisibility("published")
     setTags([])
     setTagInput("")
-    
+
     // Company fields
     setCompany("")
     setRole("")
@@ -136,10 +148,17 @@ export function ContentItemDialog({
 
     switch (item.type) {
       case "company": {
-        const companyItem = item as ContentItem & { 
-          company?: string; role?: string; location?: string; website?: string;
-          startDate?: string; endDate?: string | null; summary?: string;
-          accomplishments?: string[]; technologies?: string[]; notes?: string;
+        const companyItem = item as ContentItem & {
+          company?: string
+          role?: string
+          location?: string
+          website?: string
+          startDate?: string
+          endDate?: string | null
+          summary?: string
+          accomplishments?: string[]
+          technologies?: string[]
+          notes?: string
         }
         setCompany(companyItem.company || "")
         setRole(companyItem.role || "")
@@ -153,12 +172,17 @@ export function ContentItemDialog({
         setNotes(companyItem.notes || "")
         break
       }
-      
+
       case "project": {
         const projectItem = item as ContentItem & {
-          name?: string; role?: string; startDate?: string; endDate?: string | null;
-          description?: string; accomplishments?: string[]; technologies?: string[];
-          challenges?: string[];
+          name?: string
+          role?: string
+          startDate?: string
+          endDate?: string | null
+          description?: string
+          accomplishments?: string[]
+          technologies?: string[]
+          challenges?: string[]
         }
         setProjectName(projectItem.name || "")
         setRole(projectItem.role || "")
@@ -179,8 +203,10 @@ export function ContentItemDialog({
       }
 
       case "text-section": {
-        const textItem = item as ContentItem & { 
-          heading?: string; content?: string; format?: "markdown" | "plain" | "html" 
+        const textItem = item as ContentItem & {
+          heading?: string
+          content?: string
+          format?: "markdown" | "plain" | "html"
         }
         setHeading(textItem.heading || "")
         setContent(textItem.content || "")
@@ -190,8 +216,14 @@ export function ContentItemDialog({
 
       case "education": {
         const eduItem = item as ContentItem & {
-          institution?: string; degree?: string; field?: string; location?: string;
-          startDate?: string; endDate?: string | null; honors?: string; description?: string;
+          institution?: string
+          degree?: string
+          field?: string
+          location?: string
+          startDate?: string
+          endDate?: string | null
+          honors?: string
+          description?: string
         }
         setInstitution(eduItem.institution || "")
         setDegree(eduItem.degree || "")
@@ -206,7 +238,12 @@ export function ContentItemDialog({
     }
   }
 
-  const addToList = (list: string[], setList: (list: string[]) => void, input: string, setInput: (input: string) => void) => {
+  const addToList = (
+    list: string[],
+    setList: (list: string[]) => void,
+    input: string,
+    setInput: (input: string) => void
+  ) => {
     if (input.trim() && !list.includes(input.trim())) {
       setList([...list, input.trim()])
       setInput("")
@@ -214,7 +251,7 @@ export function ContentItemDialog({
   }
 
   const removeFromList = (list: string[], setList: (list: string[]) => void, item: string) => {
-    setList(list.filter(i => i !== item))
+    setList(list.filter((i) => i !== item))
   }
 
   const handleSave = async () => {
@@ -310,7 +347,7 @@ export function ContentItemDialog({
       console.error("Failed to save content item:", error)
       setAlert({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to save content item"
+        message: error instanceof Error ? error.message : "Failed to save content item",
       })
     } finally {
       setLoading(false)
@@ -319,7 +356,7 @@ export function ContentItemDialog({
 
   const getDialogTitle = () => {
     const action = item ? "Edit" : "Create"
-    const typeName = type.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())
+    const typeName = type.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())
     return `${action} ${typeName}`
   }
 
@@ -414,14 +451,26 @@ export function ContentItemDialog({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault()
-                      addToList(accomplishments, setAccomplishments, accomplishmentInput, setAccomplishmentInput)
+                      addToList(
+                        accomplishments,
+                        setAccomplishments,
+                        accomplishmentInput,
+                        setAccomplishmentInput
+                      )
                     }
                   }}
                 />
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => addToList(accomplishments, setAccomplishments, accomplishmentInput, setAccomplishmentInput)}
+                  onClick={() =>
+                    addToList(
+                      accomplishments,
+                      setAccomplishments,
+                      accomplishmentInput,
+                      setAccomplishmentInput
+                    )
+                  }
                 >
                   Add
                 </Button>
@@ -429,11 +478,17 @@ export function ContentItemDialog({
               {accomplishments.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {accomplishments.map((accomplishment) => (
-                    <Badge key={accomplishment} variant="secondary" className="flex items-center gap-1">
+                    <Badge
+                      key={accomplishment}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
                       {accomplishment}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
-                        onClick={() => removeFromList(accomplishments, setAccomplishments, accomplishment)}
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() =>
+                          removeFromList(accomplishments, setAccomplishments, accomplishment)
+                        }
                       />
                     </Badge>
                   ))}
@@ -468,8 +523,8 @@ export function ContentItemDialog({
                   {technologies.map((tech) => (
                     <Badge key={tech} variant="outline" className="flex items-center gap-1">
                       {tech}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeFromList(technologies, setTechnologies, tech)}
                       />
                     </Badge>
@@ -532,8 +587,8 @@ export function ContentItemDialog({
                   {skills.map((skill) => (
                     <Badge key={skill} variant="outline" className="flex items-center gap-1">
                       {skill}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeFromList(skills, setSkills, skill)}
                       />
                     </Badge>
@@ -559,7 +614,10 @@ export function ContentItemDialog({
               </div>
               <div>
                 <Label htmlFor="format">Format</Label>
-                <Select value={format} onValueChange={(value: "markdown" | "plain" | "html") => setFormat(value)}>
+                <Select
+                  value={format}
+                  onValueChange={(value: "markdown" | "plain" | "html") => setFormat(value)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -614,7 +672,10 @@ export function ContentItemDialog({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="visibility">Visibility</Label>
-              <Select value={visibility} onValueChange={(value: ContentItemVisibility) => setVisibility(value)}>
+              <Select
+                value={visibility}
+                onValueChange={(value: ContentItemVisibility) => setVisibility(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -652,8 +713,8 @@ export function ContentItemDialog({
                   {tags.map((tag) => (
                     <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                       {tag}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeFromList(tags, setTags, tag)}
                       />
                     </Badge>

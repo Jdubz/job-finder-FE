@@ -42,10 +42,14 @@ export function QueueStatusTable({ userId, maxItems = 10 }: QueueStatusTableProp
         return {
           id: doc.id,
           ...data,
-          created_at: data.created_at instanceof Timestamp ? data.created_at.toDate() : data.created_at,
-          updated_at: data.updated_at instanceof Timestamp ? data.updated_at.toDate() : data.updated_at,
-          processed_at: data.processed_at instanceof Timestamp ? data.processed_at.toDate() : data.processed_at,
-          completed_at: data.completed_at instanceof Timestamp ? data.completed_at.toDate() : data.completed_at,
+          created_at:
+            data.created_at instanceof Timestamp ? data.created_at.toDate() : data.created_at,
+          updated_at:
+            data.updated_at instanceof Timestamp ? data.updated_at.toDate() : data.updated_at,
+          processed_at:
+            data.processed_at instanceof Timestamp ? data.processed_at.toDate() : data.processed_at,
+          completed_at:
+            data.completed_at instanceof Timestamp ? data.completed_at.toDate() : data.completed_at,
         } as QueueItem
       })
 
@@ -68,7 +72,11 @@ export function QueueStatusTable({ userId, maxItems = 10 }: QueueStatusTableProp
           </Badge>
         )
       case "success":
-        return <Badge variant="default" className="bg-green-500">Success</Badge>
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Success
+          </Badge>
+        )
       case "failed":
         return <Badge variant="destructive">Failed</Badge>
       case "skipped":

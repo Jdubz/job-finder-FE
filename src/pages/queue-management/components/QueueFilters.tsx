@@ -1,16 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { 
-  Calendar,
-  Filter,
-  SortAsc,
-  SortDesc,
-  Search,
-  X
-} from "lucide-react"
+import { Calendar, Filter, SortAsc, SortDesc, Search, X } from "lucide-react"
 
 interface QueueFiltersType {
   status?: string
@@ -35,13 +34,13 @@ export function QueueFilters({
   sortBy,
   onSortByChange,
   sortOrder,
-  onSortOrderChange
+  onSortOrderChange,
 }: QueueFiltersProps) {
   const clearFilters = () => {
     onFiltersChange({})
   }
 
-  const hasActiveFilters = Object.values(filters).some(value => value && value !== "all")
+  const hasActiveFilters = Object.values(filters).some((value) => value && value !== "all")
 
   return (
     <Card>
@@ -81,10 +80,10 @@ export function QueueFilters({
             <Label htmlFor="status-filter">Status</Label>
             <Select
               value={filters.status || "all"}
-              onValueChange={(value) => 
-                onFiltersChange({ 
-                  ...filters, 
-                  status: value === "all" ? undefined : value 
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  status: value === "all" ? undefined : value,
                 })
               }
             >
@@ -107,10 +106,10 @@ export function QueueFilters({
             <Label htmlFor="type-filter">Type</Label>
             <Select
               value={filters.type || "all"}
-              onValueChange={(value) => 
-                onFiltersChange({ 
-                  ...filters, 
-                  type: value === "all" ? undefined : value 
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  type: value === "all" ? undefined : value,
                 })
               }
             >
@@ -131,10 +130,10 @@ export function QueueFilters({
             <Label htmlFor="source-filter">Source</Label>
             <Select
               value={filters.source || "all"}
-              onValueChange={(value) => 
-                onFiltersChange({ 
-                  ...filters, 
-                  source: value === "all" ? undefined : value 
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  source: value === "all" ? undefined : value,
                 })
               }
             >
@@ -158,10 +157,10 @@ export function QueueFilters({
           <Label htmlFor="date-range">Date Range</Label>
           <Select
             value={filters.dateRange || "all"}
-            onValueChange={(value) => 
-              onFiltersChange({ 
-                ...filters, 
-                dateRange: value === "all" ? undefined : value 
+            onValueChange={(value) =>
+              onFiltersChange({
+                ...filters,
+                dateRange: value === "all" ? undefined : value,
               })
             }
           >
@@ -185,7 +184,7 @@ export function QueueFilters({
             <Calendar className="h-4 w-4" />
             <span className="font-medium">Sorting</span>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="sort-by">Sort By</Label>
@@ -207,8 +206,8 @@ export function QueueFilters({
 
             <div className="space-y-2">
               <Label htmlFor="sort-order">Sort Order</Label>
-              <Select 
-                value={sortOrder} 
+              <Select
+                value={sortOrder}
                 onValueChange={(value) => onSortOrderChange(value as "asc" | "desc")}
               >
                 <SelectTrigger id="sort-order">

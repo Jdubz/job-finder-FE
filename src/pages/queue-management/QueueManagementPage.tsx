@@ -5,19 +5,17 @@ import type { QueueItem, QueueStats } from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  RefreshCw, 
-  Search, 
-  Filter,
-  RotateCcw,
-  Trash2,
-  AlertCircle,
-  Activity
-} from "lucide-react"
+import { RefreshCw, Search, Filter, RotateCcw, Trash2, AlertCircle, Activity } from "lucide-react"
 import { QueueItemCard } from "./components/QueueItemCard"
 import { QueueStatsGrid } from "./components/QueueStatsGrid"
 import { QueueFilters } from "./components/QueueFilters"
@@ -53,7 +51,7 @@ export function QueueManagementPage() {
     }
 
     loadQueueData()
-    
+
     // Set up auto-refresh every 30 seconds
     const interval = setInterval(loadQueueData, 30000)
     return () => clearInterval(interval)
@@ -69,9 +67,9 @@ export function QueueManagementPage() {
     try {
       const [items, stats] = await Promise.all([
         jobQueueClient.getQueueItems(),
-        jobQueueClient.getQueueStats()
+        jobQueueClient.getQueueStats(),
       ])
-      
+
       setQueueItems(items)
       setQueueStats(stats)
       setAlert(null)
@@ -79,7 +77,7 @@ export function QueueManagementPage() {
       console.error("Failed to load queue data:", error)
       setAlert({
         type: "error",
-        message: "Failed to load queue data. Please try again."
+        message: "Failed to load queue data. Please try again.",
       })
     } finally {
       setLoading(false)
@@ -97,23 +95,24 @@ export function QueueManagementPage() {
 
     // Apply filters
     if (filters.status && filters.status !== "all") {
-      filtered = filtered.filter(item => item.status === filters.status)
+      filtered = filtered.filter((item) => item.status === filters.status)
     }
-    
+
     if (filters.type && filters.type !== "all") {
-      filtered = filtered.filter(item => item.type === filters.type)
+      filtered = filtered.filter((item) => item.type === filters.type)
     }
-    
+
     if (filters.source && filters.source !== "all") {
-      filtered = filtered.filter(item => item.source === filters.source)
+      filtered = filtered.filter((item) => item.source === filters.source)
     }
-    
+
     if (filters.search) {
       const searchLower = filters.search.toLowerCase()
-      filtered = filtered.filter(item => 
-        item.url.toLowerCase().includes(searchLower) ||
-        item.company_name.toLowerCase().includes(searchLower) ||
-        item.result_message?.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (item) =>
+          item.url.toLowerCase().includes(searchLower) ||
+          item.company_name.toLowerCase().includes(searchLower) ||
+          item.result_message?.toLowerCase().includes(searchLower)
       )
     }
 
@@ -123,20 +122,20 @@ export function QueueManagementPage() {
       let aValue: any = a[sortBy as keyof QueueItem]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let bValue: any = b[sortBy as keyof QueueItem]
-      
+
       // Handle dates
       if (aValue instanceof Date) {
         aValue = aValue.getTime()
       } else if (aValue?.toDate) {
         aValue = aValue.toDate().getTime()
       }
-      
+
       if (bValue instanceof Date) {
         bValue = bValue.getTime()
       } else if (bValue?.toDate) {
         bValue = bValue.toDate().getTime()
       }
-      
+
       if (sortOrder === "asc") {
         return aValue > bValue ? 1 : -1
       } else {
@@ -152,14 +151,14 @@ export function QueueManagementPage() {
       await jobQueueClient.retryQueueItem(id)
       setAlert({
         type: "success",
-        message: "Queue item queued for retry"
+        message: "Queue item queued for retry",
       })
       await loadQueueData()
     } catch (error) {
       console.error("Failed to retry item:", error)
       setAlert({
         type: "error",
-        message: "Failed to retry queue item"
+        message: "Failed to retry queue item",
       })
     }
   }
@@ -168,15 +167,15 @@ export function QueueManagementPage() {
     try {
       await jobQueueClient.cancelQueueItem(id)
       setAlert({
-        type: "success", 
-        message: "Queue item cancelled"
+        type: "success",
+        message: "Queue item cancelled",
       })
       await loadQueueData()
     } catch (error) {
       console.error("Failed to cancel item:", error)
       setAlert({
         type: "error",
-        message: "Failed to cancel queue item"
+        message: "Failed to cancel queue item",
       })
     }
   }
@@ -185,23 +184,21 @@ export function QueueManagementPage() {
     if (selectedItems.size === 0) return
 
     try {
-      const promises = Array.from(selectedItems).map(id =>
-        action === "retry" 
-          ? jobQueueClient.retryQueueItem(id)
-          : jobQueueClient.cancelQueueItem(id)
+      const promises = Array.from(selectedItems).map((id) =>
+        action === "retry" ? jobQueueClient.retryQueueItem(id) : jobQueueClient.cancelQueueItem(id)
       )
-      
+
       await Promise.all(promises)
       setAlert({
         type: "success",
-        message: `${action === "retry" ? "Retried" : "Cancelled"} ${selectedItems.size} items`
+        message: `${action === "retry" ? "Retried" : "Cancelled"} ${selectedItems.size} items`,
       })
       setSelectedItems(new Set())
       await loadQueueData()
     } catch {
       setAlert({
         type: "error",
-        message: `Failed to ${action} selected items`
+        message: `Failed to ${action} selected items`,
       })
     }
   }
@@ -211,9 +208,7 @@ export function QueueManagementPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Please sign in to access queue management
-          </p>
+          <p className="text-muted-foreground mt-2">Please sign in to access queue management</p>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -230,9 +225,7 @@ export function QueueManagementPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Monitor and manage the job processing queue
-          </p>
+          <p className="text-muted-foreground mt-2">Monitor and manage the job processing queue</p>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -249,37 +242,22 @@ export function QueueManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Monitor and manage the job processing queue
-          </p>
+          <p className="text-muted-foreground mt-2">Monitor and manage the job processing queue</p>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
-          
+
           {selectedItems.size > 0 && (
             <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkAction("retry")}
-              >
+              <Button variant="outline" size="sm" onClick={() => handleBulkAction("retry")}>
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Retry ({selectedItems.size})
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBulkAction("cancel")}
-              >
+              <Button variant="outline" size="sm" onClick={() => handleBulkAction("cancel")}>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Cancel ({selectedItems.size})
               </Button>
@@ -302,8 +280,8 @@ export function QueueManagementPage() {
             <Skeleton key={i} className="h-24" />
           ))}
         </div>
-      ) : queueStats && (
-        <QueueStatsGrid stats={queueStats} />
+      ) : (
+        queueStats && <QueueStatsGrid stats={queueStats} />
       )}
 
       {/* Queue Management Interface */}
@@ -326,7 +304,9 @@ export function QueueManagementPage() {
               <label className="text-sm font-medium">Status:</label>
               <Select
                 value={filters.status || "all"}
-                onValueChange={(value) => setFilters({ ...filters, status: value === "all" ? undefined : value })}
+                onValueChange={(value) =>
+                  setFilters({ ...filters, status: value === "all" ? undefined : value })
+                }
               >
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -347,7 +327,9 @@ export function QueueManagementPage() {
               <label className="text-sm font-medium">Type:</label>
               <Select
                 value={filters.type || "all"}
-                onValueChange={(value) => setFilters({ ...filters, type: value === "all" ? undefined : value })}
+                onValueChange={(value) =>
+                  setFilters({ ...filters, type: value === "all" ? undefined : value })
+                }
               >
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -386,10 +368,9 @@ export function QueueManagementPage() {
                 <Activity className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                 <h3 className="text-lg font-medium text-muted-foreground mb-2">No Queue Items</h3>
                 <p className="text-sm text-muted-foreground">
-                  {queueItems.length === 0 
+                  {queueItems.length === 0
                     ? "The queue is empty."
-                    : "No items match the current filters."
-                  }
+                    : "No items match the current filters."}
                 </p>
               </CardContent>
             </Card>
@@ -418,7 +399,7 @@ export function QueueManagementPage() {
         </TabsContent>
 
         <TabsContent value="filters">
-          <QueueFilters 
+          <QueueFilters
             filters={filters}
             onFiltersChange={setFilters}
             sortBy={sortBy}

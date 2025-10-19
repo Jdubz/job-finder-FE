@@ -1,14 +1,7 @@
 import type { SystemHealthMetrics } from "@/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Clock,
-  Zap,
-  Database
-} from "lucide-react"
+import { TrendingUp, TrendingDown, Activity, Clock, Zap, Database } from "lucide-react"
 
 interface HealthChartProps {
   metrics: SystemHealthMetrics
@@ -19,43 +12,43 @@ export function HealthChart({ metrics }: HealthChartProps) {
   const generateMockData = () => {
     const data = []
     const now = Date.now()
-    
+
     for (let i = 23; i >= 0; i--) {
-      const timestamp = now - (i * 60 * 60 * 1000) // Last 24 hours
+      const timestamp = now - i * 60 * 60 * 1000 // Last 24 hours
       data.push({
         time: new Date(timestamp),
         apiResponse: Math.random() * 300 + 100, // 100-400ms
-        dbResponse: Math.random() * 50 + 20,    // 20-70ms
+        dbResponse: Math.random() * 50 + 20, // 20-70ms
         queueItems: Math.floor(Math.random() * 100) + 50,
         aiRequests: Math.floor(Math.random() * 50) + 10,
         errorRate: Math.random() * 0.05, // 0-5%
       })
     }
-    
+
     return data
   }
 
   const historicalData = generateMockData()
-  
+
   const getPerformanceTrend = (current: number, historical: number[]) => {
     const average = historical.reduce((sum, val) => sum + val, 0) / historical.length
     const change = ((current - average) / average) * 100
-    
+
     return {
       change: Math.abs(change),
-      direction: change > 0 ? 'up' : 'down',
-      isGood: change < 0 // For response times, lower is better
+      direction: change > 0 ? "up" : "down",
+      isGood: change < 0, // For response times, lower is better
     }
   }
 
   const apiResponseTrend = getPerformanceTrend(
     metrics.api.responseTime,
-    historicalData.map(d => d.apiResponse)
+    historicalData.map((d) => d.apiResponse)
   )
-  
+
   const dbResponseTrend = getPerformanceTrend(
     metrics.database.responseTime,
-    historicalData.map(d => d.dbResponse)
+    historicalData.map((d) => d.dbResponse)
   )
 
   return (
@@ -72,16 +65,18 @@ export function HealthChart({ metrics }: HealthChartProps) {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold">
-                  {Math.round(metrics.api.responseTime)}ms
-                </div>
+                <div className="text-2xl font-bold">{Math.round(metrics.api.responseTime)}ms</div>
                 <div className="flex items-center gap-1 text-xs">
-                  {apiResponseTrend.direction === 'up' ? (
-                    <TrendingUp className={`h-3 w-3 ${apiResponseTrend.isGood ? 'text-red-500' : 'text-green-500'}`} />
+                  {apiResponseTrend.direction === "up" ? (
+                    <TrendingUp
+                      className={`h-3 w-3 ${apiResponseTrend.isGood ? "text-red-500" : "text-green-500"}`}
+                    />
                   ) : (
-                    <TrendingDown className={`h-3 w-3 ${apiResponseTrend.isGood ? 'text-green-500' : 'text-red-500'}`} />
+                    <TrendingDown
+                      className={`h-3 w-3 ${apiResponseTrend.isGood ? "text-green-500" : "text-red-500"}`}
+                    />
                   )}
-                  <span className={apiResponseTrend.isGood ? 'text-green-500' : 'text-red-500'}>
+                  <span className={apiResponseTrend.isGood ? "text-green-500" : "text-red-500"}>
                     {apiResponseTrend.change.toFixed(1)}%
                   </span>
                 </div>
@@ -107,12 +102,16 @@ export function HealthChart({ metrics }: HealthChartProps) {
                   {Math.round(metrics.database.responseTime)}ms
                 </div>
                 <div className="flex items-center gap-1 text-xs">
-                  {dbResponseTrend.direction === 'up' ? (
-                    <TrendingUp className={`h-3 w-3 ${dbResponseTrend.isGood ? 'text-red-500' : 'text-green-500'}`} />
+                  {dbResponseTrend.direction === "up" ? (
+                    <TrendingUp
+                      className={`h-3 w-3 ${dbResponseTrend.isGood ? "text-red-500" : "text-green-500"}`}
+                    />
                   ) : (
-                    <TrendingDown className={`h-3 w-3 ${dbResponseTrend.isGood ? 'text-green-500' : 'text-red-500'}`} />
+                    <TrendingDown
+                      className={`h-3 w-3 ${dbResponseTrend.isGood ? "text-green-500" : "text-red-500"}`}
+                    />
                   )}
-                  <span className={dbResponseTrend.isGood ? 'text-green-500' : 'text-red-500'}>
+                  <span className={dbResponseTrend.isGood ? "text-green-500" : "text-red-500"}>
                     {dbResponseTrend.change.toFixed(1)}%
                   </span>
                 </div>
@@ -184,16 +183,18 @@ export function HealthChart({ metrics }: HealthChartProps) {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium">API Response Time</span>
-                <span className="text-xs text-muted-foreground">Current: {Math.round(metrics.api.responseTime)}ms</span>
+                <span className="text-xs text-muted-foreground">
+                  Current: {Math.round(metrics.api.responseTime)}ms
+                </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all ${
-                    metrics.api.responseTime > 500 
-                      ? 'bg-red-500' 
-                      : metrics.api.responseTime > 200 
-                        ? 'bg-yellow-500' 
-                        : 'bg-green-500'
+                    metrics.api.responseTime > 500
+                      ? "bg-red-500"
+                      : metrics.api.responseTime > 200
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
                   }`}
                   style={{ width: `${Math.min((metrics.api.responseTime / 1000) * 100, 100)}%` }}
                 />
@@ -204,18 +205,22 @@ export function HealthChart({ metrics }: HealthChartProps) {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium">Database Response Time</span>
-                <span className="text-xs text-muted-foreground">Current: {Math.round(metrics.database.responseTime)}ms</span>
+                <span className="text-xs text-muted-foreground">
+                  Current: {Math.round(metrics.database.responseTime)}ms
+                </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all ${
-                    metrics.database.responseTime > 100 
-                      ? 'bg-red-500' 
-                      : metrics.database.responseTime > 50 
-                        ? 'bg-yellow-500' 
-                        : 'bg-green-500'
+                    metrics.database.responseTime > 100
+                      ? "bg-red-500"
+                      : metrics.database.responseTime > 50
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
                   }`}
-                  style={{ width: `${Math.min((metrics.database.responseTime / 200) * 100, 100)}%` }}
+                  style={{
+                    width: `${Math.min((metrics.database.responseTime / 200) * 100, 100)}%`,
+                  }}
                 />
               </div>
             </div>
@@ -229,16 +234,16 @@ export function HealthChart({ metrics }: HealthChartProps) {
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all ${
-                    (metrics.queue.pendingItems + metrics.queue.processingItems) > 50 
-                      ? 'bg-red-500' 
-                      : (metrics.queue.pendingItems + metrics.queue.processingItems) > 20 
-                        ? 'bg-yellow-500' 
-                        : 'bg-green-500'
+                    metrics.queue.pendingItems + metrics.queue.processingItems > 50
+                      ? "bg-red-500"
+                      : metrics.queue.pendingItems + metrics.queue.processingItems > 20
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
                   }`}
-                  style={{ 
-                    width: `${Math.min(((metrics.queue.pendingItems + metrics.queue.processingItems) / 100) * 100, 100)}%` 
+                  style={{
+                    width: `${Math.min(((metrics.queue.pendingItems + metrics.queue.processingItems) / 100) * 100, 100)}%`,
                   }}
                 />
               </div>
@@ -253,13 +258,13 @@ export function HealthChart({ metrics }: HealthChartProps) {
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full transition-all ${
-                    metrics.ai.successRate > 0.95 
-                      ? 'bg-green-500' 
-                      : metrics.ai.successRate > 0.90 
-                        ? 'bg-yellow-500' 
-                        : 'bg-red-500'
+                    metrics.ai.successRate > 0.95
+                      ? "bg-green-500"
+                      : metrics.ai.successRate > 0.9
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
                   }`}
                   style={{ width: `${metrics.ai.successRate * 100}%` }}
                 />
@@ -277,7 +282,7 @@ export function HealthChart({ metrics }: HealthChartProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-500">
-              {Math.round(Math.max(...historicalData.map(d => d.apiResponse)))}ms
+              {Math.round(Math.max(...historicalData.map((d) => d.apiResponse)))}ms
             </div>
             <p className="text-xs text-muted-foreground">Highest in last 24h</p>
           </CardContent>
@@ -289,7 +294,9 @@ export function HealthChart({ metrics }: HealthChartProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-500">
-              {Math.round(historicalData.reduce((sum, d) => sum + d.queueItems, 0) / historicalData.length)}
+              {Math.round(
+                historicalData.reduce((sum, d) => sum + d.queueItems, 0) / historicalData.length
+              )}
             </div>
             <p className="text-xs text-muted-foreground">24h average</p>
           </CardContent>

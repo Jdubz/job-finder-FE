@@ -3,16 +3,16 @@ import type { ContentItemWithChildren, CompanyItem } from "@/types/content-items
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Building2, 
-  MapPin, 
-  Calendar, 
-  Edit2, 
-  Trash2, 
+import {
+  Building2,
+  MapPin,
+  Calendar,
+  Edit2,
+  Trash2,
   ExternalLink,
   ChevronDown,
   ChevronRight,
-  FolderOpen
+  FolderOpen,
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -39,11 +39,11 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
     try {
       const start = new Date(startDate + "-01") // Add day to YYYY-MM format
       const startFormatted = format(start, "MMM yyyy")
-      
+
       if (!endDate) {
         return `${startFormatted} - Present`
       }
-      
+
       const end = new Date(endDate + "-01")
       const endFormatted = format(end, "MMM yyyy")
       return `${startFormatted} - ${endFormatted}`
@@ -69,7 +69,8 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
       {items.map((item) => {
         const company = item as CompanyItem & { children?: ContentItemWithChildren[] }
         const isExpanded = expandedCompanies.has(company.id)
-        const projectCount = company.children?.filter(child => child.type === "project").length || 0
+        const projectCount =
+          company.children?.filter((child) => child.type === "project").length || 0
 
         return (
           <Card key={company.id} className="relative">
@@ -83,9 +84,9 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                     </CardTitle>
                     {company.website && (
                       <Button variant="ghost" size="sm" asChild>
-                        <a 
-                          href={company.website} 
-                          target="_blank" 
+                        <a
+                          href={company.website}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="p-1 h-auto"
                         >
@@ -94,11 +95,11 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                       </Button>
                     )}
                   </div>
-                  
+
                   {company.role && (
                     <p className="text-lg font-medium text-foreground mb-1">{company.role}</p>
                   )}
-                  
+
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -119,11 +120,7 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEdit(company)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => onEdit(company)}>
                     <Edit2 className="h-4 w-4" />
                   </Button>
                   <Button
@@ -142,9 +139,7 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
               {company.summary && (
                 <div>
                   <h4 className="font-medium mb-2">Summary</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {company.summary}
-                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{company.summary}</p>
                 </div>
               )}
 
@@ -153,7 +148,10 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                   <h4 className="font-medium mb-2">Key Accomplishments</h4>
                   <ul className="space-y-1">
                     {company.accomplishments.map((accomplishment, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <li
+                        key={index}
+                        className="text-sm text-muted-foreground flex items-start gap-2"
+                      >
                         <span className="text-blue-600 mt-1.5 text-xs">•</span>
                         <span className="leading-relaxed">{accomplishment}</span>
                       </li>
@@ -189,13 +187,13 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                       <ChevronRight className="h-4 w-4 mr-1" />
                     )}
                     <FolderOpen className="h-4 w-4 mr-2" />
-                    {projectCount} Project{projectCount !== 1 ? 's' : ''}
+                    {projectCount} Project{projectCount !== 1 ? "s" : ""}
                   </Button>
 
                   {isExpanded && company.children && (
                     <div className="space-y-3 ml-6">
                       {company.children
-                        .filter(child => child.type === "project")
+                        .filter((child) => child.type === "project")
                         .map((project) => (
                           <Card key={project.id} className="bg-muted/30">
                             <CardContent className="p-4">
@@ -220,13 +218,13 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
                                   </Button>
                                 </div>
                               </div>
-                              
+
                               {project.description && (
                                 <p className="text-sm text-muted-foreground mb-2">
                                   {project.description}
                                 </p>
                               )}
-                              
+
                               {project.technologies && project.technologies.length > 0 && (
                                 <div className="flex flex-wrap gap-1">
                                   {project.technologies.map((tech) => (
@@ -247,9 +245,7 @@ export function CompanyList({ items, onEdit, onDelete }: CompanyListProps) {
               {company.notes && (
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2">Notes</h4>
-                  <p className="text-sm text-muted-foreground italic">
-                    {company.notes}
-                  </p>
+                  <p className="text-sm text-muted-foreground italic">{company.notes}</p>
                 </div>
               )}
             </CardContent>

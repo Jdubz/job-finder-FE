@@ -3,7 +3,13 @@ import { useAuth } from "@/contexts/AuthContext"
 import { jobMatchesClient } from "@/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Search, SlidersHorizontal } from "lucide-react"
@@ -31,13 +37,10 @@ export function JobApplicationsPage() {
       return
     }
 
-    const unsubscribe = jobMatchesClient.subscribeToMatches(
-      user.uid,
-      (updatedMatches) => {
-        setMatches(updatedMatches)
-        setLoading(false)
-      }
-    )
+    const unsubscribe = jobMatchesClient.subscribeToMatches(user.uid, (updatedMatches) => {
+      setMatches(updatedMatches)
+      setLoading(false)
+    })
 
     return () => unsubscribe()
   }, [user])
@@ -114,9 +117,7 @@ export function JobApplicationsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Job Applications</h1>
-        <p className="text-muted-foreground mt-2">
-          AI-matched opportunities ranked by relevance
-        </p>
+        <p className="text-muted-foreground mt-2">AI-matched opportunities ranked by relevance</p>
       </div>
 
       {/* Stats Overview */}
@@ -141,9 +142,7 @@ export function JobApplicationsPage() {
           <div className="bg-green-100 dark:bg-green-950 p-4 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
               {matches.length > 0
-                ? Math.round(
-                    matches.reduce((sum, m) => sum + m.matchScore, 0) / matches.length
-                  )
+                ? Math.round(matches.reduce((sum, m) => sum + m.matchScore, 0) / matches.length)
                 : 0}
               %
             </div>
@@ -222,18 +221,14 @@ export function JobApplicationsPage() {
           <p className="text-muted-foreground mb-4">
             Submit job URLs in the Job Finder to get AI-powered matches
           </p>
-          <Button onClick={() => (window.location.href = "/job-finder")}>
-            Go to Job Finder
-          </Button>
+          <Button onClick={() => (window.location.href = "/job-finder")}>Go to Job Finder</Button>
         </div>
       )}
 
       {/* No Results After Filter */}
       {!loading && matches.length > 0 && filteredMatches.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            No matches found for your current filters
-          </p>
+          <p className="text-muted-foreground">No matches found for your current filters</p>
           <Button
             variant="outline"
             className="mt-4"
@@ -251,11 +246,7 @@ export function JobApplicationsPage() {
       {!loading && filteredMatches.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredMatches.map((match) => (
-            <JobMatchCard
-              key={match.id}
-              match={match}
-              onViewDetails={handleViewDetails}
-            />
+            <JobMatchCard key={match.id} match={match} onViewDetails={handleViewDetails} />
           ))}
         </div>
       )}

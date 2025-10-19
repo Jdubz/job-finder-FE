@@ -1,7 +1,7 @@
 import type { SystemHealthMetrics } from "@/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
+import {
   Activity,
   Clock,
   Database,
@@ -11,7 +11,7 @@ import {
   XCircle,
   AlertTriangle,
   Timer,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -38,7 +38,7 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
       case "healthy":
         return "default"
       case "degraded":
-        return "secondary" 
+        return "secondary"
       case "unhealthy":
         return "destructive"
       default:
@@ -69,7 +69,15 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant={getStatusBadgeVariant(metrics.api.status) as "default" | "secondary" | "destructive" | "outline"}>
+            <Badge
+              variant={
+                getStatusBadgeVariant(metrics.api.status) as
+                  | "default"
+                  | "secondary"
+                  | "destructive"
+                  | "outline"
+              }
+            >
               {metrics.api.status.toUpperCase()}
             </Badge>
             <span className="text-xs text-muted-foreground">v{metrics.api.version}</span>
@@ -92,7 +100,15 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant={getStatusBadgeVariant(metrics.queue.status) as "default" | "secondary" | "destructive" | "outline"}>
+            <Badge
+              variant={
+                getStatusBadgeVariant(metrics.queue.status) as
+                  | "default"
+                  | "secondary"
+                  | "destructive"
+                  | "outline"
+              }
+            >
               {metrics.queue.status.toUpperCase()}
             </Badge>
             <span className="text-xs text-muted-foreground">{metrics.queue.totalItems} total</span>
@@ -117,10 +133,20 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant={getStatusBadgeVariant(metrics.database.status) as "default" | "secondary" | "destructive" | "outline"}>
+            <Badge
+              variant={
+                getStatusBadgeVariant(metrics.database.status) as
+                  | "default"
+                  | "secondary"
+                  | "destructive"
+                  | "outline"
+              }
+            >
               {metrics.database.status.toUpperCase()}
             </Badge>
-            <span className="text-xs text-muted-foreground">{metrics.database.connectionCount} conn</span>
+            <span className="text-xs text-muted-foreground">
+              {metrics.database.connectionCount} conn
+            </span>
           </div>
           <div className="space-y-1 text-xs text-muted-foreground">
             <div>Response: {Math.round(metrics.database.responseTime)}ms</div>
@@ -140,7 +166,15 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant={getStatusBadgeVariant(metrics.ai.status) as "default" | "secondary" | "destructive" | "outline"}>
+            <Badge
+              variant={
+                getStatusBadgeVariant(metrics.ai.status) as
+                  | "default"
+                  | "secondary"
+                  | "destructive"
+                  | "outline"
+              }
+            >
               {metrics.ai.status.toUpperCase()}
             </Badge>
             <span className="text-xs text-muted-foreground">
@@ -170,7 +204,15 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant={getStatusBadgeVariant(metrics.storage.status) as "default" | "secondary" | "destructive" | "outline"}>
+            <Badge
+              variant={
+                getStatusBadgeVariant(metrics.storage.status) as
+                  | "default"
+                  | "secondary"
+                  | "destructive"
+                  | "outline"
+              }
+            >
               {metrics.storage.status.toUpperCase()}
             </Badge>
             <span className="text-xs text-muted-foreground">
@@ -205,19 +247,31 @@ export function HealthMetricsGrid({ metrics }: HealthMetricsGridProps) {
             </div>
             <div className="flex justify-between text-xs">
               <span>DB Response</span>
-              <span className={metrics.database.responseTime > 100 ? "text-yellow-500" : "text-green-500"}>
+              <span
+                className={
+                  metrics.database.responseTime > 100 ? "text-yellow-500" : "text-green-500"
+                }
+              >
                 {Math.round(metrics.database.responseTime)}ms
               </span>
             </div>
             <div className="flex justify-between text-xs">
               <span>Queue Processing</span>
-              <span className={metrics.queue.avgProcessingTime > 30000 ? "text-red-500" : "text-green-500"}>
+              <span
+                className={
+                  metrics.queue.avgProcessingTime > 30000 ? "text-red-500" : "text-green-500"
+                }
+              >
                 {formatDuration(metrics.queue.avgProcessingTime)}
               </span>
             </div>
             <div className="flex justify-between text-xs">
               <span>AI Response</span>
-              <span className={metrics.ai.avgResponseTime > 10000 ? "text-yellow-500" : "text-green-500"}>
+              <span
+                className={
+                  metrics.ai.avgResponseTime > 10000 ? "text-yellow-500" : "text-green-500"
+                }
+              >
                 {formatDuration(metrics.ai.avgResponseTime)}
               </span>
             </div>

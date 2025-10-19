@@ -2,16 +2,15 @@ import type { SystemLogs } from "@/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useState } from "react"
-import { 
-  AlertCircle,
-  Info,
-  AlertTriangle,
-  XCircle,
-  Search,
-  Filter
-} from "lucide-react"
+import { AlertCircle, Info, AlertTriangle, XCircle, Search, Filter } from "lucide-react"
 import { format } from "date-fns"
 
 interface SystemLogsPanelProps {
@@ -54,19 +53,20 @@ export function SystemLogsPanel({ logs }: SystemLogsPanelProps) {
   }
 
   // Filter logs based on search and filters
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = !searchTerm || 
+  const filteredLogs = logs.filter((log) => {
+    const matchesSearch =
+      !searchTerm ||
       log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.component.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const matchesLevel = levelFilter === "all" || log.level === levelFilter
     const matchesComponent = componentFilter === "all" || log.component === componentFilter
-    
+
     return matchesSearch && matchesLevel && matchesComponent
   })
 
   // Get unique components for filter dropdown
-  const uniqueComponents = Array.from(new Set(logs.map(log => log.component)))
+  const uniqueComponents = Array.from(new Set(logs.map((log) => log.component)))
 
   if (logs.length === 0) {
     return (
@@ -103,7 +103,7 @@ export function SystemLogsPanel({ logs }: SystemLogsPanelProps) {
                 className="w-64"
               />
             </div>
-            
+
             <Select value={levelFilter} onValueChange={setLevelFilter}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Level" />
@@ -116,21 +116,21 @@ export function SystemLogsPanel({ logs }: SystemLogsPanelProps) {
                 <SelectItem value="debug">Debug</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select value={componentFilter} onValueChange={setComponentFilter}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Component" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Components</SelectItem>
-                {uniqueComponents.map(component => (
+                {uniqueComponents.map((component) => (
                   <SelectItem key={component} value={component}>
                     {component}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            
+
             <div className="text-sm text-muted-foreground">
               Showing {filteredLogs.length} of {logs.length} logs
             </div>
@@ -161,21 +161,28 @@ export function SystemLogsPanel({ logs }: SystemLogsPanelProps) {
                       {format(log.timestamp, "HH:mm:ss")}
                     </span>
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge variant={getLevelBadgeVariant(log.level) as "default" | "secondary" | "destructive" | "outline"} className="text-xs">
+                      <Badge
+                        variant={
+                          getLevelBadgeVariant(log.level) as
+                            | "default"
+                            | "secondary"
+                            | "destructive"
+                            | "outline"
+                        }
+                        className="text-xs"
+                      >
                         {log.level.toUpperCase()}
                       </Badge>
                       <Badge variant="outline" className="text-xs">
                         {log.component}
                       </Badge>
                     </div>
-                    
-                    <p className="text-sm text-foreground">
-                      {log.message}
-                    </p>
-                    
+
+                    <p className="text-sm text-foreground">{log.message}</p>
+
                     {log.details && (
                       <div className="mt-2 p-2 bg-muted rounded text-xs font-mono text-muted-foreground">
                         <pre className="whitespace-pre-wrap">
@@ -200,25 +207,25 @@ export function SystemLogsPanel({ logs }: SystemLogsPanelProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-xl font-bold text-red-500">
-                {logs.filter(log => log.level === "error").length}
+                {logs.filter((log) => log.level === "error").length}
               </div>
               <div className="text-xs text-muted-foreground">Errors</div>
             </div>
             <div>
               <div className="text-xl font-bold text-yellow-500">
-                {logs.filter(log => log.level === "warn").length}
+                {logs.filter((log) => log.level === "warn").length}
               </div>
               <div className="text-xs text-muted-foreground">Warnings</div>
             </div>
             <div>
               <div className="text-xl font-bold text-blue-500">
-                {logs.filter(log => log.level === "info").length}
+                {logs.filter((log) => log.level === "info").length}
               </div>
               <div className="text-xs text-muted-foreground">Info</div>
             </div>
             <div>
               <div className="text-xl font-bold text-gray-500">
-                {logs.filter(log => log.level === "debug").length}
+                {logs.filter((log) => log.level === "debug").length}
               </div>
               <div className="text-xs text-muted-foreground">Debug</div>
             </div>

@@ -8,8 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { 
-  RefreshCw, 
+import {
+  RefreshCw,
   AlertCircle,
   Activity,
   Database,
@@ -19,7 +19,7 @@ import {
   XCircle,
   AlertTriangle,
   TrendingUp,
-  Gauge
+  Gauge,
 } from "lucide-react"
 import { format } from "date-fns"
 import { HealthMetricsGrid } from "./components/HealthMetricsGrid"
@@ -45,7 +45,7 @@ export function SystemHealthPage() {
     }
 
     loadSystemHealth()
-    
+
     const interval = setInterval(loadSystemHealth, 30000)
     return () => clearInterval(interval)
   }, [user, isEditor])
@@ -55,9 +55,9 @@ export function SystemHealthPage() {
       const [metrics, alertsData, logsData] = await Promise.all([
         systemHealthClient.getHealthMetrics(),
         systemHealthClient.getSystemAlerts(),
-        systemHealthClient.getSystemLogs(50)
+        systemHealthClient.getSystemLogs(50),
       ])
-      
+
       setHealthMetrics(metrics)
       setAlerts(alertsData)
       setLogs(logsData)
@@ -86,7 +86,7 @@ export function SystemHealthPage() {
       } else {
         setError(result.message)
       }
-    } catch (err) {
+    } catch {
       setError("Health check failed")
     }
   }
@@ -94,9 +94,9 @@ export function SystemHealthPage() {
   const handleResolveAlert = async (alertId: string) => {
     try {
       await systemHealthClient.resolveAlert(alertId)
-      setAlerts(prev => prev.map(alert => 
-        alert.id === alertId ? { ...alert, resolved: true } : alert
-      ))
+      setAlerts((prev) =>
+        prev.map((alert) => (alert.id === alertId ? { ...alert, resolved: true } : alert))
+      )
     } catch (err) {
       console.error("Failed to resolve alert:", err)
     }
@@ -104,17 +104,17 @@ export function SystemHealthPage() {
 
   const getOverallHealthStatus = () => {
     if (!healthMetrics) return "unknown"
-    
+
     const components = [
       healthMetrics.api.status,
       healthMetrics.queue.status,
       healthMetrics.database.status,
       healthMetrics.ai.status,
-      healthMetrics.storage.status
+      healthMetrics.storage.status,
     ]
-    
-    if (components.some(status => status === "unhealthy")) return "unhealthy"
-    if (components.some(status => status === "degraded")) return "degraded"
+
+    if (components.some((status) => status === "unhealthy")) return "unhealthy"
+    if (components.some((status) => status === "degraded")) return "degraded"
     return "healthy"
   }
 
@@ -183,7 +183,7 @@ export function SystemHealthPage() {
   }
 
   const overallStatus = getOverallHealthStatus()
-  const unresolvedAlerts = alerts.filter(alert => !alert.resolved)
+  const unresolvedAlerts = alerts.filter((alert) => !alert.resolved)
 
   return (
     <div className="space-y-6">
@@ -195,23 +195,14 @@ export function SystemHealthPage() {
             Monitor system health, performance metrics, and alerts
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRunHealthCheck}
-          >
+
+          <Button variant="outline" size="sm" onClick={handleRunHealthCheck}>
             <Activity className="h-4 w-4 mr-2" />
             Run Check
           </Button>
@@ -239,14 +230,22 @@ export function SystemHealthPage() {
                 </CardDescription>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Badge variant={getStatusBadgeVariant(overallStatus) as "default" | "secondary" | "destructive" | "outline"}>
+              <Badge
+                variant={
+                  getStatusBadgeVariant(overallStatus) as
+                    | "default"
+                    | "secondary"
+                    | "destructive"
+                    | "outline"
+                }
+              >
                 {overallStatus.toUpperCase()}
               </Badge>
               {unresolvedAlerts.length > 0 && (
                 <Badge variant="destructive">
-                  {unresolvedAlerts.length} Alert{unresolvedAlerts.length !== 1 ? 's' : ''}
+                  {unresolvedAlerts.length} Alert{unresolvedAlerts.length !== 1 ? "s" : ""}
                 </Badge>
               )}
             </div>
@@ -261,8 +260,8 @@ export function SystemHealthPage() {
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
-      ) : healthMetrics && (
-        <HealthMetricsGrid metrics={healthMetrics} />
+      ) : (
+        healthMetrics && <HealthMetricsGrid metrics={healthMetrics} />
       )}
 
       {/* Detailed Monitoring */}
@@ -294,10 +293,7 @@ export function SystemHealthPage() {
               ))}
             </div>
           ) : (
-            <SystemAlertsPanel 
-              alerts={alerts} 
-              onResolveAlert={handleResolveAlert}
-            />
+            <SystemAlertsPanel alerts={alerts} onResolveAlert={handleResolveAlert} />
           )}
         </TabsContent>
 
@@ -316,8 +312,8 @@ export function SystemHealthPage() {
         <TabsContent value="performance">
           {loading ? (
             <Skeleton className="h-64" />
-          ) : healthMetrics && (
-            <HealthChart metrics={healthMetrics} />
+          ) : (
+            healthMetrics && <HealthChart metrics={healthMetrics} />
           )}
         </TabsContent>
 
@@ -340,9 +336,11 @@ export function SystemHealthPage() {
                         <span>{healthMetrics.database.connectionCount}/20</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-blue-500 transition-all"
-                          style={{ width: `${(healthMetrics.database.connectionCount / 20) * 100}%` }}
+                          style={{
+                            width: `${(healthMetrics.database.connectionCount / 20) * 100}%`,
+                          }}
                         />
                       </div>
                     </div>
@@ -367,13 +365,13 @@ export function SystemHealthPage() {
                         <span>{Math.round(healthMetrics.storage.storageUsed * 100)}%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full transition-all ${
-                            healthMetrics.storage.storageUsed > 0.8 
-                              ? 'bg-red-500' 
-                              : healthMetrics.storage.storageUsed > 0.6 
-                                ? 'bg-yellow-500' 
-                                : 'bg-green-500'
+                            healthMetrics.storage.storageUsed > 0.8
+                              ? "bg-red-500"
+                              : healthMetrics.storage.storageUsed > 0.6
+                                ? "bg-yellow-500"
+                                : "bg-green-500"
                           }`}
                           style={{ width: `${healthMetrics.storage.storageUsed * 100}%` }}
                         />
@@ -398,19 +396,24 @@ export function SystemHealthPage() {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span>API Usage</span>
-                          <span>{healthMetrics.ai.quotaUsage.used}/{healthMetrics.ai.quotaUsage.limit}</span>
+                          <span>
+                            {healthMetrics.ai.quotaUsage.used}/{healthMetrics.ai.quotaUsage.limit}
+                          </span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className={`h-full transition-all ${
-                              (healthMetrics.ai.quotaUsage.used / healthMetrics.ai.quotaUsage.limit) > 0.9 
-                                ? 'bg-red-500' 
-                                : (healthMetrics.ai.quotaUsage.used / healthMetrics.ai.quotaUsage.limit) > 0.7 
-                                  ? 'bg-yellow-500' 
-                                  : 'bg-green-500'
+                              healthMetrics.ai.quotaUsage.used / healthMetrics.ai.quotaUsage.limit >
+                              0.9
+                                ? "bg-red-500"
+                                : healthMetrics.ai.quotaUsage.used /
+                                      healthMetrics.ai.quotaUsage.limit >
+                                    0.7
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
                             }`}
-                            style={{ 
-                              width: `${(healthMetrics.ai.quotaUsage.used / healthMetrics.ai.quotaUsage.limit) * 100}%` 
+                            style={{
+                              width: `${(healthMetrics.ai.quotaUsage.used / healthMetrics.ai.quotaUsage.limit) * 100}%`,
                             }}
                           />
                         </div>

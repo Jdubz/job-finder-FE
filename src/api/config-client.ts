@@ -7,11 +7,7 @@
 
 import { db } from "@/config/firebase"
 import { doc, getDoc, setDoc, updateDoc, Timestamp } from "firebase/firestore"
-import type {
-  StopList,
-  QueueSettings,
-  AISettings,
-} from "@jsdubzw/job-finder-shared-types"
+import type { StopList, QueueSettings, AISettings } from "@jsdubzw/job-finder-shared-types"
 
 export class ConfigClient {
   private collectionName = "job-finder-config"
@@ -48,10 +44,7 @@ export class ConfigClient {
   /**
    * Update stop list configuration
    */
-  async updateStopList(
-    stopList: Partial<StopList>,
-    userEmail: string,
-  ): Promise<void> {
+  async updateStopList(stopList: Partial<StopList>, userEmail: string): Promise<void> {
     const docRef = doc(db, this.collectionName, "stop-list")
     const docSnap = await getDoc(docRef)
 
@@ -85,7 +78,7 @@ export class ConfigClient {
         {
           excludedCompanies: [...excludedCompanies, companyName],
         },
-        userEmail,
+        userEmail
       )
     }
   }
@@ -101,7 +94,7 @@ export class ConfigClient {
       {
         excludedCompanies: excludedCompanies.filter((c) => c !== companyName),
       },
-      userEmail,
+      userEmail
     )
   }
 
@@ -117,7 +110,7 @@ export class ConfigClient {
         {
           excludedKeywords: [...excludedKeywords, keyword],
         },
-        userEmail,
+        userEmail
       )
     }
   }
@@ -133,7 +126,7 @@ export class ConfigClient {
       {
         excludedKeywords: excludedKeywords.filter((k) => k !== keyword),
       },
-      userEmail,
+      userEmail
     )
   }
 
@@ -149,7 +142,7 @@ export class ConfigClient {
         {
           excludedDomains: [...excludedDomains, domain],
         },
-        userEmail,
+        userEmail
       )
     }
   }
@@ -165,7 +158,7 @@ export class ConfigClient {
       {
         excludedDomains: excludedDomains.filter((d) => d !== domain),
       },
-      userEmail,
+      userEmail
     )
   }
 
@@ -186,10 +179,7 @@ export class ConfigClient {
   /**
    * Update queue settings
    */
-  async updateQueueSettings(
-    settings: Partial<QueueSettings>,
-    userEmail: string,
-  ): Promise<void> {
+  async updateQueueSettings(settings: Partial<QueueSettings>, userEmail: string): Promise<void> {
     const docRef = doc(db, this.collectionName, "queue-settings")
     const docSnap = await getDoc(docRef)
 
@@ -228,10 +218,7 @@ export class ConfigClient {
   /**
    * Update AI settings
    */
-  async updateAISettings(
-    settings: Partial<AISettings>,
-    userEmail: string,
-  ): Promise<void> {
+  async updateAISettings(settings: Partial<AISettings>, userEmail: string): Promise<void> {
     const docRef = doc(db, this.collectionName, "ai-settings")
     const docSnap = await getDoc(docRef)
 

@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -156,9 +162,7 @@ export function DocumentBuilderPage() {
           <Card>
             <CardHeader>
               <CardTitle>Generate Document</CardTitle>
-              <CardDescription>
-                Create a customized resume or cover letter using AI
-              </CardDescription>
+              <CardDescription>Create a customized resume or cover letter using AI</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {alert && (
@@ -226,7 +230,7 @@ export function DocumentBuilderPage() {
               {/* Job Details */}
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-semibold">Job Details</h3>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="job-title">
                     Job Title <span className="text-destructive">*</span>
@@ -266,7 +270,7 @@ export function DocumentBuilderPage() {
               {/* Customization */}
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-semibold">Customization (Optional)</h3>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="target-summary">Professional Summary Override</Label>
                   <Textarea

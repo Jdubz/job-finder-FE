@@ -31,8 +31,4 @@ export type {
   ContentItemType,
   ContentItemVisibility,
 } from "@/types/content-items"
-export type {
-  SystemHealthMetrics,
-  SystemAlerts,
-  SystemLogs,
-} from "./system-health-client"
+export type { SystemHealthMetrics, SystemAlerts, SystemLogs } from "./system-health-client"

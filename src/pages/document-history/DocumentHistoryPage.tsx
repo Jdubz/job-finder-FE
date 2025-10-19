@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Loader2,
   FileText,
@@ -15,9 +15,9 @@ import {
   Calendar,
   Building2,
   Filter,
-  RefreshCw
-} from 'lucide-react';
-import { generatorClient, type DocumentHistoryItem } from '@/api';
+  RefreshCw,
+} from "lucide-react"
+import { generatorClient, type DocumentHistoryItem } from "@/api"
 import {
   Dialog,
   DialogContent,
@@ -25,167 +25,172 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-type SortField = 'createdAt' | 'jobTitle' | 'companyName' | 'type';
-type SortOrder = 'asc' | 'desc';
+type SortField = "createdAt" | "jobTitle" | "companyName" | "type"
+type SortOrder = "asc" | "desc"
 
 export function DocumentHistoryPage() {
-  const { isEditor, user } = useAuth();
-  const [documents, setDocuments] = useState<DocumentHistoryItem[]>([]);
-  const [filteredDocuments, setFilteredDocuments] = useState<DocumentHistoryItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  
+  const { isEditor, user } = useAuth()
+  const [documents, setDocuments] = useState<DocumentHistoryItem[]>([])
+  const [filteredDocuments, setFilteredDocuments] = useState<DocumentHistoryItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
   // Filter and search state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'resume' | 'cover_letter'>('all');
-  const [sortField, setSortField] = useState<SortField>('createdAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filterType, setFilterType] = useState<"all" | "resume" | "cover_letter">("all")
+  const [sortField, setSortField] = useState<SortField>("createdAt")
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+
   // Delete confirmation dialog
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [documentToDelete, setDocumentToDelete] = useState<DocumentHistoryItem | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [documentToDelete, setDocumentToDelete] = useState<DocumentHistoryItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    loadDocuments();
+    loadDocuments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user])
 
   useEffect(() => {
-    applyFiltersAndSort();
+    applyFiltersAndSort()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documents, searchTerm, filterType, sortField, sortOrder]);
+  }, [documents, searchTerm, filterType, sortField, sortOrder])
 
   const loadDocuments = async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
 
     try {
-      const history = await generatorClient.getHistory(user?.uid);
-      setDocuments(history);
+      const history = await generatorClient.getHistory(user?.uid)
+      setDocuments(history)
     } catch (err) {
-      setError('Failed to load document history');
-      console.error('Error loading documents:', err);
+      setError("Failed to load document history")
+      console.error("Error loading documents:", err)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const applyFiltersAndSort = () => {
-    let filtered = [...documents];
+    let filtered = [...documents]
 
     // Apply search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (doc) =>
-          doc.jobTitle.toLowerCase().includes(term) ||
-          doc.companyName.toLowerCase().includes(term)
-      );
+          doc.jobTitle.toLowerCase().includes(term) || doc.companyName.toLowerCase().includes(term)
+      )
     }
 
     // Apply type filter
-    if (filterType !== 'all') {
-      filtered = filtered.filter((doc) => doc.type === filterType);
+    if (filterType !== "all") {
+      filtered = filtered.filter((doc) => doc.type === filterType)
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      let comparison = 0;
+      let comparison = 0
 
       switch (sortField) {
-        case 'createdAt':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case 'jobTitle':
-          comparison = a.jobTitle.localeCompare(b.jobTitle);
-          break;
-        case 'companyName':
-          comparison = a.companyName.localeCompare(b.companyName);
-          break;
-        case 'type':
-          comparison = a.type.localeCompare(b.type);
-          break;
+        case "createdAt":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          break
+        case "jobTitle":
+          comparison = a.jobTitle.localeCompare(b.jobTitle)
+          break
+        case "companyName":
+          comparison = a.companyName.localeCompare(b.companyName)
+          break
+        case "type":
+          comparison = a.type.localeCompare(b.type)
+          break
       }
 
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+      return sortOrder === "asc" ? comparison : -comparison
+    })
 
-    setFilteredDocuments(filtered);
-  };
+    setFilteredDocuments(filtered)
+  }
 
   const handleDownload = async (document: DocumentHistoryItem) => {
     try {
       // Open the document URL in a new tab
-      window.open(document.documentUrl, '_blank');
-      
-      setSuccess(`Downloading ${document.type === 'resume' ? 'resume' : 'cover letter'}...`);
-      setTimeout(() => setSuccess(null), 3000);
+      window.open(document.documentUrl, "_blank")
+
+      setSuccess(`Downloading ${document.type === "resume" ? "resume" : "cover letter"}...`)
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to download document');
-      console.error('Error downloading document:', err);
+      setError("Failed to download document")
+      console.error("Error downloading document:", err)
     }
-  };
+  }
 
   const handleDeleteClick = (document: DocumentHistoryItem) => {
-    setDocumentToDelete(document);
-    setDeleteDialogOpen(true);
-  };
+    setDocumentToDelete(document)
+    setDeleteDialogOpen(true)
+  }
 
   const handleDeleteConfirm = async () => {
-    if (!documentToDelete) return;
+    if (!documentToDelete) return
 
-    setIsDeleting(true);
-    setError(null);
+    setIsDeleting(true)
+    setError(null)
 
     try {
-      await generatorClient.deleteDocument(documentToDelete.id);
-      
+      await generatorClient.deleteDocument(documentToDelete.id)
+
       // Remove from local state
-      setDocuments((prev) => prev.filter((doc) => doc.id !== documentToDelete.id));
-      
-      setSuccess('Document deleted successfully');
-      setTimeout(() => setSuccess(null), 3000);
-      setDeleteDialogOpen(false);
-      setDocumentToDelete(null);
+      setDocuments((prev) => prev.filter((doc) => doc.id !== documentToDelete.id))
+
+      setSuccess("Document deleted successfully")
+      setTimeout(() => setSuccess(null), 3000)
+      setDeleteDialogOpen(false)
+      setDocumentToDelete(null)
     } catch (err) {
-      setError('Failed to delete document');
-      console.error('Error deleting document:', err);
+      setError("Failed to delete document")
+      console.error("Error deleting document:", err)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(date))
+  }
 
   const getRelativeTime = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - new Date(date).getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    const now = new Date()
+    const diffMs = now.getTime() - new Date(date).getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
 
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 30) return `${diffDays}d ago`;
-    return formatDate(date);
-  };
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays < 30) return `${diffDays}d ago`
+    return formatDate(date)
+  }
 
   const handleRefresh = () => {
-    loadDocuments();
-  };
+    loadDocuments()
+  }
 
   if (!isEditor) {
     return (
@@ -196,7 +201,7 @@ export function DocumentHistoryPage() {
           </AlertDescription>
         </Alert>
       </div>
-    );
+    )
   }
 
   if (isLoading) {
@@ -223,7 +228,7 @@ export function DocumentHistoryPage() {
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -273,7 +278,10 @@ export function DocumentHistoryPage() {
             </div>
 
             {/* Type Filter */}
-            <Select value={filterType} onValueChange={(value: 'all' | 'resume' | 'cover_letter') => setFilterType(value)}>
+            <Select
+              value={filterType}
+              onValueChange={(value: "all" | "resume" | "cover_letter") => setFilterType(value)}
+            >
               <SelectTrigger className="w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -286,11 +294,14 @@ export function DocumentHistoryPage() {
             </Select>
 
             {/* Sort */}
-            <Select value={`${sortField}-${sortOrder}`} onValueChange={(value) => {
-              const [field, order] = value.split('-');
-              setSortField(field as SortField);
-              setSortOrder(order as SortOrder);
-            }}>
+            <Select
+              value={`${sortField}-${sortOrder}`}
+              onValueChange={(value) => {
+                const [field, order] = value.split("-")
+                setSortField(field as SortField)
+                setSortOrder(order as SortOrder)
+              }}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue />
               </SelectTrigger>
@@ -310,7 +321,8 @@ export function DocumentHistoryPage() {
       {/* Results Summary */}
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Showing {filteredDocuments.length} of {documents.length} document{documents.length !== 1 ? 's' : ''}
+          Showing {filteredDocuments.length} of {documents.length} document
+          {documents.length !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -321,9 +333,9 @@ export function DocumentHistoryPage() {
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No documents found</h3>
             <p className="text-gray-600">
-              {searchTerm || filterType !== 'all'
-                ? 'Try adjusting your filters or search terms'
-                : 'Generate your first document to get started'}
+              {searchTerm || filterType !== "all"
+                ? "Try adjusting your filters or search terms"
+                : "Generate your first document to get started"}
             </p>
           </CardContent>
         </Card>
@@ -334,11 +346,13 @@ export function DocumentHistoryPage() {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   {/* Icon */}
-                  <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
-                    document.type === 'resume'
-                      ? 'bg-blue-100 text-blue-600'
-                      : 'bg-purple-100 text-purple-600'
-                  }`}>
+                  <div
+                    className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
+                      document.type === "resume"
+                        ? "bg-blue-100 text-blue-600"
+                        : "bg-purple-100 text-purple-600"
+                    }`}
+                  >
                     <FileText className="h-6 w-6" />
                   </div>
 
@@ -359,20 +373,16 @@ export function DocumentHistoryPage() {
                         </div>
                       </div>
                       <Badge
-                        variant={document.type === 'resume' ? 'default' : 'secondary'}
+                        variant={document.type === "resume" ? "default" : "secondary"}
                         className="ml-2"
                       >
-                        {document.type === 'resume' ? 'Resume' : 'Cover Letter'}
+                        {document.type === "resume" ? "Resume" : "Cover Letter"}
                       </Badge>
                     </div>
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-4">
-                      <Button
-                        onClick={() => handleDownload(document)}
-                        size="sm"
-                        variant="outline"
-                      >
+                      <Button onClick={() => handleDownload(document)} size="sm" variant="outline">
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
@@ -408,7 +418,7 @@ export function DocumentHistoryPage() {
               <p className="font-semibold">{documentToDelete.jobTitle}</p>
               <p className="text-sm text-gray-600">{documentToDelete.companyName}</p>
               <Badge variant="secondary" className="mt-2">
-                {documentToDelete.type === 'resume' ? 'Resume' : 'Cover Letter'}
+                {documentToDelete.type === "resume" ? "Resume" : "Cover Letter"}
               </Badge>
             </div>
           )}
@@ -420,23 +430,19 @@ export function DocumentHistoryPage() {
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-            >
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={isDeleting}>
               {isDeleting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Deleting...
                 </>
               ) : (
-                'Delete'
+                "Delete"
               )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

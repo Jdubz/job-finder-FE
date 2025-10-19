@@ -22,11 +22,7 @@ export class ApiError extends Error {
   statusCode?: number
   response?: unknown
 
-  constructor(
-    message: string,
-    statusCode?: number,
-    response?: unknown,
-  ) {
+  constructor(message: string, statusCode?: number, response?: unknown) {
     super(message)
     this.name = "ApiError"
     this.statusCode = statusCode
@@ -46,7 +42,7 @@ export class BaseApiClient {
       timeout?: number
       retryAttempts?: number
       retryDelay?: number
-    },
+    }
   ) {
     this.baseUrl = baseUrl
     this.defaultTimeout = options?.timeout || 30000
@@ -74,10 +70,7 @@ export class BaseApiClient {
   /**
    * Make HTTP request with retry logic
    */
-  async request<T>(
-    endpoint: string,
-    options: RequestOptions = {},
-  ): Promise<T> {
+  async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const {
       method = "GET",
       headers = {},
@@ -125,7 +118,7 @@ export class BaseApiClient {
           throw new ApiError(
             errorData.message || `HTTP ${response.status}: ${response.statusText}`,
             response.status,
-            errorData,
+            errorData
           )
         }
 
@@ -172,22 +165,14 @@ export class BaseApiClient {
   /**
    * HTTP POST request
    */
-  async post<T>(
-    endpoint: string,
-    body?: unknown,
-    options?: RequestOptions,
-  ): Promise<T> {
+  async post<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: "POST", body })
   }
 
   /**
    * HTTP PUT request
    */
-  async put<T>(
-    endpoint: string,
-    body?: unknown,
-    options?: RequestOptions,
-  ): Promise<T> {
+  async put<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: "PUT", body })
   }
 
@@ -201,11 +186,7 @@ export class BaseApiClient {
   /**
    * HTTP PATCH request
    */
-  async patch<T>(
-    endpoint: string,
-    body?: unknown,
-    options?: RequestOptions,
-  ): Promise<T> {
+  async patch<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: "PATCH", body })
   }
 }

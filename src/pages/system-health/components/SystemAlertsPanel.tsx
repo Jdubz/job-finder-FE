@@ -3,12 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { 
-  AlertTriangle,
-  XCircle,
-  Info,
-  CheckCircle2
-} from "lucide-react"
+import { AlertTriangle, XCircle, Info, CheckCircle2 } from "lucide-react"
 import { format } from "date-fns"
 
 interface SystemAlertsPanelProps {
@@ -17,8 +12,8 @@ interface SystemAlertsPanelProps {
 }
 
 export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelProps) {
-  const unresolvedAlerts = alerts.filter(alert => !alert.resolved)
-  const resolvedAlerts = alerts.filter(alert => alert.resolved)
+  const unresolvedAlerts = alerts.filter((alert) => !alert.resolved)
+  const resolvedAlerts = alerts.filter((alert) => alert.resolved)
 
   const getAlertIcon = (type: string) => {
     switch (type) {
@@ -46,17 +41,13 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
     }
   }
 
-
-
   if (alerts.length === 0) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
           <CheckCircle2 className="h-12 w-12 mx-auto text-green-500 mb-4" />
           <h3 className="text-lg font-medium text-muted-foreground mb-2">No Active Alerts</h3>
-          <p className="text-sm text-muted-foreground">
-            All systems are operating normally.
-          </p>
+          <p className="text-sm text-muted-foreground">All systems are operating normally.</p>
         </CardContent>
       </Card>
     )
@@ -71,7 +62,7 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
             <AlertTriangle className="h-5 w-5 text-yellow-500" />
             Active Alerts ({unresolvedAlerts.length})
           </h3>
-          
+
           <div className="space-y-3">
             {unresolvedAlerts.map((alert) => (
               <Alert key={alert.id} variant={alert.type === "error" ? "destructive" : "default"}>
@@ -80,7 +71,15 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
                     {getAlertIcon(alert.type)}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge variant={getAlertBadgeVariant(alert.type) as "default" | "secondary" | "destructive" | "outline"}>
+                        <Badge
+                          variant={
+                            getAlertBadgeVariant(alert.type) as
+                              | "default"
+                              | "secondary"
+                              | "destructive"
+                              | "outline"
+                          }
+                        >
                           {alert.type.toUpperCase()}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
@@ -90,12 +89,10 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
                           {format(alert.timestamp, "MMM d, HH:mm")}
                         </span>
                       </div>
-                      <AlertDescription className="text-sm">
-                        {alert.message}
-                      </AlertDescription>
+                      <AlertDescription className="text-sm">{alert.message}</AlertDescription>
                     </div>
                   </div>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -119,7 +116,7 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
             <CheckCircle2 className="h-5 w-5 text-green-500" />
             Recently Resolved ({resolvedAlerts.length})
           </h3>
-          
+
           <div className="space-y-2">
             {resolvedAlerts.slice(0, 5).map((alert) => (
               <Card key={alert.id} className="opacity-60">
@@ -135,9 +132,7 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
                           {format(alert.timestamp, "MMM d, HH:mm")}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {alert.message}
-                      </p>
+                      <p className="text-sm text-muted-foreground truncate">{alert.message}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -156,26 +151,24 @@ export function SystemAlertsPanel({ alerts, onResolveAlert }: SystemAlertsPanelP
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-red-500">
-                {alerts.filter(a => a.type === "error" && !a.resolved).length}
+                {alerts.filter((a) => a.type === "error" && !a.resolved).length}
               </div>
               <div className="text-xs text-muted-foreground">Errors</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-yellow-500">
-                {alerts.filter(a => a.type === "warning" && !a.resolved).length}
+                {alerts.filter((a) => a.type === "warning" && !a.resolved).length}
               </div>
               <div className="text-xs text-muted-foreground">Warnings</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-blue-500">
-                {alerts.filter(a => a.type === "info" && !a.resolved).length}
+                {alerts.filter((a) => a.type === "info" && !a.resolved).length}
               </div>
               <div className="text-xs text-muted-foreground">Info</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-500">
-                {resolvedAlerts.length}
-              </div>
+              <div className="text-2xl font-bold text-green-500">{resolvedAlerts.length}</div>
               <div className="text-xs text-muted-foreground">Resolved</div>
             </div>
           </div>

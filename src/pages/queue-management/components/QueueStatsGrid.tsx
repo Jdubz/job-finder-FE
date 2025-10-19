@@ -1,13 +1,6 @@
 import type { QueueStats } from "@jsdubzw/job-finder-shared-types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-  Clock, 
-  Zap, 
-  CheckCircle2, 
-  XCircle, 
-  Activity,
-  TrendingUp
-} from "lucide-react"
+import { Clock, Zap, CheckCircle2, XCircle, Activity, TrendingUp } from "lucide-react"
 
 interface QueueStatsGridProps {
   stats: QueueStats
@@ -23,9 +16,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.total}</div>
-          <p className="text-xs text-muted-foreground">
-            All queue items
-          </p>
+          <p className="text-xs text-muted-foreground">All queue items</p>
         </CardContent>
       </Card>
 
@@ -36,9 +27,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-          <p className="text-xs text-muted-foreground">
-            Waiting to process
-          </p>
+          <p className="text-xs text-muted-foreground">Waiting to process</p>
         </CardContent>
       </Card>
 
@@ -49,9 +38,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-blue-600">{stats.processing}</div>
-          <p className="text-xs text-muted-foreground">
-            Currently running
-          </p>
+          <p className="text-xs text-muted-foreground">Currently running</p>
         </CardContent>
       </Card>
 
@@ -64,9 +51,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
           <div className="text-2xl font-bold text-green-600">
             {stats.total > 0 ? Math.round((stats.success / stats.total) * 100) : 0}%
           </div>
-          <p className="text-xs text-muted-foreground">
-            {stats.success} successful
-          </p>
+          <p className="text-xs text-muted-foreground">{stats.success} successful</p>
         </CardContent>
       </Card>
 
@@ -77,9 +62,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-600">{stats.failed}</div>
-          <p className="text-xs text-muted-foreground">
-            Need attention
-          </p>
+          <p className="text-xs text-muted-foreground">Need attention</p>
         </CardContent>
       </Card>
 
@@ -90,9 +73,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">{stats.success}</div>
-          <p className="text-xs text-muted-foreground">
-            Completed successfully
-          </p>
+          <p className="text-xs text-muted-foreground">Completed successfully</p>
         </CardContent>
       </Card>
 
@@ -103,9 +84,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-gray-600">{stats.skipped || 0}</div>
-          <p className="text-xs text-muted-foreground">
-            Skipped items
-          </p>
+          <p className="text-xs text-muted-foreground">Skipped items</p>
         </CardContent>
       </Card>
 
@@ -116,9 +95,7 @@ export function QueueStatsGrid({ stats }: QueueStatsGridProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-purple-600">{stats.filtered || 0}</div>
-          <p className="text-xs text-muted-foreground">
-            Filtered out
-          </p>
+          <p className="text-xs text-muted-foreground">Filtered out</p>
         </CardContent>
       </Card>
     </div>

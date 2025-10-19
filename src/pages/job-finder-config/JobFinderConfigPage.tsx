@@ -1,207 +1,213 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Save, RotateCcw, Plus, X } from 'lucide-react';
-import { configClient } from '@/api';
-import type { StopList, QueueSettings, AISettings } from '@jsdubzw/job-finder-shared-types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { Loader2, Save, RotateCcw, Plus, X } from "lucide-react"
+import { configClient } from "@/api"
+import type { StopList, QueueSettings, AISettings } from "@jsdubzw/job-finder-shared-types"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function JobFinderConfigPage() {
-  const { isEditor, user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'stop-list' | 'queue' | 'ai'>('stop-list');
+  const { isEditor, user } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<"stop-list" | "queue" | "ai">("stop-list")
 
   // Stop List state
-  const [stopList, setStopList] = useState<StopList | null>(null);
-  const [originalStopList, setOriginalStopList] = useState<StopList | null>(null);
-  const [newCompany, setNewCompany] = useState('');
-  const [newKeyword, setNewKeyword] = useState('');
-  const [newDomain, setNewDomain] = useState('');
+  const [stopList, setStopList] = useState<StopList | null>(null)
+  const [originalStopList, setOriginalStopList] = useState<StopList | null>(null)
+  const [newCompany, setNewCompany] = useState("")
+  const [newKeyword, setNewKeyword] = useState("")
+  const [newDomain, setNewDomain] = useState("")
 
   // Queue Settings state
-  const [queueSettings, setQueueSettings] = useState<QueueSettings | null>(null);
-  const [originalQueueSettings, setOriginalQueueSettings] = useState<QueueSettings | null>(null);
+  const [queueSettings, setQueueSettings] = useState<QueueSettings | null>(null)
+  const [originalQueueSettings, setOriginalQueueSettings] = useState<QueueSettings | null>(null)
 
   // AI Settings state
-  const [aiSettings, setAISettings] = useState<AISettings | null>(null);
-  const [originalAISettings, setOriginalAISettings] = useState<AISettings | null>(null);
+  const [aiSettings, setAISettings] = useState<AISettings | null>(null)
+  const [originalAISettings, setOriginalAISettings] = useState<AISettings | null>(null)
 
   useEffect(() => {
-    loadAllSettings();
-  }, []);
+    loadAllSettings()
+  }, [])
 
   const loadAllSettings = async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
 
     try {
       const [stopListData, queueData, aiData] = await Promise.all([
         configClient.getStopList(),
         configClient.getQueueSettings(),
         configClient.getAISettings(),
-      ]);
+      ])
 
-      setStopList(stopListData);
-      setOriginalStopList(stopListData);
-      setQueueSettings(queueData);
-      setOriginalQueueSettings(queueData);
-      setAISettings(aiData);
-      setOriginalAISettings(aiData);
+      setStopList(stopListData)
+      setOriginalStopList(stopListData)
+      setQueueSettings(queueData)
+      setOriginalQueueSettings(queueData)
+      setAISettings(aiData)
+      setOriginalAISettings(aiData)
     } catch (err) {
-      setError('Failed to load configuration settings');
-      console.error('Error loading settings:', err);
+      setError("Failed to load configuration settings")
+      console.error("Error loading settings:", err)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSaveStopList = async () => {
-    if (!user?.email || !stopList) return;
+    if (!user?.email || !stopList) return
 
-    setIsSaving(true);
-    setError(null);
-    setSuccess(null);
+    setIsSaving(true)
+    setError(null)
+    setSuccess(null)
 
     try {
-      await configClient.updateStopList(stopList, user.email);
-      setOriginalStopList(stopList);
-      setSuccess('Stop list saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      await configClient.updateStopList(stopList, user.email)
+      setOriginalStopList(stopList)
+      setSuccess("Stop list saved successfully!")
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to save stop list');
-      console.error('Error saving stop list:', err);
+      setError("Failed to save stop list")
+      console.error("Error saving stop list:", err)
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleSaveQueueSettings = async () => {
-    if (!user?.email || !queueSettings) return;
+    if (!user?.email || !queueSettings) return
 
-    setIsSaving(true);
-    setError(null);
-    setSuccess(null);
+    setIsSaving(true)
+    setError(null)
+    setSuccess(null)
 
     try {
-      await configClient.updateQueueSettings(queueSettings, user.email);
-      setOriginalQueueSettings(queueSettings);
-      setSuccess('Queue settings saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      await configClient.updateQueueSettings(queueSettings, user.email)
+      setOriginalQueueSettings(queueSettings)
+      setSuccess("Queue settings saved successfully!")
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to save queue settings');
-      console.error('Error saving queue settings:', err);
+      setError("Failed to save queue settings")
+      console.error("Error saving queue settings:", err)
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleSaveAISettings = async () => {
-    if (!user?.email || !aiSettings) return;
+    if (!user?.email || !aiSettings) return
 
-    setIsSaving(true);
-    setError(null);
-    setSuccess(null);
+    setIsSaving(true)
+    setError(null)
+    setSuccess(null)
 
     try {
-      await configClient.updateAISettings(aiSettings, user.email);
-      setOriginalAISettings(aiSettings);
-      setSuccess('AI settings saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      await configClient.updateAISettings(aiSettings, user.email)
+      setOriginalAISettings(aiSettings)
+      setSuccess("AI settings saved successfully!")
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to save AI settings');
-      console.error('Error saving AI settings:', err);
+      setError("Failed to save AI settings")
+      console.error("Error saving AI settings:", err)
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleAddCompany = () => {
-    if (!newCompany.trim() || !stopList) return;
-    
+    if (!newCompany.trim() || !stopList) return
+
     setStopList({
       ...stopList,
-      excludedCompanies: [...(stopList.excludedCompanies || []), newCompany.trim()]
-    });
-    setNewCompany('');
-  };
+      excludedCompanies: [...(stopList.excludedCompanies || []), newCompany.trim()],
+    })
+    setNewCompany("")
+  }
 
   const handleRemoveCompany = (company: string) => {
-    if (!stopList) return;
-    
+    if (!stopList) return
+
     setStopList({
       ...stopList,
-      excludedCompanies: (stopList.excludedCompanies || []).filter(c => c !== company)
-    });
-  };
+      excludedCompanies: (stopList.excludedCompanies || []).filter((c) => c !== company),
+    })
+  }
 
   const handleAddKeyword = () => {
-    if (!newKeyword.trim() || !stopList) return;
-    
+    if (!newKeyword.trim() || !stopList) return
+
     setStopList({
       ...stopList,
-      excludedKeywords: [...(stopList.excludedKeywords || []), newKeyword.trim()]
-    });
-    setNewKeyword('');
-  };
+      excludedKeywords: [...(stopList.excludedKeywords || []), newKeyword.trim()],
+    })
+    setNewKeyword("")
+  }
 
   const handleRemoveKeyword = (keyword: string) => {
-    if (!stopList) return;
-    
+    if (!stopList) return
+
     setStopList({
       ...stopList,
-      excludedKeywords: (stopList.excludedKeywords || []).filter(k => k !== keyword)
-    });
-  };
+      excludedKeywords: (stopList.excludedKeywords || []).filter((k) => k !== keyword),
+    })
+  }
 
   const handleAddDomain = () => {
-    if (!newDomain.trim() || !stopList) return;
-    
+    if (!newDomain.trim() || !stopList) return
+
     setStopList({
       ...stopList,
-      excludedDomains: [...(stopList.excludedDomains || []), newDomain.trim()]
-    });
-    setNewDomain('');
-  };
+      excludedDomains: [...(stopList.excludedDomains || []), newDomain.trim()],
+    })
+    setNewDomain("")
+  }
 
   const handleRemoveDomain = (domain: string) => {
-    if (!stopList) return;
-    
+    if (!stopList) return
+
     setStopList({
       ...stopList,
-      excludedDomains: (stopList.excludedDomains || []).filter(d => d !== domain)
-    });
-  };
+      excludedDomains: (stopList.excludedDomains || []).filter((d) => d !== domain),
+    })
+  }
 
   const handleResetStopList = () => {
-    setStopList(originalStopList);
-    setError(null);
-    setSuccess(null);
-  };
+    setStopList(originalStopList)
+    setError(null)
+    setSuccess(null)
+  }
 
   const handleResetQueueSettings = () => {
-    setQueueSettings(originalQueueSettings);
-    setError(null);
-    setSuccess(null);
-  };
+    setQueueSettings(originalQueueSettings)
+    setError(null)
+    setSuccess(null)
+  }
 
   const handleResetAISettings = () => {
-    setAISettings(originalAISettings);
-    setError(null);
-    setSuccess(null);
-  };
+    setAISettings(originalAISettings)
+    setError(null)
+    setSuccess(null)
+  }
 
-  const hasStopListChanges = JSON.stringify(stopList) !== JSON.stringify(originalStopList);
-  const hasQueueChanges = JSON.stringify(queueSettings) !== JSON.stringify(originalQueueSettings);
-  const hasAIChanges = JSON.stringify(aiSettings) !== JSON.stringify(originalAISettings);
+  const hasStopListChanges = JSON.stringify(stopList) !== JSON.stringify(originalStopList)
+  const hasQueueChanges = JSON.stringify(queueSettings) !== JSON.stringify(originalQueueSettings)
+  const hasAIChanges = JSON.stringify(aiSettings) !== JSON.stringify(originalAISettings)
 
   if (!isEditor) {
     return (
@@ -212,7 +218,7 @@ export function JobFinderConfigPage() {
           </AlertDescription>
         </Alert>
       </div>
-    );
+    )
   }
 
   if (isLoading) {
@@ -223,7 +229,7 @@ export function JobFinderConfigPage() {
           <p className="text-gray-600">Loading configuration...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -275,10 +281,7 @@ export function JobFinderConfigPage() {
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
                   </Button>
-                  <Button
-                    onClick={handleSaveStopList}
-                    disabled={!hasStopListChanges || isSaving}
-                  >
+                  <Button onClick={handleSaveStopList} disabled={!hasStopListChanges || isSaving}>
                     {isSaving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -303,7 +306,7 @@ export function JobFinderConfigPage() {
                     placeholder="Enter company name..."
                     value={newCompany}
                     onChange={(e) => setNewCompany(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddCompany()}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddCompany()}
                   />
                   <Button onClick={handleAddCompany} size="sm">
                     <Plus className="h-4 w-4 mr-1" />
@@ -336,7 +339,7 @@ export function JobFinderConfigPage() {
                     placeholder="Enter keyword..."
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddKeyword()}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddKeyword()}
                   />
                   <Button onClick={handleAddKeyword} size="sm">
                     <Plus className="h-4 w-4 mr-1" />
@@ -369,7 +372,7 @@ export function JobFinderConfigPage() {
                     placeholder="Enter domain (e.g., example.com)..."
                     value={newDomain}
                     onChange={(e) => setNewDomain(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddDomain()}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddDomain()}
                   />
                   <Button onClick={handleAddDomain} size="sm">
                     <Plus className="h-4 w-4 mr-1" />
@@ -418,10 +421,7 @@ export function JobFinderConfigPage() {
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
                   </Button>
-                  <Button
-                    onClick={handleSaveQueueSettings}
-                    disabled={!hasQueueChanges || isSaving}
-                  >
+                  <Button onClick={handleSaveQueueSettings} disabled={!hasQueueChanges || isSaving}>
                     {isSaving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -447,9 +447,15 @@ export function JobFinderConfigPage() {
                     min="0"
                     max="10"
                     value={queueSettings?.maxRetries || 3}
-                    onChange={(e) => setQueueSettings(prev => prev ? { ...prev, maxRetries: parseInt(e.target.value) || 3 } : null)}
+                    onChange={(e) =>
+                      setQueueSettings((prev) =>
+                        prev ? { ...prev, maxRetries: parseInt(e.target.value) || 3 } : null
+                      )
+                    }
                   />
-                  <p className="text-xs text-gray-500">Maximum number of retry attempts for failed jobs</p>
+                  <p className="text-xs text-gray-500">
+                    Maximum number of retry attempts for failed jobs
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -460,7 +466,13 @@ export function JobFinderConfigPage() {
                     min="0"
                     max="3600"
                     value={queueSettings?.retryDelaySeconds || 300}
-                    onChange={(e) => setQueueSettings(prev => prev ? { ...prev, retryDelaySeconds: parseInt(e.target.value) || 300 } : null)}
+                    onChange={(e) =>
+                      setQueueSettings((prev) =>
+                        prev
+                          ? { ...prev, retryDelaySeconds: parseInt(e.target.value) || 300 }
+                          : null
+                      )
+                    }
                   />
                   <p className="text-xs text-gray-500">Delay before retrying a failed job</p>
                 </div>
@@ -473,7 +485,13 @@ export function JobFinderConfigPage() {
                     min="0"
                     max="3600"
                     value={queueSettings?.processingTimeout || 600}
-                    onChange={(e) => setQueueSettings(prev => prev ? { ...prev, processingTimeout: parseInt(e.target.value) || 600 } : null)}
+                    onChange={(e) =>
+                      setQueueSettings((prev) =>
+                        prev
+                          ? { ...prev, processingTimeout: parseInt(e.target.value) || 600 }
+                          : null
+                      )
+                    }
                   />
                   <p className="text-xs text-gray-500">Maximum time allowed for job processing</p>
                 </div>
@@ -503,10 +521,7 @@ export function JobFinderConfigPage() {
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset
                   </Button>
-                  <Button
-                    onClick={handleSaveAISettings}
-                    disabled={!hasAIChanges || isSaving}
-                  >
+                  <Button onClick={handleSaveAISettings} disabled={!hasAIChanges || isSaving}>
                     {isSaving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -527,8 +542,12 @@ export function JobFinderConfigPage() {
                 <div className="space-y-2">
                   <Label htmlFor="provider">AI Provider</Label>
                   <Select
-                    value={aiSettings?.provider || 'claude'}
-                    onValueChange={(value) => setAISettings(prev => prev ? { ...prev, provider: value as 'claude' | 'openai' | 'gemini' } : null)}
+                    value={aiSettings?.provider || "claude"}
+                    onValueChange={(value) =>
+                      setAISettings((prev) =>
+                        prev ? { ...prev, provider: value as "claude" | "openai" | "gemini" } : null
+                      )
+                    }
                   >
                     <SelectTrigger id="provider">
                       <SelectValue />
@@ -539,15 +558,19 @@ export function JobFinderConfigPage() {
                       <SelectItem value="gemini">Google Gemini</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-gray-500">AI provider for job matching and document generation</p>
+                  <p className="text-xs text-gray-500">
+                    AI provider for job matching and document generation
+                  </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="model">Model</Label>
                   <Input
                     id="model"
-                    value={aiSettings?.model || 'claude-sonnet-4'}
-                    onChange={(e) => setAISettings(prev => prev ? { ...prev, model: e.target.value } : null)}
+                    value={aiSettings?.model || "claude-sonnet-4"}
+                    onChange={(e) =>
+                      setAISettings((prev) => (prev ? { ...prev, model: e.target.value } : null))
+                    }
                     placeholder="e.g., claude-sonnet-4, gpt-4, gemini-pro"
                   />
                   <p className="text-xs text-gray-500">Specific model version to use</p>
@@ -561,9 +584,15 @@ export function JobFinderConfigPage() {
                     min="0"
                     max="100"
                     value={aiSettings?.minMatchScore || 70}
-                    onChange={(e) => setAISettings(prev => prev ? { ...prev, minMatchScore: parseInt(e.target.value) || 70 } : null)}
+                    onChange={(e) =>
+                      setAISettings((prev) =>
+                        prev ? { ...prev, minMatchScore: parseInt(e.target.value) || 70 } : null
+                      )
+                    }
                   />
-                  <p className="text-xs text-gray-500">Minimum score required to create a job match (0-100)</p>
+                  <p className="text-xs text-gray-500">
+                    Minimum score required to create a job match (0-100)
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -574,7 +603,13 @@ export function JobFinderConfigPage() {
                     min="0"
                     step="0.01"
                     value={aiSettings?.costBudgetDaily || 10.0}
-                    onChange={(e) => setAISettings(prev => prev ? { ...prev, costBudgetDaily: parseFloat(e.target.value) || 10.0 } : null)}
+                    onChange={(e) =>
+                      setAISettings((prev) =>
+                        prev
+                          ? { ...prev, costBudgetDaily: parseFloat(e.target.value) || 10.0 }
+                          : null
+                      )
+                    }
                   />
                   <p className="text-xs text-gray-500">Maximum daily AI API cost (USD)</p>
                 </div>
@@ -584,5 +619,5 @@ export function JobFinderConfigPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

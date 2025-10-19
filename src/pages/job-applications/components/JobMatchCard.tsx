@@ -133,11 +133,7 @@ export function JobMatchCard({ match, onViewDetails }: JobMatchCardProps) {
           <Button onClick={() => onViewDetails(match)} className="flex-1">
             View Full Details
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => window.open(match.url, "_blank")}
-          >
+          <Button variant="outline" size="icon" onClick={() => window.open(match.url, "_blank")}>
             <ExternalLink className="h-4 w-4" />
           </Button>
         </div>
