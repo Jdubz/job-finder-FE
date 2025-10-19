@@ -77,7 +77,5 @@ export class JobQueueClient extends BaseApiClient {
 
 // Export singleton instance
 const functionBaseUrl =
-  import.meta.env.VITE_JOB_QUEUE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  ""
+  import.meta.env.VITE_JOB_QUEUE_API_URL || import.meta.env.VITE_API_BASE_URL || ""
 export const jobQueueClient = new JobQueueClient(functionBaseUrl)

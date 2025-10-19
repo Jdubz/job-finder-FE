@@ -36,12 +36,15 @@ export class JobMatchesClient {
   /**
    * Convert Firestore document to JobMatch
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private convertDoc(docData: any): JobMatch {
     return {
       ...docData,
       id: docData.id,
-      analyzedAt: docData.analyzedAt instanceof Timestamp ? docData.analyzedAt.toDate() : docData.analyzedAt,
-      createdAt: docData.createdAt instanceof Timestamp ? docData.createdAt.toDate() : docData.createdAt,
+      analyzedAt:
+        docData.analyzedAt instanceof Timestamp ? docData.analyzedAt.toDate() : docData.analyzedAt,
+      createdAt:
+        docData.createdAt instanceof Timestamp ? docData.createdAt.toDate() : docData.createdAt,
     } as JobMatch
   }
 
@@ -97,7 +100,7 @@ export class JobMatchesClient {
   subscribeToMatches(
     userId: string,
     callback: (matches: JobMatch[]) => void,
-    filters?: JobMatchFilters,
+    filters?: JobMatchFilters
   ): Unsubscribe {
     let q: Query = collection(db, this.collectionName)
 
@@ -124,9 +127,7 @@ export class JobMatchesClient {
     }
 
     return onSnapshot(q, (snapshot) => {
-      const matches = snapshot.docs.map((doc) =>
-        this.convertDoc({ id: doc.id, ...doc.data() }),
-      )
+      const matches = snapshot.docs.map((doc) => this.convertDoc({ id: doc.id, ...doc.data() }))
       callback(matches)
     })
   }
@@ -152,8 +153,7 @@ export class JobMatchesClient {
     }
 
     if (matches.length > 0) {
-      stats.averageScore =
-        matches.reduce((sum, m) => sum + m.matchScore, 0) / matches.length
+      stats.averageScore = matches.reduce((sum, m) => sum + m.matchScore, 0) / matches.length
     }
 
     return stats

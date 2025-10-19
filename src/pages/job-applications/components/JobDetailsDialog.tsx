@@ -56,23 +56,15 @@ export function JobDetailsDialog({
                 <h3 className="font-semibold mb-2">Match Analysis</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-3 bg-secondary rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {match.matchScore}%
-                    </div>
+                    <div className="text-2xl font-bold text-green-600">{match.matchScore}%</div>
                     <div className="text-xs text-muted-foreground">Overall Match</div>
                   </div>
                   <div className="text-center p-3 bg-secondary rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {match.experienceMatch}%
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Experience Match
-                    </div>
+                    <div className="text-2xl font-bold text-blue-600">{match.experienceMatch}%</div>
+                    <div className="text-xs text-muted-foreground">Experience Match</div>
                   </div>
                   <div className="text-center p-3 bg-secondary rounded-lg">
-                    <Badge className="text-base">
-                      {match.applicationPriority}
-                    </Badge>
+                    <Badge className="text-base">{match.applicationPriority}</Badge>
                     <div className="text-xs text-muted-foreground mt-1">Priority</div>
                   </div>
                 </div>
@@ -114,9 +106,7 @@ export function JobDetailsDialog({
               {/* Potential Concerns */}
               {match.potentialConcerns && match.potentialConcerns.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="font-semibold mb-2 text-orange-600">
-                    Potential Concerns
-                  </h3>
+                  <h3 className="font-semibold mb-2 text-orange-600">Potential Concerns</h3>
                   <ul className="space-y-2">
                     {match.potentialConcerns.map((concern, idx) => (
                       <li key={idx} className="flex items-start gap-2">
@@ -168,9 +158,7 @@ export function JobDetailsDialog({
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-sm text-muted-foreground">
-                      You have all required skills!
-                    </p>
+                    <p className="text-sm text-muted-foreground">You have all required skills!</p>
                   )}
                 </div>
               </div>
@@ -183,15 +171,11 @@ export function JobDetailsDialog({
               {match.customizationRecommendations &&
               match.customizationRecommendations.length > 0 ? (
                 <div>
-                  <h3 className="font-semibold mb-3">
-                    How to Customize Your Application
-                  </h3>
+                  <h3 className="font-semibold mb-3">How to Customize Your Application</h3>
                   <ul className="space-y-3">
                     {match.customizationRecommendations.map((rec, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-blue-500 mt-1 font-bold">
-                          {idx + 1}.
-                        </span>
+                        <span className="text-blue-500 mt-1 font-bold">{idx + 1}.</span>
                         <span className="text-sm">{rec}</span>
                       </li>
                     ))}
@@ -215,8 +199,10 @@ export function JobDetailsDialog({
                     <div className="bg-secondary p-3 rounded-md">
                       <p className="text-sm">
                         ✓ Target summary generated
-                        <br />✓ Skills prioritized ({match.resumeIntakeData.skillsPriority?.length || 0})
-                        <br />✓ ATS keywords identified ({match.resumeIntakeData.atsKeywords?.length || 0})
+                        <br />✓ Skills prioritized (
+                        {match.resumeIntakeData.skillsPriority?.length || 0})
+                        <br />✓ ATS keywords identified (
+                        {match.resumeIntakeData.atsKeywords?.length || 0})
                         <br />✓ Experience highlights prepared
                       </p>
                     </div>
@@ -241,9 +227,7 @@ export function JobDetailsDialog({
 
                 <div>
                   <h3 className="font-semibold mb-2">Job Description</h3>
-                  <div className="text-sm whitespace-pre-wrap">
-                    {match.jobDescription}
-                  </div>
+                  <div className="text-sm whitespace-pre-wrap">{match.jobDescription}</div>
                 </div>
               </div>
             </ScrollArea>
@@ -258,10 +242,7 @@ export function JobDetailsDialog({
               Generate Custom Resume
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => window.open(match.url, "_blank")}
-          >
+          <Button variant="outline" onClick={() => window.open(match.url, "_blank")}>
             <ExternalLink className="mr-2 h-4 w-4" />
             View Job Posting
           </Button>

@@ -9,12 +9,26 @@ export { jobQueueClient, JobQueueClient } from "./job-queue-client"
 export { jobMatchesClient, JobMatchesClient } from "./job-matches-client"
 export { generatorClient, GeneratorClient } from "./generator-client"
 export { configClient, ConfigClient } from "./config-client"
+export { promptsClient, PromptsClient, DEFAULT_PROMPTS } from "./prompts-client"
+export { contentItemsClient, ContentItemsClient } from "./content-items-client"
+export { systemHealthClient, SystemHealthClient } from "./system-health-client"
 
 export type { RequestOptions } from "./base-client"
 export type { JobMatchFilters } from "./job-matches-client"
+export type { PromptConfig } from "./prompts-client"
 export type {
   GenerateDocumentRequest,
   GenerateDocumentResponse,
   DocumentHistoryItem,
   UserDefaults,
 } from "./generator-client"
+export type {
+  ContentItem,
+  ContentItemWithChildren,
+  ContentItemFilters,
+  CreateContentItemData,
+  UpdateContentItemData,
+  ContentItemType,
+  ContentItemVisibility,
+} from "@/types/content-items"
+export type { SystemHealthMetrics, SystemAlerts, SystemLogs } from "./system-health-client"

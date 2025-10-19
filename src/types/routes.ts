@@ -11,6 +11,7 @@ export const ROUTES = {
   JOB_FINDER: "/job-finder",
   QUEUE_MANAGEMENT: "/queue-management",
   JOB_FINDER_CONFIG: "/job-finder-config",
+  SYSTEM_HEALTH: "/system-health",
   // Auth
   LOGIN: "/login",
   UNAUTHORIZED: "/unauthorized",
@@ -26,6 +27,7 @@ export const EDITOR_ROUTES: RoutePath[] = [
   ROUTES.JOB_FINDER,
   ROUTES.QUEUE_MANAGEMENT,
   ROUTES.JOB_FINDER_CONFIG,
+  ROUTES.SYSTEM_HEALTH,
 ]
 
 // Public routes that anyone can access

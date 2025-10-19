@@ -115,9 +115,7 @@ export function JobFinderPage() {
                 disabled={isSubmitting}
                 required
               />
-              <p className="text-sm text-muted-foreground">
-                The full URL to the job posting
-              </p>
+              <p className="text-sm text-muted-foreground">The full URL to the job posting</p>
             </div>
 
             {/* Company Name (Optional) */}
@@ -128,7 +126,9 @@ export function JobFinderPage() {
                 type="text"
                 placeholder="Acme Corporation"
                 value={companyName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyName(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCompanyName(e.target.value)
+                }
                 disabled={isSubmitting}
               />
               <p className="text-sm text-muted-foreground">
@@ -187,9 +187,7 @@ export function JobFinderPage() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Submissions</CardTitle>
-          <CardDescription>
-            Track the status of your submitted jobs
-          </CardDescription>
+          <CardDescription>Track the status of your submitted jobs</CardDescription>
         </CardHeader>
         <CardContent>
           <QueueStatusTable userId={user?.uid || ""} />

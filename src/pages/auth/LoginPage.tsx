@@ -21,9 +21,7 @@ export function LoginPage() {
       <div className="w-full max-w-md space-y-8 p-8 border rounded-lg">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight">Sign In</h1>
-          <p className="text-muted-foreground mt-2">
-            Sign in to access Job Finder
-          </p>
+          <p className="text-muted-foreground mt-2">Sign in to access Job Finder</p>
         </div>
 
         <button
