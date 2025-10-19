@@ -2,7 +2,7 @@
  * Generator API Client
  *
  * Handles AI resume and cover letter generation.
- * Integrates with Portfolio Firebase Functions.
+ * Integrates with Firebase Cloud Functions.
  */
 
 import { BaseApiClient } from "./base-client"
