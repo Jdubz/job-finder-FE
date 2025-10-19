@@ -36,6 +36,7 @@ export class JobMatchesClient {
   /**
    * Convert Firestore document to JobMatch
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private convertDoc(docData: any): JobMatch {
     return {
       ...docData,

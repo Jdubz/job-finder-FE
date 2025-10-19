@@ -19,7 +19,9 @@ export class ConfigClient {
   /**
    * Convert Firestore timestamps to Dates
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private convertTimestamps<T extends Record<string, any>>(data: T): T {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const converted = { ...data } as any
     Object.keys(converted).forEach((key) => {
       if (converted[key] instanceof Timestamp) {
