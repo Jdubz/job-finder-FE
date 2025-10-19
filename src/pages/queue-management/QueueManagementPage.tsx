@@ -111,7 +111,7 @@ export function QueueManagementPage() {
       filtered = filtered.filter(
         (item) =>
           item.url.toLowerCase().includes(searchLower) ||
-          item.company_name.toLowerCase().includes(searchLower) ||
+          (item.company_name ?? "").toLowerCase().includes(searchLower) ||
           item.result_message?.toLowerCase().includes(searchLower)
       )
     }

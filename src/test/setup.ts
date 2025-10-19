@@ -4,15 +4,15 @@ import { afterEach, beforeAll, vi } from "vitest"
 
 // Mock environment variables for tests
 beforeAll(() => {
-  // Set test environment variables
-  import.meta.env.VITE_FIREBASE_API_KEY = "test-api-key"
-  import.meta.env.VITE_FIREBASE_AUTH_DOMAIN = "test-project.firebaseapp.com"
-  import.meta.env.VITE_FIREBASE_PROJECT_ID = "test-project"
-  import.meta.env.VITE_FIREBASE_STORAGE_BUCKET = "test-project.appspot.com"
-  import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID = "123456789"
-  import.meta.env.VITE_FIREBASE_APP_ID = "1:123456789:web:abcdef"
-  import.meta.env.VITE_USE_EMULATORS = "false"
-  import.meta.env.VITE_ENVIRONMENT = "test"
+  // Set test environment variables using Vitest's vi.stubEnv
+  vi.stubEnv("VITE_FIREBASE_API_KEY", "test-api-key")
+  vi.stubEnv("VITE_FIREBASE_AUTH_DOMAIN", "test-project.firebaseapp.com")
+  vi.stubEnv("VITE_FIREBASE_PROJECT_ID", "test-project")
+  vi.stubEnv("VITE_FIREBASE_STORAGE_BUCKET", "test-project.appspot.com")
+  vi.stubEnv("VITE_FIREBASE_MESSAGING_SENDER_ID", "123456789")
+  vi.stubEnv("VITE_FIREBASE_APP_ID", "1:123456789:web:abcdef")
+  vi.stubEnv("VITE_USE_EMULATORS", "false")
+  vi.stubEnv("VITE_ENVIRONMENT", "test")
 })
 
 // Mock Firebase modules to avoid initialization in tests
