@@ -126,7 +126,7 @@ export class PromptsClient {
    */
   async savePrompts(
     prompts: Omit<PromptConfig, "updatedAt" | "updatedBy">,
-    userEmail: string,
+    userEmail: string
   ): Promise<void> {
     try {
       const docRef = doc(db, this.collectionName, this.documentId)
@@ -155,7 +155,10 @@ export class PromptsClient {
    * Validate prompt format
    * Checks for required variable placeholders
    */
-  validatePrompt(prompt: string, requiredVariables: string[]): {
+  validatePrompt(
+    prompt: string,
+    requiredVariables: string[]
+  ): {
     valid: boolean
     missing: string[]
   } {
@@ -167,9 +170,7 @@ export class PromptsClient {
       foundVariables.add(match[1])
     }
 
-    const missing = requiredVariables.filter(
-      (variable) => !foundVariables.has(variable),
-    )
+    const missing = requiredVariables.filter((variable) => !foundVariables.has(variable))
 
     return {
       valid: missing.length === 0,

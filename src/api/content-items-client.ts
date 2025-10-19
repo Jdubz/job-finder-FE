@@ -27,7 +27,7 @@ export class ContentItemsClient extends BaseApiClient {
    */
   async getItems(filters?: ContentItemFilters, options?: RequestOptions): Promise<ContentItem[]> {
     const params = new URLSearchParams()
-    
+
     if (filters) {
       if (filters.type) params.append("type", filters.type.join(","))
       if (filters.parentId !== undefined) params.append("parentId", filters.parentId || "")
@@ -51,10 +51,13 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Get content items organized in a hierarchy (with children)
    */
-  async getHierarchy(filters?: ContentItemFilters, options?: RequestOptions): Promise<ContentItemWithChildren[]> {
+  async getHierarchy(
+    filters?: ContentItemFilters,
+    options?: RequestOptions
+  ): Promise<ContentItemWithChildren[]> {
     const params = new URLSearchParams()
     params.append("hierarchy", "true")
-    
+
     if (filters) {
       if (filters.type) params.append("type", filters.type.join(","))
       if (filters.visibility) params.append("visibility", filters.visibility.join(","))
@@ -62,7 +65,10 @@ export class ContentItemsClient extends BaseApiClient {
       if (filters.search) params.append("search", filters.search)
     }
 
-    const response = await this.get<ContentItemApiResponse>(`${this.baseEndpoint}?${params}`, options)
+    const response = await this.get<ContentItemApiResponse>(
+      `${this.baseEndpoint}?${params}`,
+      options
+    )
 
     if (!response.success || !response.data?.hierarchy) {
       throw new Error(response.error || "Failed to fetch content items hierarchy")
@@ -88,10 +94,14 @@ export class ContentItemsClient extends BaseApiClient {
    * Create a new content item
    */
   async createItem(data: CreateContentItemData, options?: RequestOptions): Promise<ContentItem> {
-    const response = await this.post<ContentItemApiResponse>(this.baseEndpoint, {
-      action: "create",
-      ...data,
-    }, options)
+    const response = await this.post<ContentItemApiResponse>(
+      this.baseEndpoint,
+      {
+        action: "create",
+        ...data,
+      },
+      options
+    )
 
     if (!response.success || !response.data?.item) {
       throw new Error(response.error || "Failed to create content item")
@@ -103,11 +113,19 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Update an existing content item
    */
-  async updateItem(id: string, data: UpdateContentItemData, options?: RequestOptions): Promise<ContentItem> {
-    const response = await this.put<ContentItemApiResponse>(`${this.baseEndpoint}/${id}`, {
-      action: "update",
-      ...data,
-    }, options)
+  async updateItem(
+    id: string,
+    data: UpdateContentItemData,
+    options?: RequestOptions
+  ): Promise<ContentItem> {
+    const response = await this.put<ContentItemApiResponse>(
+      `${this.baseEndpoint}/${id}`,
+      {
+        action: "update",
+        ...data,
+      },
+      options
+    )
 
     if (!response.success || !response.data?.item) {
       throw new Error(response.error || "Failed to update content item")
@@ -119,14 +137,18 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Delete a content item (and optionally its children)
    */
-  async deleteItem(id: string, deleteChildren?: boolean, options?: RequestOptions): Promise<number> {
+  async deleteItem(
+    id: string,
+    deleteChildren?: boolean,
+    options?: RequestOptions
+  ): Promise<number> {
     const params = new URLSearchParams()
     if (deleteChildren) params.append("deleteChildren", "true")
 
-    const url = params.toString() 
+    const url = params.toString()
       ? `${this.baseEndpoint}/${id}?${params}`
       : `${this.baseEndpoint}/${id}`
-    
+
     const response = await this.delete<ContentItemApiResponse>(url, options)
 
     if (!response.success) {
@@ -139,10 +161,17 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Reorder content items
    */
-  async reorderItems(items: Array<{ id: string; order: number }>, options?: RequestOptions): Promise<void> {
-    const response = await this.patch<ContentItemApiResponse>(`${this.baseEndpoint}/reorder`, {
-      items
-    }, options)
+  async reorderItems(
+    items: Array<{ id: string; order: number }>,
+    options?: RequestOptions
+  ): Promise<void> {
+    const response = await this.patch<ContentItemApiResponse>(
+      `${this.baseEndpoint}/reorder`,
+      {
+        items,
+      },
+      options
+    )
 
     if (!response.success) {
       throw new Error(response.error || "Failed to reorder content items")
@@ -153,7 +182,7 @@ export class ContentItemsClient extends BaseApiClient {
    * Get content items by type
    */
   async getItemsByType<T extends ContentItem>(
-    type: ContentItemType, 
+    type: ContentItemType,
     options?: RequestOptions
   ): Promise<T[]> {
     const items = await this.getItems({ type: [type] }, options)
@@ -171,8 +200,8 @@ export class ContentItemsClient extends BaseApiClient {
    * Get all projects (optionally for a specific company)
    */
   async getProjects(companyId?: string, options?: RequestOptions) {
-    const filters: ContentItemFilters = companyId 
-      ? { type: ["project"], parentId: companyId } 
+    const filters: ContentItemFilters = companyId
+      ? { type: ["project"], parentId: companyId }
       : { type: ["project"] }
     return this.getItems(filters, options)
   }
@@ -208,10 +237,17 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Import content items from JSON
    */
-  async importItems(items: CreateContentItemData[], options?: RequestOptions): Promise<ContentItem[]> {
-    const response = await this.post<ContentItemApiResponse>(`${this.baseEndpoint}/import`, {
-      items
-    }, options)
+  async importItems(
+    items: CreateContentItemData[],
+    options?: RequestOptions
+  ): Promise<ContentItem[]> {
+    const response = await this.post<ContentItemApiResponse>(
+      `${this.baseEndpoint}/import`,
+      {
+        items,
+      },
+      options
+    )
 
     if (!response.success || !response.data?.items) {
       throw new Error(response.error || "Failed to import content items")
@@ -223,19 +259,22 @@ export class ContentItemsClient extends BaseApiClient {
   /**
    * Export all content items
    */
-  async exportItems(filters?: ContentItemFilters, options?: RequestOptions): Promise<ContentItem[]> {
+  async exportItems(
+    filters?: ContentItemFilters,
+    options?: RequestOptions
+  ): Promise<ContentItem[]> {
     const params = new URLSearchParams()
-    
+
     if (filters) {
       if (filters.type) params.append("type", filters.type.join(","))
       if (filters.visibility) params.append("visibility", filters.visibility.join(","))
       if (filters.tags) params.append("tags", filters.tags.join(","))
     }
 
-    const url = params.toString() 
+    const url = params.toString()
       ? `${this.baseEndpoint}/export?${params}`
       : `${this.baseEndpoint}/export`
-    
+
     const response = await this.get<ContentItemApiResponse>(url, options)
 
     if (!response.success || !response.data?.items) {
@@ -255,7 +294,8 @@ export class ContentItemsClient extends BaseApiClient {
 
 // Portfolio Functions URL from environment
 const portfolioFunctionsUrl =
-  import.meta.env.VITE_PORTFOLIO_FUNCTIONS_URL || "https://us-central1-static-sites-257923.cloudfunctions.net"
+  import.meta.env.VITE_PORTFOLIO_FUNCTIONS_URL ||
+  "https://us-central1-static-sites-257923.cloudfunctions.net"
 
 // Create singleton instance
 export const contentItemsClient = new ContentItemsClient(portfolioFunctionsUrl)

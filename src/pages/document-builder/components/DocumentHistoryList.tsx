@@ -129,57 +129,56 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
       </CardHeader>
       <CardContent className="space-y-3">
         {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-            >
-              {/* Icon */}
-              <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
-                <FileText className="w-6 h-6 text-primary" />
-              </div>
+          <div
+            key={doc.id}
+            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+          >
+            {/* Icon */}
+            <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
+              <FileText className="w-6 h-6 text-primary" />
+            </div>
 
-              {/* Document Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold truncate">{doc.jobTitle}</h4>
-                  <Badge variant={doc.type === "resume" ? "default" : "secondary"} className="shrink-0">
-                    {doc.type === "resume" ? "Resume" : "Cover Letter"}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground truncate mb-1">{doc.companyName}</p>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <CalendarDays className="w-3 h-3" />
-                  {new Date(doc.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
+            {/* Document Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold truncate">{doc.jobTitle}</h4>
+                <Badge
+                  variant={doc.type === "resume" ? "default" : "secondary"}
+                  className="shrink-0"
+                >
+                  {doc.type === "resume" ? "Resume" : "Cover Letter"}
+                </Badge>
               </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(doc.documentUrl)}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(doc.id)}
-                  disabled={deletingId === doc.id}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+              <p className="text-sm text-muted-foreground truncate mb-1">{doc.companyName}</p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <CalendarDays className="w-3 h-3" />
+                {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </div>
             </div>
-          ))}
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={() => handleDownload(doc.documentUrl)}>
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDelete(doc.id)}
+                disabled={deletingId === doc.id}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   )

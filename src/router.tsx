@@ -6,9 +6,7 @@ import { PublicRoute } from "@/components/auth/PublicRoute"
 import { ROUTES } from "@/types/routes"
 
 // Lazy load pages for code splitting
-const HomePage = lazy(() =>
-  import("@/pages/HomePage").then((m) => ({ default: m.HomePage }))
-)
+const HomePage = lazy(() => import("@/pages/HomePage").then((m) => ({ default: m.HomePage })))
 const HowItWorksPage = lazy(() =>
   import("@/pages/how-it-works/HowItWorksPage").then((m) => ({
     default: m.HowItWorksPage,

@@ -2,10 +2,10 @@ import type { QueueItem } from "@jsdubzw/job-finder-shared-types"
 import { Card, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Clock, 
-  Zap, 
-  CheckCircle2, 
+import {
+  Clock,
+  Zap,
+  CheckCircle2,
   XCircle,
   Pause,
   Filter,
@@ -13,7 +13,7 @@ import {
   RotateCcw,
   Trash2,
   ExternalLink,
-  Calendar
+  Calendar,
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -25,13 +25,7 @@ interface QueueItemCardProps {
   onCancel: (id: string) => void
 }
 
-export function QueueItemCard({ 
-  item, 
-  selected, 
-  onSelect, 
-  onRetry, 
-  onCancel 
-}: QueueItemCardProps) {
+export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: QueueItemCardProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -72,19 +66,19 @@ export function QueueItemCard({
 
   const formatDate = (date: unknown) => {
     if (!date) return "N/A"
-    
-    if (date && typeof date === 'object' && 'toDate' in date) {
+
+    if (date && typeof date === "object" && "toDate" in date) {
       return format((date as { toDate: () => Date }).toDate(), "MMM d, yyyy 'at' h:mm a")
     }
-    
+
     if (date instanceof Date) {
       return format(date, "MMM d, yyyy 'at' h:mm a")
     }
-    
-    if (typeof date === 'string' || typeof date === 'number') {
+
+    if (typeof date === "string" || typeof date === "number") {
       return new Date(date).toLocaleString()
     }
-    
+
     return "N/A"
   }
 
@@ -101,11 +95,19 @@ export function QueueItemCard({
             onChange={(e) => onSelect(item.id!, e.target.checked)}
             className="mt-1 rounded border-gray-300"
           />
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               {getStatusIcon(item.status)}
-              <Badge variant={getStatusBadgeVariant(item.status) as "default" | "secondary" | "destructive" | "outline"}>
+              <Badge
+                variant={
+                  getStatusBadgeVariant(item.status) as
+                    | "default"
+                    | "secondary"
+                    | "destructive"
+                    | "outline"
+                }
+              >
                 {item.status}
               </Badge>
               <Badge variant="outline">{item.type}</Badge>
@@ -153,9 +155,7 @@ export function QueueItemCard({
                   <div className="text-xs font-medium text-muted-foreground mb-1">
                     Result Message:
                   </div>
-                  <div className="text-sm text-foreground">
-                    {item.result_message}
-                  </div>
+                  <div className="text-sm text-foreground">{item.result_message}</div>
                 </div>
               )}
 

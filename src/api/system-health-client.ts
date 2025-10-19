@@ -72,16 +72,16 @@ export class SystemHealthClient extends BaseApiClient {
   async getHealthMetrics(): Promise<SystemHealthMetrics> {
     // For now, return mock data since we don't have backend health endpoints
     // In production, this would call: return this.get("/health")
-    
+
     const now = new Date()
-    
+
     return {
       api: {
         status: "healthy",
         responseTime: Math.random() * 200 + 50, // 50-250ms
         uptime: Date.now() - (Date.now() % (24 * 60 * 60 * 1000)), // Today's uptime
         version: "1.0.0",
-        lastChecked: now
+        lastChecked: now,
       },
       queue: {
         status: Math.random() > 0.8 ? "degraded" : "healthy",
@@ -90,13 +90,13 @@ export class SystemHealthClient extends BaseApiClient {
         processingItems: Math.floor(Math.random() * 10) + 1,
         failedItems: Math.floor(Math.random() * 20),
         avgProcessingTime: Math.random() * 30000 + 5000, // 5-35 seconds
-        lastProcessed: new Date(Date.now() - Math.random() * 60000) // Last minute
+        lastProcessed: new Date(Date.now() - Math.random() * 60000), // Last minute
       },
       database: {
         status: "healthy",
         connectionCount: Math.floor(Math.random() * 10) + 5,
         responseTime: Math.random() * 50 + 10, // 10-60ms
-        lastChecked: now
+        lastChecked: now,
       },
       ai: {
         status: Math.random() > 0.9 ? "degraded" : "healthy",
@@ -107,16 +107,16 @@ export class SystemHealthClient extends BaseApiClient {
         quotaUsage: {
           used: Math.floor(Math.random() * 8000) + 1000,
           limit: 10000,
-          resetDate: new Date(Date.now() + 24 * 60 * 60 * 1000) // Tomorrow
-        }
+          resetDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+        },
       },
       storage: {
         status: "healthy",
         documentsStored: Math.floor(Math.random() * 5000) + 1000,
         storageUsed: Math.random() * 0.7 + 0.1, // 10-80% usage
         storageLimit: 1, // 100%
-        lastBackup: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000) // Last 24 hours
-      }
+        lastBackup: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000), // Last 24 hours
+      },
     }
   }
 
@@ -126,7 +126,7 @@ export class SystemHealthClient extends BaseApiClient {
   async getSystemAlerts(): Promise<SystemAlerts[]> {
     // Mock alerts data
     const alerts: SystemAlerts[] = []
-    
+
     if (Math.random() > 0.7) {
       alerts.push({
         id: "alert-1",
@@ -134,21 +134,21 @@ export class SystemHealthClient extends BaseApiClient {
         component: "queue",
         message: "Queue processing is slower than usual",
         timestamp: new Date(Date.now() - Math.random() * 60000),
-        resolved: false
+        resolved: false,
       })
     }
-    
+
     if (Math.random() > 0.8) {
       alerts.push({
-        id: "alert-2", 
+        id: "alert-2",
         type: "info",
         component: "ai",
         message: "AI quota usage is at 80%",
         timestamp: new Date(Date.now() - Math.random() * 300000),
-        resolved: false
+        resolved: false,
       })
     }
-    
+
     if (Math.random() > 0.9) {
       alerts.push({
         id: "alert-3",
@@ -156,10 +156,10 @@ export class SystemHealthClient extends BaseApiClient {
         component: "database",
         message: "Database connection timeout detected",
         timestamp: new Date(Date.now() - Math.random() * 600000),
-        resolved: Math.random() > 0.5
+        resolved: Math.random() > 0.5,
       })
     }
-    
+
     return alerts
   }
 
@@ -181,23 +181,26 @@ export class SystemHealthClient extends BaseApiClient {
       "Rate limit applied",
       "Authentication successful",
       "Job search initiated",
-      "Configuration updated"
+      "Configuration updated",
     ]
-    
+
     for (let i = 0; i < Math.min(limit, 50); i++) {
       logs.push({
         timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000),
         level: levels[Math.floor(Math.random() * levels.length)],
         component: components[Math.floor(Math.random() * components.length)],
         message: messages[Math.floor(Math.random() * messages.length)],
-        details: Math.random() > 0.7 ? {
-          userId: `user-${Math.floor(Math.random() * 100)}`,
-          duration: Math.floor(Math.random() * 5000),
-          status: Math.random() > 0.8 ? "error" : "success"
-        } : undefined
+        details:
+          Math.random() > 0.7
+            ? {
+                userId: `user-${Math.floor(Math.random() * 100)}`,
+                duration: Math.floor(Math.random() * 5000),
+                status: Math.random() > 0.8 ? "error" : "success",
+              }
+            : undefined,
       })
     }
-    
+
     return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
   }
 
@@ -218,11 +221,12 @@ export class SystemHealthClient extends BaseApiClient {
     timestamp: Date
   }> {
     // In production: return this.post("/health-check")
-    
+
     return {
       success: Math.random() > 0.1, // 90% success rate
-      message: Math.random() > 0.1 ? "All systems operational" : "Some components are experiencing issues",
-      timestamp: new Date()
+      message:
+        Math.random() > 0.1 ? "All systems operational" : "Some components are experiencing issues",
+      timestamp: new Date(),
     }
   }
 }

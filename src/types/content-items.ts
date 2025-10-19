@@ -218,22 +218,34 @@ export interface ContentItemApiResponse {
 /**
  * Create/Update data types (for forms)
  */
-export type CreateCompanyData = Omit<CompanyItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+export type CreateCompanyData = Omit<
+  CompanyItem,
+  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+>
 export type UpdateCompanyData = Partial<
   Omit<CompanyItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
 
-export type CreateProjectData = Omit<ProjectItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+export type CreateProjectData = Omit<
+  ProjectItem,
+  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+>
 export type UpdateProjectData = Partial<
   Omit<ProjectItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
 
-export type CreateSkillGroupData = Omit<SkillGroupItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+export type CreateSkillGroupData = Omit<
+  SkillGroupItem,
+  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+>
 export type UpdateSkillGroupData = Partial<
   Omit<SkillGroupItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
 
-export type CreateEducationData = Omit<EducationItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+export type CreateEducationData = Omit<
+  EducationItem,
+  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+>
 export type UpdateEducationData = Partial<
   Omit<EducationItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
@@ -246,7 +258,10 @@ export type UpdateProfileSectionData = Partial<
   Omit<ProfileSectionItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
 
-export type CreateTextSectionData = Omit<TextSectionItem, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+export type CreateTextSectionData = Omit<
+  TextSectionItem,
+  "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+>
 export type UpdateTextSectionData = Partial<
   Omit<TextSectionItem, "id" | "type" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
 >
