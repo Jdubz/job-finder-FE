@@ -6,9 +6,7 @@ import { PublicRoute } from "@/components/auth/PublicRoute"
 import { ROUTES } from "@/types/routes"
 
 // Lazy load pages for code splitting
-const HomePage = lazy(() =>
-  import("@/pages/HomePage").then((m) => ({ default: m.HomePage }))
-)
+const HomePage = lazy(() => import("@/pages/HomePage").then((m) => ({ default: m.HomePage })))
 const HowItWorksPage = lazy(() =>
   import("@/pages/how-it-works/HowItWorksPage").then((m) => ({
     default: m.HowItWorksPage,
@@ -53,6 +51,11 @@ const QueueManagementPage = lazy(() =>
 const JobFinderConfigPage = lazy(() =>
   import("@/pages/job-finder-config/JobFinderConfigPage").then((m) => ({
     default: m.JobFinderConfigPage,
+  }))
+)
+const SystemHealthPage = lazy(() =>
+  import("@/pages/system-health/SystemHealthPage").then((m) => ({
+    default: m.SystemHealthPage,
   }))
 )
 const LoginPage = lazy(() =>
@@ -118,14 +121,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.AI_PROMPTS,
-            element: (
-              <LazyPage>
-                <AIPromptsPage />
-              </LazyPage>
-            ),
-          },
-          {
             path: ROUTES.SETTINGS,
             element: (
               <LazyPage>
@@ -156,6 +151,14 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute requireEditor />,
         children: [
+          {
+            path: ROUTES.AI_PROMPTS,
+            element: (
+              <LazyPage>
+                <AIPromptsPage />
+              </LazyPage>
+            ),
+          },
           {
             path: ROUTES.DOCUMENT_HISTORY,
             element: (
@@ -193,6 +196,14 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <JobFinderConfigPage />
+              </LazyPage>
+            ),
+          },
+          {
+            path: ROUTES.SYSTEM_HEALTH,
+            element: (
+              <LazyPage>
+                <SystemHealthPage />
               </LazyPage>
             ),
           },
