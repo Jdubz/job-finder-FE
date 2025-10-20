@@ -22,10 +22,10 @@
 
 ## Overview
 
-The Job Finder frontend is deployed using Firebase Hosting with automated CI/CD via GitHub Actions. We maintain two environments:
+The Job Finder frontend is deployed using Firebase Hosting with automated CI/CD via GitHub Actions. We maintain two environments (Cloudflare serves as the public entry point while Firebase Hosting remains the origin):
 
-- **Staging**: https://job-finder-staging.web.app
-- **Production**: https://job-finder-production.web.app
+- **Staging**: https://job-finder-staging.joshwentworth.com (Cloudflare) → https://job-finder-staging.web.app (Firebase origin)
+- **Production**: https://job-finder.joshwentworth.com (Cloudflare) → https://job-finder-production.web.app (Firebase origin)
 
 ### Architecture
 - **Build Tool**: Vite 7.x
@@ -211,7 +211,7 @@ ls -la dist/
 firebase deploy --only hosting:staging
 
 # 8. Verify
-curl -I https://job-finder-staging.web.app
+curl -I https://job-finder-staging.joshwentworth.com  # Cloudflare proxy (origin remains https://job-finder-staging.web.app)
 ```
 
 ### Production Manual Deploy
@@ -245,7 +245,7 @@ ls -la dist/
 firebase deploy --only hosting:production
 
 # 9. Verify
-curl -I https://job-finder-production.web.app
+curl -I https://job-finder.joshwentworth.com  # Cloudflare proxy (origin remains https://job-finder-production.web.app)
 
 # 10. Tag deployment
 git tag -a "deploy-prod-$(date +%Y%m%d-%H%M%S)" -m "Production deployment $(date)"
@@ -269,7 +269,7 @@ firebase hosting:clone --site job-finder-staging
 firebase hosting:rollback --site job-finder-staging
 
 # Verify
-curl -I https://job-finder-staging.web.app
+curl -I https://job-finder-staging.joshwentworth.com  # Cloudflare proxy (origin: https://job-finder-staging.web.app)
 ```
 
 #### Production Rollback
@@ -283,7 +283,7 @@ firebase hosting:clone --site job-finder-production
 firebase hosting:rollback --site job-finder-production
 
 # Verify immediately
-curl -I https://job-finder-production.web.app
+curl -I https://job-finder.joshwentworth.com  # Cloudflare proxy (origin: https://job-finder-production.web.app)
 
 # Notify team
 echo "Production rolled back at $(date)" | tee -a rollback.log
@@ -328,14 +328,14 @@ git checkout deploy-prod-20251019-120000
 #### Manual Verification Checklist
 
 **Staging**:
-- [ ] Site loads: https://job-finder-staging.web.app
+- [ ] Site loads: https://job-finder-staging.joshwentworth.com (Cloudflare) → confirm origin via https://job-finder-staging.web.app if needed
 - [ ] Login page accessible
 - [ ] Firebase Auth works
 - [ ] API calls to Cloud Functions work (check Network tab)
 - [ ] No console errors
 
-**Production** (additional checks):
-- [ ] All staging checks pass
+- **Production** (additional checks):
+- [ ] All staging checks pass (Cloudflare front door: https://job-finder.joshwentworth.com; origin: https://job-finder-production.web.app)
 - [ ] Analytics loading correctly
 - [ ] No broken links in navigation
 - [ ] Job application flow works
@@ -368,11 +368,11 @@ du -sh dist/
 du -h dist/assets/*.js | sort -h | tail -5
 
 # Check response times
-time curl -I https://job-finder-staging.web.app
-time curl -I https://job-finder-production.web.app
+time curl -I https://job-finder-staging.joshwentworth.com  # Cloudflare proxy (origin: https://job-finder-staging.web.app)
+time curl -I https://job-finder.joshwentworth.com  # Cloudflare proxy (origin: https://job-finder-production.web.app)
 
 # Lighthouse audit (requires Chrome)
-npx lighthouse https://job-finder-production.web.app --output html --output-path ./lighthouse-report.html
+npx lighthouse https://job-finder.joshwentworth.com --output html --output-path ./lighthouse-report.html  # Run against Cloudflare front door (origin: https://job-finder-production.web.app)
 ```
 
 ---

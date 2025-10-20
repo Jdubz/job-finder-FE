@@ -22,9 +22,9 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [x] Firebase project verified (static-sites-257923)
 - [x] DNS records exist for both environments
 - [x] SSL certificates valid and active
-- [ ] Custom domain configured (if applicable)
-  - Current: `https://job-finder-production.web.app`
-  - Target: TBD by PM (e.g., `app.joshwentworth.com`)
+- [x] Custom domain configured
+  - Public staging: `https://job-finder-staging.joshwentworth.com` (Cloudflare proxy → `https://job-finder-staging.web.app`)
+  - Public production: `https://job-finder.joshwentworth.com` (Cloudflare proxy → `https://job-finder-production.web.app`)
 
 ### 2. Deployment Pipeline ✅
 
@@ -194,8 +194,8 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
    
 3. [ ] **Verify Deployment Success**
    ```bash
-   # Check HTTP status
-   curl -I https://job-finder-production.web.app
+  # Check HTTP status (Cloudflare front door; origin remains https://job-finder-production.web.app)
+  curl -I https://job-finder.joshwentworth.com
    
    # Check Cloud Functions
    for func in manageJobQueue manageGenerator manageExperience manageContentItems contact-form; do
@@ -253,7 +253,7 @@ Execute rollback immediately if:
 firebase hosting:rollback --site job-finder-production
 
 # 2. Verify rollback
-curl -I https://job-finder-production.web.app
+curl -I https://job-finder.joshwentworth.com  # Cloudflare proxy (origin: https://job-finder-production.web.app)
 
 # 3. Notify team
 echo "Production rolled back at $(date)" >> deployment.log
@@ -313,7 +313,8 @@ We'll update this thread with progress.
 
 Job Finder Frontend is now live in production!
 
-URL: https://job-finder-production.web.app
+Public URL: https://job-finder.joshwentworth.com (Cloudflare)
+Origin URL: https://job-finder-production.web.app (Firebase)
 Version: v1.0.0-production
 Status: All systems operational
 
@@ -334,7 +335,7 @@ Status: Previous version restored
 
 The team is investigating. We'll update you shortly.
 
-Current status: https://job-finder-production.web.app is stable
+Current status: https://job-finder.joshwentworth.com (Cloudflare) is stable
 ```
 
 ---
@@ -439,7 +440,7 @@ Deployment is considered successful when:
 ## Open Questions for PM
 
 - [ ] **Target Domain**: Should we use custom domain or stick with Firebase default?
-  - Current: `https://job-finder-production.web.app`
+  - Current: `https://job-finder.joshwentworth.com` (Cloudflare) → origin `https://job-finder-production.web.app`
   - Custom: `app.joshwentworth.com` or similar?
 
 - [ ] **Deployment Window**: When should we do the production cutover?
