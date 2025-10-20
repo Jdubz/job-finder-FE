@@ -28,6 +28,7 @@ The Job Finder frontend is deployed using Firebase Hosting with automated CI/CD 
 - **Production**: https://job-finder.joshwentworth.com (Cloudflare) → https://job-finder-production.web.app (Firebase origin)
 
 ### Architecture
+
 - **Build Tool**: Vite 7.x
 - **Hosting**: Firebase Hosting
 - **CI/CD**: GitHub Actions
@@ -38,11 +39,13 @@ The Job Finder frontend is deployed using Firebase Hosting with automated CI/CD 
 ## Prerequisites
 
 ### Required Access
+
 - GitHub repository write access
 - Firebase project access (static-sites-257923)
 - Firebase CLI installed and authenticated
 
 ### Required Tools
+
 ```bash
 # Node.js 20+
 node --version  # Should be 20.x or higher
@@ -56,6 +59,7 @@ firebase --version  # Should be 14.x or higher
 ```
 
 ### Authentication
+
 ```bash
 # Login to Firebase
 firebase login
@@ -74,12 +78,14 @@ firebase projects:list
 2. Create two environments:
 
 #### Staging Environment
+
 - **Name**: `staging`
 - **Deployment branches**: Only `staging` branch
 - **Environment secrets**: None needed (uses repository secrets)
 - **Protection rules**: None (auto-deploy on push)
 
 #### Production Environment
+
 - **Name**: `production`
 - **Deployment branches**: Only `main` branch
 - **Protection rules**:
@@ -108,10 +114,12 @@ To generate this secret:
 ```
 
 **Secret permissions required**:
+
 - Firebase Hosting Admin
 - Cloud Functions Viewer (optional, for verification)
 
 #### Optional Secrets (for future enhancements)
+
 - `SENTRY_DSN` - Error tracking
 - `SLACK_WEBHOOK_URL` - Deployment notifications
 - `DATADOG_API_KEY` - Performance monitoring
@@ -137,6 +145,7 @@ Ensure the following workflow files exist:
 **Trigger**: Push to `staging` branch
 
 **Process**:
+
 1. Quality checks run (lint, type-check, tests)
 2. Build application with `.env.staging` configuration
 3. Deploy to Firebase Hosting staging site
@@ -146,6 +155,7 @@ Ensure the following workflow files exist:
 **Typical Duration**: 3-5 minutes
 
 **Monitoring**:
+
 ```bash
 # Watch GitHub Actions
 # https://github.com/Jdubz/job-finder-FE/actions
@@ -159,6 +169,7 @@ firebase hosting:channel:list --site job-finder-staging
 **Trigger**: Push to `main` branch (requires PR merge)
 
 **Process**:
+
 1. Quality checks run (lint, type-check, tests, E2E smoke tests)
 2. Requires manual approval (if environment protection is enabled)
 3. Build application with `.env.production` configuration
@@ -170,6 +181,7 @@ firebase hosting:channel:list --site job-finder-staging
 **Typical Duration**: 5-7 minutes (including approval wait time)
 
 **Approval Process**:
+
 1. PR must be approved and merged to `main`
 2. Deployment waits for environment approval (if configured)
 3. PM or authorized reviewer approves deployment
@@ -180,6 +192,7 @@ firebase hosting:channel:list --site job-finder-staging
 ## Manual Deployments
 
 ### When to Use Manual Deployment
+
 - Emergency hotfix needed immediately
 - Automated pipeline is broken
 - Testing deployment process
@@ -261,6 +274,7 @@ git push origin --tags
 Firebase Hosting keeps previous versions available for instant rollback.
 
 #### Staging Rollback
+
 ```bash
 # List recent deployments
 firebase hosting:clone --site job-finder-staging
@@ -273,6 +287,7 @@ curl -I https://job-finder-staging.joshwentworth.com  # Cloudflare proxy (origin
 ```
 
 #### Production Rollback
+
 ```bash
 # ⚠️ PRODUCTION ROLLBACK - USE WITH CAUTION
 
@@ -321,6 +336,7 @@ git checkout deploy-prod-20251019-120000
 ### Post-Deployment Checks
 
 #### Automated Checks (in CI/CD)
+
 - ✅ Site returns HTTP 200
 - ✅ Cloud Functions endpoints accessible (401 = auth required = OK)
 - ✅ Build artifacts present
@@ -328,6 +344,7 @@ git checkout deploy-prod-20251019-120000
 #### Manual Verification Checklist
 
 **Staging**:
+
 - [ ] Site loads: https://job-finder-staging.joshwentworth.com (Cloudflare) → confirm origin via https://job-finder-staging.web.app if needed
 - [ ] Login page accessible
 - [ ] Firebase Auth works
@@ -384,12 +401,14 @@ npx lighthouse https://job-finder.joshwentworth.com --output html --output-path 
 **Symptom**: `npm run build` fails
 
 **Common Causes**:
+
 1. TypeScript errors
 2. Missing dependencies
 3. Environment variable issues
 4. Memory issues
 
 **Solutions**:
+
 ```bash
 # Check TypeScript errors
 npm run type-check
@@ -410,12 +429,14 @@ NODE_OPTIONS="--max-old-space-size=4096" npm run build
 **Symptom**: Firebase deployment fails
 
 **Common Causes**:
+
 1. Authentication issues
 2. Wrong project/target
 3. Build artifacts missing
 4. Permission issues
 
 **Solutions**:
+
 ```bash
 # Re-authenticate
 firebase logout
@@ -438,11 +459,13 @@ firebase deploy --only hosting:staging --debug
 **Symptom**: Deployed site shows 404
 
 **Causes**:
+
 1. Wrong hosting target
 2. Build artifacts not uploaded
 3. Routing configuration issue
 
 **Solutions**:
+
 ```bash
 # Check hosting configuration
 cat firebase.json
@@ -462,12 +485,14 @@ firebase deploy --only hosting:staging
 **Symptom**: Frontend can't reach Cloud Functions
 
 **Causes**:
+
 1. Wrong endpoint URL
 2. Functions not deployed
 3. CORS issues
 4. Authentication problems
 
 **Solutions**:
+
 ```bash
 # Check function URLs in environment
 cat .env.staging
@@ -488,6 +513,7 @@ curl -i https://us-central1-static-sites-257923.cloudfunctions.net/manageJobQueu
 **Impact**: Low (gzipped size is acceptable)
 
 **Future Optimization**:
+
 ```typescript
 // Implement dynamic imports in routes
 const JobApplicationsPage = lazy(() => import('./pages/JobApplicationsPage'))
@@ -510,11 +536,13 @@ build: {
 ## Emergency Contacts
 
 ### Team
+
 - **PM**: [Contact info]
 - **Worker A** (Backend/DevOps): [Contact info]
 - **Worker B** (Frontend): [Contact info]
 
 ### Escalation Path
+
 1. Check GitHub Actions logs
 2. Check Firebase Console logs
 3. Contact Worker A (deployment specialist)
@@ -522,6 +550,7 @@ build: {
 5. If critical production issue, execute rollback immediately
 
 ### Resources
+
 - **Firebase Console**: https://console.firebase.google.com/project/static-sites-257923
 - **GitHub Actions**: https://github.com/Jdubz/job-finder-FE/actions
 - **Documentation**: `/docs/architecture/FE_DEPLOYMENT_PLAN.md`
@@ -534,6 +563,7 @@ build: {
 ### Environment Variables Reference
 
 #### Staging (.env.staging)
+
 ```bash
 VITE_FIREBASE_PROJECT_ID=static-sites-257923
 VITE_FIREBASE_AUTH_DOMAIN=staging.joshwentworth.com
@@ -543,6 +573,7 @@ VITE_ENVIRONMENT=staging
 ```
 
 #### Production (.env.production)
+
 ```bash
 VITE_FIREBASE_PROJECT_ID=static-sites-257923
 VITE_FIREBASE_AUTH_DOMAIN=joshwentworth.com
@@ -576,10 +607,10 @@ rm -rf node_modules/.vite dist/
 
 ### Change Log
 
-| Date | Version | Changes | Author |
-|------|---------|---------|--------|
-| 2025-10-19 | 1.0 | Initial runbook created | Worker A |
-| 2025-10-19 | 1.1 | Added automated pipeline documentation | Worker A |
+| Date       | Version | Changes                                | Author   |
+| ---------- | ------- | -------------------------------------- | -------- |
+| 2025-10-19 | 1.0     | Initial runbook created                | Worker A |
+| 2025-10-19 | 1.1     | Added automated pipeline documentation | Worker A |
 
 ---
 

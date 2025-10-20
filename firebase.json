@@ -3,13 +3,7 @@
     {
       "target": "staging",
       "public": "dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**",
-        "**/.DS_Store",
-        "**/Thumbs.db"
-      ],
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/.DS_Store", "**/Thumbs.db"],
       "cleanUrls": true,
       "trailingSlash": false,
       "rewrites": [
@@ -97,13 +91,7 @@
     {
       "target": "production",
       "public": "dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**",
-        "**/.DS_Store",
-        "**/Thumbs.db"
-      ],
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/.DS_Store", "**/Thumbs.db"],
       "cleanUrls": true,
       "trailingSlash": false,
       "rewrites": [

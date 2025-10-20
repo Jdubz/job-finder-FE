@@ -6,9 +6,11 @@
 - **Labels**: priority-p1, repository-frontend, type-migration, status-todo
 
 ## What This Issue Covers
+
 Replace every legacy Portfolio API dependency with the new `job-finder-BE` endpoints, refresh the shared types dependency, and prove the frontend works against staging using only assets located in `job-finder-FE`.
 
 ## Tasks
+
 1. **Inventory Existing Calls**
    - Run `npm run lint` to surface type warnings, then search for `portfolio`, `legacy`, or hard-coded `cloudfunctions.net` URLs in `src/`.
    - Capture findings in a table appended to this issue with columns: component/hook, current endpoint, replacement endpoint, status.
@@ -32,6 +34,7 @@ Replace every legacy Portfolio API dependency with the new `job-finder-BE` endpo
    - Remove or rewrite sections referencing the Portfolio backend to avoid confusion.
 
 ## Acceptance Criteria
+
 - [ ] Endpoint replacement table completed and committed in this issue.
 - [ ] All API clients point to `job-finder-BE`; lint/build show no references to legacy Portfolio URLs.
 - [ ] Shared types updated with zero `any` fallbacks and passing TypeScript build.
@@ -40,12 +43,14 @@ Replace every legacy Portfolio API dependency with the new `job-finder-BE` endpo
 - [ ] `npm run lint`, `npm run test`, and `npm run build` succeed.
 
 ## Test Commands
+
 - `npm run test -- api`
 - `npm run lint`
 - `npm run build`
 - `npm run preview`
 
 ## Useful Files
+
 - `src/config/api.ts`
 - `src/api/`
 - `src/tests/api/`

@@ -6,9 +6,11 @@
 - **Labels**: priority-p1, repository-frontend, type-performance, status-todo
 
 ## Why This Matters
+
 `npm run build` currently generates a main chunk (`dist/assets/index-uADF9HG1.js`) of ~756 KB. Slow initial loads hurt Core Web Vitals and limit frontend deploy velocity. We need a clear, reproducible plan to cut the bundle down using only the files in this repo.
 
 ## Approach
+
 1. **Measure the Baseline**
    - Run `npm run build -- --analyze` (Vite’s visualizer). If the analyzer is not installed, add it under `devDependencies` and commit the configuration.
    - Save the output as `docs/perf/bundle-report-YYYYMMDD.md` with top offenders listed (import path + size).
@@ -27,12 +29,14 @@
    - Smoke test major pages: `/`, `/job-finder`, `/document-builder`, `/queue-management`.
 
 ## Deliverables
+
 - Updated code with tree-shaken imports and lazy loading.
 - `docs/perf/bundle-report-<date>.md` summarizing before/after bundle sizes.
 - `scripts/check-bundle-size.mjs` (or similar) plus `npm run check:bundle` command.
 - README snippet describing how to run bundle analysis.
 
 ## Acceptance Criteria
+
 - [ ] Main bundle (`dist/assets/index-*.js`) is < 500 KB after `npm run build`.
 - [ ] Bundle report committed documenting the reduction.
 - [ ] Automatic size check exists and is enforced in CI or as a pre-commit step.
@@ -40,6 +44,7 @@
 - [ ] `npm run lint`, `npm run test`, and `npm run build` pass.
 
 ## Helpful Files
+
 - `src/router.tsx` — current lazy-loading setup.
 - `src/config/firebase.ts` — Firebase import surface.
 - `src/components/*` — icon and UI imports.

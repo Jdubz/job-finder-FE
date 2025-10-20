@@ -50,6 +50,7 @@ npm run test:coverage
 ## Test Categories
 
 ### 1. API Client Tests
+
 - **Generator API**: Document generation (resumes, cover letters)
 - **Content Items API**: CRUD operations for experience, projects, skills
 - **Job Queue API**: Job submission and queue management
@@ -57,6 +58,7 @@ npm run test:coverage
 - **Authentication**: User sign-in, sign-out, token management
 
 ### 2. Error Handling Tests
+
 - Network failures and timeouts
 - Authentication errors (401, 403)
 - Validation errors (400)
@@ -64,6 +66,7 @@ npm run test:coverage
 - Rate limiting (429)
 
 ### 3. Data Validation Tests
+
 - Request/response structure validation
 - Type safety and data integrity
 - Timestamp and relationship consistency
@@ -93,11 +96,13 @@ VITE_TEST_EDITOR_PASSWORD=editorpassword123
 For full integration testing with Firebase:
 
 1. Install Firebase CLI:
+
    ```bash
    npm install -g firebase-tools
    ```
 
 2. Start Firebase emulators:
+
    ```bash
    firebase emulators:start
    ```
@@ -119,6 +124,7 @@ For full integration testing with Firebase:
 ### With Firebase Emulator
 
 All tests should pass when Firebase emulator is running, as they can:
+
 - Authenticate test users
 - Make actual API calls
 - Test real-time data synchronization
@@ -129,27 +135,27 @@ All tests should pass when Firebase emulator is running, as they can:
 ### Basic Integration Test Template
 
 ```typescript
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
-import { yourClient } from '@/api/your-client'
-import { signInTestUser, cleanupTestAuth } from '../utils/testHelpers'
-import { auth } from '@/config/firebase'
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest"
+import { yourClient } from "@/api/your-client"
+import { signInTestUser, cleanupTestAuth } from "../utils/testHelpers"
+import { auth } from "@/config/firebase"
 
 // Skip if Firebase is mocked
-const isFirebaseMocked = typeof vi !== 'undefined' && vi.isMockFunction(auth.currentUser as never)
+const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
 const describeIntegration = isFirebaseMocked ? describe.skip : describe
 
-describeIntegration('Your API Integration', () => {
+describeIntegration("Your API Integration", () => {
   beforeAll(async () => {
-    await signInTestUser('regular')
+    await signInTestUser("regular")
   })
 
   beforeEach(async () => {
     await cleanupTestAuth()
-    await signInTestUser('regular')
+    await signInTestUser("regular")
   })
 
-  describe('Your Test Suite', () => {
-    it('should test something', async () => {
+  describe("Your Test Suite", () => {
+    it("should test something", async () => {
       // Your test code
       expect(true).toBe(true)
     })
@@ -161,15 +167,15 @@ describeIntegration('Your API Integration', () => {
 
 ```typescript
 import {
-  signInTestUser,           // Sign in test user
-  cleanupTestAuth,          // Sign out and cleanup
-  getTestAuthToken,         // Get auth token
+  signInTestUser, // Sign in test user
+  cleanupTestAuth, // Sign out and cleanup
+  getTestAuthToken, // Get auth token
   makeAuthenticatedRequest, // Make authenticated API call
   makeUnauthenticatedRequest, // Make unauthenticated API call
-  generateTestId,           // Generate unique test ID
-  waitFor,                  // Wait for async condition
-  delay,                    // Delay execution
-} from '../utils/testHelpers'
+  generateTestId, // Generate unique test ID
+  waitFor, // Wait for async condition
+  delay, // Delay execution
+} from "../utils/testHelpers"
 ```
 
 ### Using Mock Data
@@ -183,27 +189,31 @@ import {
   mockSkillItem,
   mockQueueStats,
   mockErrorResponses,
-} from '../fixtures/mockData'
+} from "../fixtures/mockData"
 ```
 
 ## Best Practices
 
 ### 1. Test Isolation
+
 - Clean up authentication between tests
 - Don't rely on test execution order
 - Use unique IDs for test data
 
 ### 2. Assertions
+
 - Test both success and failure cases
 - Validate data structure and content
 - Check edge cases and boundaries
 
 ### 3. Error Handling
+
 - Test all error scenarios (4xx, 5xx)
 - Validate error messages and codes
 - Test retry and recovery behavior
 
 ### 4. Performance
+
 - Use appropriate timeouts
 - Mock expensive operations when possible
 - Run tests in parallel when safe
@@ -215,6 +225,7 @@ import {
 **Problem**: Tests fail with `auth/network-request-failed`
 
 **Solution**: These tests require Firebase emulator or real backend:
+
 ```bash
 firebase emulators:start
 npm run test:integration
@@ -230,7 +241,8 @@ npm run test:integration
 
 **Problem**: Tests fail with auth errors
 
-**Solution**: 
+**Solution**:
+
 1. Check `.env.test` has correct credentials
 2. Ensure Firebase emulator is running
 3. Verify test users exist in emulator
@@ -240,6 +252,7 @@ npm run test:integration
 **Problem**: Tests timeout waiting for responses
 
 **Solution**:
+
 1. Increase test timeout in test file
 2. Check backend is responsive
 3. Verify network connectivity
@@ -280,6 +293,7 @@ When adding new tests:
 ## Support
 
 For questions or issues with tests:
+
 - Check existing test files for examples
 - Review test helpers and mock data
 - Consult the main [CLAUDE.md](../CLAUDE.md) for project context

@@ -1,44 +1,59 @@
 /**
  * Test Helper Utilities
- * 
+ *
  * Shared utilities for integration and E2E tests
  */
 
-import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '@/config/firebase'
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/config/firebase"
 
 /**
  * Test user credentials
  */
 export const TEST_USERS = {
   regular: {
-    email: process.env.VITE_TEST_USER_EMAIL || 'test@example.com',
-    password: process.env.VITE_TEST_USER_PASSWORD || 'testpassword123',
+    email: process.env.VITE_TEST_USER_EMAIL || "test@example.com",
+    password: process.env.VITE_TEST_USER_PASSWORD || "testpassword123",
   },
   editor: {
-    email: process.env.VITE_TEST_EDITOR_EMAIL || 'editor@example.com',
-    password: process.env.VITE_TEST_EDITOR_PASSWORD || 'editorpassword123',
+    email: process.env.VITE_TEST_EDITOR_EMAIL || "editor@example.com",
+    password: process.env.VITE_TEST_EDITOR_PASSWORD || "editorpassword123",
   },
 }
 
 /**
  * Get authentication token for test user
  */
-export async function getTestAuthToken(userType: 'regular' | 'editor' = 'regular'): Promise<string> {
+export async function getTestAuthToken(
+  userType: "regular" | "editor" = "regular"
+): Promise<string> {
   const { email, password } = TEST_USERS[userType]
 
   if (!email || !password) {
-    throw new Error('Test credentials not configured')
+    throw new Error("Test credentials not configured")
   }
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     return await userCredential.user.getIdToken()
   } catch (error) {
+    const errorCode = (error as { code?: string }).code
+
     // If user doesn't exist in emulator, create it
-    if ((error as { code?: string }).code === 'auth/user-not-found') {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      return await userCredential.user.getIdToken()
+    if (errorCode === "auth/user-not-found" || errorCode === "auth/invalid-credential") {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        return await userCredential.user.getIdToken()
+      } catch (createError) {
+        const createErrorCode = (createError as { code?: string }).code
+
+        // If user was created between our check and create attempt, try signing in again
+        if (createErrorCode === "auth/email-already-in-use") {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password)
+          return await userCredential.user.getIdToken()
+        }
+        throw createError
+      }
     }
     throw error
   }
@@ -47,17 +62,30 @@ export async function getTestAuthToken(userType: 'regular' | 'editor' = 'regular
 /**
  * Sign in test user and return auth token
  */
-export async function signInTestUser(userType: 'regular' | 'editor' = 'regular') {
+export async function signInTestUser(userType: "regular" | "editor" = "regular") {
   const { email, password } = TEST_USERS[userType]
-  
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
     return userCredential.user
   } catch (error) {
+    const errorCode = (error as { code?: string }).code
+
     // If user doesn't exist in emulator, create it
-    if ((error as { code?: string }).code === 'auth/user-not-found') {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      return userCredential.user
+    if (errorCode === "auth/user-not-found" || errorCode === "auth/invalid-credential") {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        return userCredential.user
+      } catch (createError) {
+        const createErrorCode = (createError as { code?: string }).code
+
+        // If user was created between our check and create attempt, try signing in again
+        if (createErrorCode === "auth/email-already-in-use") {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password)
+          return userCredential.user
+        }
+        throw createError
+      }
     }
     throw error
   }
@@ -71,7 +99,7 @@ export async function cleanupTestAuth() {
     await signOut(auth)
   } catch (error) {
     // Ignore errors during cleanup
-    console.warn('Failed to sign out during cleanup:', error)
+    console.warn("Failed to sign out during cleanup:", error)
   }
 }
 
@@ -88,8 +116,8 @@ export async function makeAuthenticatedRequest(
     ...options,
     headers: {
       ...options.headers,
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   })
 }
@@ -105,7 +133,7 @@ export async function makeUnauthenticatedRequest(
     ...options,
     headers: {
       ...options.headers,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   })
 }
@@ -121,10 +149,10 @@ export async function waitFor<T>(
     errorMessage?: string
   } = {}
 ): Promise<T> {
-  const { timeout = 5000, interval = 100, errorMessage = 'Timeout waiting for condition' } = options
-  
+  const { timeout = 5000, interval = 100, errorMessage = "Timeout waiting for condition" } = options
+
   const startTime = Date.now()
-  
+
   while (Date.now() - startTime < timeout) {
     try {
       return await fn()
@@ -132,17 +160,17 @@ export async function waitFor<T>(
       if (Date.now() - startTime >= timeout) {
         throw new Error(errorMessage)
       }
-      await new Promise(resolve => setTimeout(resolve, interval))
+      await new Promise((resolve) => setTimeout(resolve, interval))
     }
   }
-  
+
   throw new Error(errorMessage)
 }
 
 /**
  * Generate random test ID
  */
-export function generateTestId(prefix = 'test'): string {
+export function generateTestId(prefix = "test"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 }
 
@@ -150,7 +178,7 @@ export function generateTestId(prefix = 'test'): string {
  * Delay execution
  */
 export async function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
@@ -167,9 +195,7 @@ export function assertSuccessResponse(response: Response, message?: string) {
  */
 export function assertResponseStatus(response: Response, expectedStatus: number, message?: string) {
   if (response.status !== expectedStatus) {
-    throw new Error(
-      message || `Expected status ${expectedStatus} but got ${response.status}`
-    )
+    throw new Error(message || `Expected status ${expectedStatus} but got ${response.status}`)
   }
 }
 
@@ -197,12 +223,7 @@ export async function retryOperation<T>(
     backoffMultiplier?: number
   } = {}
 ): Promise<T> {
-  const {
-    maxRetries = 3,
-    initialDelay = 1000,
-    maxDelay = 10000,
-    backoffMultiplier = 2,
-  } = options
+  const { maxRetries = 3, initialDelay = 1000, maxDelay = 10000, backoffMultiplier = 2 } = options
 
   let lastError: Error | null = null
   let currentDelay = initialDelay
@@ -212,7 +233,7 @@ export async function retryOperation<T>(
       return await operation()
     } catch (error) {
       lastError = error as Error
-      
+
       if (attempt < maxRetries - 1) {
         await delay(Math.min(currentDelay, maxDelay))
         currentDelay *= backoffMultiplier
@@ -220,5 +241,5 @@ export async function retryOperation<T>(
     }
   }
 
-  throw lastError || new Error('Operation failed after all retries')
+  throw lastError || new Error("Operation failed after all retries")
 }

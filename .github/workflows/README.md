@@ -9,6 +9,7 @@ This directory contains GitHub Actions workflows for the job-finder-app frontend
 Runs on every pull request and push to main/staging/develop branches.
 
 **Jobs:**
+
 - **Lint**: Runs ESLint and Prettier checks
 - **Type Check**: Validates TypeScript types
 - **Test**: Runs unit tests with Vitest
@@ -16,6 +17,7 @@ Runs on every pull request and push to main/staging/develop branches.
 - **E2E**: Runs Playwright end-to-end tests on Chromium and Firefox
 
 **Required Secrets:**
+
 - `VITE_FIREBASE_API_KEY`
 - `VITE_FIREBASE_AUTH_DOMAIN`
 - `VITE_FIREBASE_PROJECT_ID`
@@ -32,6 +34,7 @@ Automatically deploys to Firebase Hosting staging environment when code is pushe
 **URL:** https://staging.job-finder-app.web.app
 
 **Additional Secrets:**
+
 - `VITE_API_BASE_URL_STAGING`
 - `FIREBASE_SERVICE_ACCOUNT_STAGING`
 - `FIREBASE_PROJECT_ID`
@@ -44,11 +47,13 @@ Automatically deploys to Firebase Hosting production environment when code is pu
 **URL:** https://job-finder-app.web.app
 
 **Features:**
+
 - Runs tests before deployment
 - Creates GitHub release for each deployment
 - Sends notifications on success/failure
 
 **Additional Secrets:**
+
 - `VITE_API_BASE_URL_PRODUCTION`
 - `FIREBASE_SERVICE_ACCOUNT_PRODUCTION`
 - `FIREBASE_PROJECT_ID`
@@ -61,6 +66,7 @@ Automatically deploys to Firebase Hosting production environment when code is pu
 2. Add the following secrets:
 
 #### Firebase Configuration (for all environments):
+
 ```
 VITE_FIREBASE_API_KEY=your-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
@@ -72,6 +78,7 @@ FIREBASE_PROJECT_ID=your-project-id
 ```
 
 #### API URLs:
+
 ```
 VITE_API_BASE_URL=https://api.job-finder-app.com
 VITE_API_BASE_URL_STAGING=https://staging-api.job-finder-app.com
@@ -79,6 +86,7 @@ VITE_API_BASE_URL_PRODUCTION=https://api.job-finder-app.com
 ```
 
 #### Firebase Service Accounts:
+
 ```
 FIREBASE_SERVICE_ACCOUNT_STAGING=<staging-service-account-json>
 FIREBASE_SERVICE_ACCOUNT_PRODUCTION=<production-service-account-json>
@@ -118,6 +126,7 @@ You can manually trigger deployments using the "workflow_dispatch" event:
 ## Monitoring
 
 Check deployment status:
+
 - **Actions Tab**: View all workflow runs
 - **Environments**: View deployment history and URLs
 - **Firebase Console**: Check hosting deployment details
@@ -125,15 +134,18 @@ Check deployment status:
 ## Troubleshooting
 
 ### Build fails with "Module not found"
+
 - Check that all dependencies are listed in `package.json`
 - Verify import paths are correct
 
 ### E2E tests fail
+
 - Check if Firebase emulator is needed for auth
 - Verify test environment variables are set
 - Review Playwright traces in artifacts
 
 ### Deployment fails
+
 - Verify Firebase service account has correct permissions
 - Check Firebase project quotas
 - Ensure `.firebaserc` has correct project targets

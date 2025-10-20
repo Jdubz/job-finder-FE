@@ -37,6 +37,7 @@ Repository: job-finder-FE
 - **Firestore Collections**: `job-matches` collection structure
 
 **Key concepts to understand**:
+
 - **JobMatch Type**: From @jdubz/job-finder-shared-types
 - **Real-time Updates**: onSnapshot listeners for live data
 - **Auth Context**: User-specific data filtering
@@ -46,6 +47,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Data Integration
+
 1. **Create Firestore hooks**
    - What: Custom React hook for job matches
    - Where: `src/hooks/useJobMatches.ts` (create)
@@ -59,6 +61,7 @@ Repository: job-finder-FE
    - Test: TypeScript shows proper type hints
 
 ### Phase 2: UI Components
+
 3. **Build JobMatchCard component**
    - What: Card component displaying individual job match
    - Where: `src/components/job-applications/JobMatchCard.tsx` (create)
@@ -72,6 +75,7 @@ Repository: job-finder-FE
    - Test: Filters and sorting update displayed matches
 
 ### Phase 3: Main Page
+
 5. **Build JobApplicationsPage**
    - What: Main page component with layout and state management
    - Where: `src/pages/job-applications/JobApplicationsPage.tsx` (create)
@@ -112,13 +116,14 @@ REFERENCE:
 ### Key Implementation Notes
 
 **Firestore Hook Pattern**:
+
 ```typescript
 // src/hooks/useJobMatches.ts
-import { useState, useEffect } from 'react'
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'
-import { db } from '@/config/firebase'
-import { useAuth } from '@/contexts/AuthContext'
-import type { JobMatch } from '@jdubz/job-finder-shared-types'
+import { useState, useEffect } from "react"
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore"
+import { db } from "@/config/firebase"
+import { useAuth } from "@/contexts/AuthContext"
+import type { JobMatch } from "@jdubz/job-finder-shared-types"
 
 export function useJobMatches() {
   const [matches, setMatches] = useState<JobMatch[]>([])
@@ -130,17 +135,17 @@ export function useJobMatches() {
     if (!user) return
 
     const q = query(
-      collection(db, 'job-matches'),
-      where('userId', '==', user.uid),
-      orderBy('matchScore', 'desc')
+      collection(db, "job-matches"),
+      where("userId", "==", user.uid),
+      orderBy("matchScore", "desc")
     )
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const matchesData = snapshot.docs.map(doc => ({
+        const matchesData = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as JobMatch[]
         setMatches(matchesData)
         setLoading(false)
@@ -159,6 +164,7 @@ export function useJobMatches() {
 ```
 
 **Job Match Card Component**:
+
 ```typescript
 // src/components/job-applications/JobMatchCard.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -208,6 +214,7 @@ export function JobMatchCard({ match, onStatusUpdate }: JobMatchCardProps) {
 ```
 
 **Integration Points**:
+
 - **Firestore**: Real-time listeners for job-matches collection
 - **Auth Context**: User-specific data filtering
 - **Router**: Protected route requiring authentication
@@ -316,12 +323,14 @@ Closes #5
 ## Resources
 
 ### Documentation
+
 - **Firestore Queries**: https://firebase.google.com/docs/firestore/query-data/queries
 - **Firestore Real-time Updates**: https://firebase.google.com/docs/firestore/query-data/listen
 - **shadcn/ui Components**: https://ui.shadcn.com/
 - **Shared Types**: @jdubz/job-finder-shared-types package
 
 ### External References
+
 - **React Hooks Best Practices**: https://react.dev/reference/react/hooks
 - **TypeScript Type Guards**: https://www.typescriptlang.org/docs/handbook/2/narrowing.html
 
@@ -330,6 +339,7 @@ Closes #5
 ## Success Metrics
 
 **How we'll measure success**:
+
 - **Real-time latency**: Updates appear within 1 second of Firestore change
 - **Load performance**: Displays 100+ matches without lag
 - **Filter response**: Filtering updates UI within 100ms
@@ -340,11 +350,13 @@ Closes #5
 ## Notes
 
 **Questions? Need clarification?**
+
 - Comment on this issue with specific questions
 - Tag @PM for guidance
 - Reference CLAUDE.md for Firestore patterns
 
 **Implementation Tips**:
+
 - Use onSnapshot for real-time updates, remember to cleanup
 - Consider pagination if match count grows large
 - Use React.memo for JobMatchCard to prevent unnecessary re-renders

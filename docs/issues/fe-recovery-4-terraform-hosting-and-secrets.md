@@ -6,9 +6,11 @@
 - **Labels**: priority-p1, repository-frontend, type-infrastructure, status-todo
 
 ## Context
+
 This repository already contains Firebase Hosting configuration (`firebase.json`, `.firebaserc`) and GitHub Actions workflows under `.github/workflows`. Deployments depend on manually managed service account JSON files and API tokens. There is no infrastructure-as-code to recreate hosting sites, Cloudflare DNS entries, or GitHub secrets from scratch. The goal is to capture all infrastructure definitions in this repo so that a new contributor with only the `job-finder-FE` project can provision staging and production reliably.
 
 ## Scope of Work (Repository Only)
+
 1. **Terraform Project Skeleton**
    - Create `infrastructure/terraform/` inside this repo.
    - Include Terraform version pinning (`required_version`) and providers (`hashicorp/google`, `cloudflare`). Store provider credentials in environment variables or Terraform Cloud — do **not** commit secrets.
@@ -26,11 +28,13 @@ This repository already contains Firebase Hosting configuration (`firebase.json`
    - Update `README.md` to highlight the Terraform workflow for new contributors.
 
 ## Assumptions You May Make
+
 - Staging and production Firebase projects already exist. Provide import instructions rather than hard-creating them.
 - Cloudflare zone ID can be passed in via Terraform variable; supply an example in a sample `terraform.tfvars.example` file.
 - GitHub Secrets will be managed manually after Terraform provisions dependent infrastructure.
 
 ## Deliverables
+
 - `infrastructure/terraform/main.tf` plus supporting files (`variables.tf`, `outputs.tf`, `versions.tf`, `terraform.tfvars.example`).
 - Updated GitHub Actions workflow that executes `terraform fmt` and `terraform validate`. If full apply is not possible, at least ensure plan runs as a CI quality gate.
 - `docs/infrastructure/terraform-hosting.md` describing:
@@ -40,6 +44,7 @@ This repository already contains Firebase Hosting configuration (`firebase.json`
 - `README.md` section linking to the new documentation.
 
 ## Acceptance Criteria
+
 - [ ] Terraform project committed with clearly separated staging and production workspaces or work dirs.
 - [ ] `terraform fmt` and `terraform validate` succeed locally and in CI.
 - [ ] Terraform configuration models Firebase Hosting sites, channels, deploy service accounts, and Cloudflare DNS entries via variables or data sources.
@@ -47,11 +52,13 @@ This repository already contains Firebase Hosting configuration (`firebase.json`
 - [ ] Documentation explains provisioning, state management, and rollback using only files contained in this repo.
 
 ## Helpful Files in This Repo
+
 - `.firebaserc` and `firebase.json` — current hosting setup.
 - `.github/workflows/` — existing CI/CD definition.
 - `docs/DEPLOYMENT_RUNBOOK.md` and `docs/GITHUB_SECRETS_SETUP.md` (if present) — current manual steps that need codifying.
 
 ## Suggested Commands
+
 - `terraform init`
 - `terraform fmt`
 - `terraform validate`

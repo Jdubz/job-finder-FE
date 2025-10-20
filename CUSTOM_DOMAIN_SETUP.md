@@ -2,7 +2,8 @@
 
 **Date**: 2025-10-19  
 **Owner**: Worker A  
-**Domains**: 
+**Domains**:
+
 - Staging: `job-finder-staging.joshwentworth.com`
 - Production: `job-finder.joshwentworth.com`
 
@@ -18,6 +19,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 
 ✅ Cloudflare account with `joshwentworth.com` domain  
 ✅ Firebase Hosting sites configured:
+
 - `job-finder-staging` → https://job-finder-staging.web.app
 - `job-finder-production` → https://job-finder-production.web.app
 
@@ -40,6 +42,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 6. Firebase will show you DNS records to add. **Keep this page open** - you'll need these values.
 
    You should see something like:
+
    ```
    Type: A
    Name: job-finder-staging
@@ -81,6 +84,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 2. Click **"Add record"**
 
 3. Configure:
+
    ```
    Type: A
    Name: job-finder-staging
@@ -92,6 +96,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 4. Click **"Save"**
 
 5. **Add a second A record** (Firebase provides multiple IPs for redundancy):
+
    ```
    Type: A
    Name: job-finder-staging
@@ -107,6 +112,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 1. Click **"Add record"** again
 
 2. Configure:
+
    ```
    Type: A
    Name: job-finder
@@ -118,6 +124,7 @@ This guide walks through connecting your custom domains from Cloudflare DNS to F
 3. Click **"Save"**
 
 4. **Add a second A record**:
+
    ```
    Type: A
    Name: job-finder
@@ -292,6 +299,7 @@ curl -I https://job-finder.joshwentworth.com
 **Problem**: Domain doesn't resolve after adding DNS records
 
 **Solution**:
+
 ```bash
 # Check DNS propagation
 dig job-finder-staging.joshwentworth.com
@@ -308,11 +316,13 @@ Wait 5-15 minutes for DNS propagation. Cloudflare is usually fast.
 **Problem**: "Your connection is not private" or certificate error
 
 **Causes**:
+
 1. SSL/TLS mode not set to "Full (strict)" in Cloudflare
 2. Certificate still provisioning (wait 10 minutes)
 3. Firebase custom domain not verified
 
 **Solution**:
+
 ```bash
 # Check Cloudflare SSL mode
 # Should be: Full (strict)
@@ -326,11 +336,13 @@ firebase hosting:sites:list
 **Problem**: Authentication fails or redirects incorrectly
 
 **Causes**:
+
 1. Domain not added to Firebase Auth authorized domains
 2. VITE_FIREBASE_AUTH_DOMAIN not updated in .env files
 3. App not rebuilt with new environment
 
 **Solution**:
+
 1. Add domains to Firebase Auth authorized domains
 2. Update .env files
 3. Rebuild: `npm run build`
@@ -340,7 +352,8 @@ firebase hosting:sites:list
 
 **Problem**: Some features not working with Cloudflare proxy
 
-**Solution**: 
+**Solution**:
+
 - Keep orange cloud ON (proxied) for DDoS protection and caching
 - If issues persist, try temporarily turning proxy OFF (gray cloud)
 - Firebase Hosting works fine with Cloudflare proxy in most cases
@@ -350,6 +363,7 @@ firebase hosting:sites:list
 **Problem**: HTTP content blocked on HTTPS site
 
 **Check**:
+
 ```bash
 # Ensure all API URLs use HTTPS
 grep -r "http://" .env.staging .env.production
@@ -366,6 +380,7 @@ All URLs should use `https://`
 1. Go to **Rules** → **Page Rules**
 
 2. Create rule for staging:
+
    ```
    URL: job-finder-staging.joshwentworth.com/*
    Settings:
@@ -393,15 +408,15 @@ All URLs should use `https://`
 
 ## Expected Timeline
 
-| Step | Time |
-|------|------|
-| Add custom domains in Firebase | 5 minutes |
-| Configure Cloudflare DNS | 5 minutes |
-| DNS propagation | 5-15 minutes |
-| SSL certificate provisioning | 5-10 minutes |
-| Update environment files | 5 minutes |
-| Rebuild and deploy | 5 minutes |
-| **Total** | **30-45 minutes** |
+| Step                           | Time              |
+| ------------------------------ | ----------------- |
+| Add custom domains in Firebase | 5 minutes         |
+| Configure Cloudflare DNS       | 5 minutes         |
+| DNS propagation                | 5-15 minutes      |
+| SSL certificate provisioning   | 5-10 minutes      |
+| Update environment files       | 5 minutes         |
+| Rebuild and deploy             | 5 minutes         |
+| **Total**                      | **30-45 minutes** |
 
 ---
 
@@ -418,17 +433,19 @@ All URLs should use `https://`
 If you want to update the URLs shown in GitHub Actions deployment summaries:
 
 Edit `.github/workflows/deploy-staging.yml`:
+
 ```yaml
 environment:
   name: staging
-  url: https://job-finder-staging.joshwentworth.com  # Updated
+  url: https://job-finder-staging.joshwentworth.com # Updated
 ```
 
 Edit `.github/workflows/deploy-production.yml`:
+
 ```yaml
 environment:
   name: production
-  url: https://job-finder.joshwentworth.com  # Updated
+  url: https://job-finder.joshwentworth.com # Updated
 ```
 
 ---
@@ -436,18 +453,22 @@ environment:
 ## Quick Reference
 
 ### Firebase Hosting Sites
+
 - Staging: `job-finder-staging` → https://job-finder-staging.web.app
 - Production: `job-finder-production` → https://job-finder-production.web.app
 
 ### Custom Domains (New)
+
 - Staging: https://job-finder-staging.joshwentworth.com
 - Production: https://job-finder.joshwentworth.com
 
 ### Firebase A Record IPs
+
 - Primary: `151.101.1.195`
 - Secondary: `151.101.65.195`
 
 ### Cloudflare Settings
+
 - SSL/TLS Mode: **Full (strict)**
 - Proxy Status: **Proxied (orange cloud ON)**
 

@@ -50,6 +50,7 @@ npm install
 ### Environment Setup
 
 1. Copy the environment template:
+
    ```bash
    cp .env.template .env
    ```
@@ -80,6 +81,7 @@ npm run type-check       # Run TypeScript type checking
 See `.env.example` for required environment variables.
 
 Key variables:
+
 - `VITE_FIREBASE_*` - Firebase configuration (project-specific)
 - `VITE_API_BASE_URL` - Backend API URL (auto-configured by environment)
 - `VITE_USE_EMULATORS` - Enable Firebase emulators in development
@@ -115,6 +117,7 @@ See the main migration plan documentation for contribution guidelines.
 ## Features
 
 ### Core Features
+
 - **Job Applications:** View and manage job matches with filtering and search
 - **Job Finder:** Submit LinkedIn job URLs for automated processing
 - **Document Builder:** Generate AI-powered resumes and cover letters
@@ -122,11 +125,13 @@ See the main migration plan documentation for contribution guidelines.
 - **Queue Management:** Monitor job processing queue status
 
 ### Configuration Features (Editor Role Required)
+
 - **Job Finder Config:** Configure stop lists, queue settings, and AI parameters
 - **AI Prompts:** Customize AI prompts for document generation with variable interpolation
 - **Settings:** Manage user preferences, theme, and default settings
 
 ### Technical Features
+
 - Protected routes with Firebase Authentication
 - Role-based access control (user/editor roles)
 - Real-time Firestore updates
