@@ -4,7 +4,7 @@ A modern React application for the Job Finder platform, built with React 18, Typ
 
 ## Overview
 
-This is the dedicated frontend application for Job Finder, extracted from the portfolio monorepo. It provides a streamlined, professional UI for job discovery, queue management, and AI-powered job matching.
+This is the dedicated frontend application for Job Finder. It provides a streamlined, professional UI for job discovery, queue management, and AI-powered job matching.
 
 ## Tech Stack
 
@@ -134,9 +134,8 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for system architecture and component d
 
 ## Related Projects
 
-- **portfolio** - Original monorepo (home page and contact form)
-- **job-finder** - Python backend for job discovery and AI matching
-- **job-finder-shared-types** - Shared TypeScript types
+- **job-finder** - Python queue worker for job discovery and scraping
+- **job-finder-shared-types** - Shared TypeScript types across all projects
 
 ## License
 

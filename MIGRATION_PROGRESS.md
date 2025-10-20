@@ -160,7 +160,7 @@ Implemented a comprehensive AI-powered document generation interface with:
 
 ### ✅ Phase 5: Content Items Page (COMPLETE)
 
-Created a comprehensive content management system for experience and portfolio items:
+Created a comprehensive content management system for experience and content items:
 
 **Content Items API Client:**
 - Complete CRUD operations for all content types
@@ -181,7 +181,7 @@ Created a comprehensive content management system for experience and portfolio i
 - Company/work experience management with projects
 - Skills and technologies organization
 - Education and certification tracking
-- Text sections for portfolio content
+- Text sections for content management
 - Import/export JSON functionality
 - Search and filtering capabilities
 - Drag-and-drop reordering (API ready)
@@ -287,9 +287,7 @@ npm run build
 
 ## Migration Roadmap Reference
 
-See the full migration plan:
-- `/portfolio/docs/development/job-finder-fe-migration-plan.md`
-- `/portfolio/docs/development/job-finder-discovery-inventory.md`
+See the full migration plan in the project documentation.
 
 ## Testing
 
@@ -409,7 +407,7 @@ job-finder-FE/
 ## Latest Update (2025-10-19)
 
 **Phase 5 Complete!** Content Items Page fully implemented with:
-- Complete content management system for all portfolio items
+- Complete content management system for all content items
 - Company/work experience with nested project support
 - Skill groups, education, and text sections
 - Rich form interfaces with validation
