@@ -4,16 +4,35 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Repository Overview
 
-This is the **Job Finder Frontend** - a standalone React application for job search automation, AI-powered resume generation, and job application management. It integrates with:
+This is the **Job Finder Frontend** - a standalone React application for job search automation, AI-powered resume generation, and job application management.
 
-- **Portfolio Backend** (Firebase Functions) - AI resume generation, contact form
+<<<<<<< HEAD
+- **Firebase Functions** (Backend API) - AI resume generation, contact form, content management
 - **Job-Finder Python Service** - Job scraping, matching, and queue management
+=======
+### Project Management
+
+**IMPORTANT**: This repository is part of a multi-repository project managed centrally.
+
+- **Task Tracking**: ALL task tracking is done in [job-finder-app-manager](https://github.com/Jdubz/job-finder-app-manager)
+- **Worker Assignment**: Check `CLAUDE_WORKER_B.md` in the manager repo for your assigned tasks
+- **Workflow**: Work in dedicated worktree on your worker branch, submit PRs to `staging`
+- **Documentation**: Architecture and setup docs live here, project management lives in manager repo
+
+### Integration
+
+This frontend integrates with:
+- **job-finder** (Python Service) - Queue worker for job scraping and AI matching
+- **job-finder-BE** (Firebase Functions) - Backend API for document generation and content management
+- **job-finder-shared-types** - Shared TypeScript type definitions
+>>>>>>> fedd6e4 (Clean up documentation: Remove task tracking, update project references)
 - **Shared Firestore Database** - Real-time data synchronization
 
-**Key Technologies:**
+### Key Technologies
+
 - **Frontend:** React 18 + TypeScript + Vite
 - **Styling:** Tailwind CSS + shadcn/ui components
-- **Routing:** React Router v6
+- **Routing:** React Router v7
 - **State Management:** React Context API + Firebase Auth
 - **Backend Integration:** Firebase SDK + REST APIs
 - **Build Tool:** Vite (fast HMR, optimized production builds)
@@ -321,11 +340,12 @@ import { cn } from '@/lib/utils'
 
 ## Cross-Project Integration
 
-### Portfolio Backend Functions
+### Firebase Cloud Functions (Backend API)
 
 **Endpoints:**
 - `POST /manageGenerator` - AI resume/cover letter generation
 - `POST /handleContactForm` - Contact form submission
+- `POST /manageContentItems` - Content and experience management
 
 ### Job-Finder Python Service
 
@@ -339,7 +359,7 @@ import { cn } from '@/lib/utils'
 2. Python service processes queue
 3. Creates JobMatch if score ≥ threshold
 4. User sees match in real-time (this app)
-5. User generates custom resume (this app → portfolio backend)
+5. User generates custom resume (this app → Firebase Functions backend)
 
 ## Deployment
 
@@ -381,138 +401,27 @@ netlify deploy --prod
 2. **Type errors:** Run `npm run type-check`
 3. **Import errors:** Check path aliases in `tsconfig.json`
 
-## Worker B Implementation Summary
+## Implemented Features
 
-### Completed Features (Worker B - UI Heavy)
+This repository contains a complete React frontend with the following features:
 
-#### Phase B1: AI Prompts Page ✅
-- **Location:** `src/pages/ai-prompts/AIPromptsPage.tsx`
-- **API Client:** `src/api/prompts-client.ts`
-- **Features:**
-  - 4-tab interface for different prompt types (Resume, Cover Letter, Scraping, Matching)
-  - Variable interpolation with `{{variable}}` syntax
-  - Real-time variable extraction and preview
-  - Save and reset to defaults functionality
-  - Editor-only access protection
-- **Types:** Uses `PromptConfig`, `PromptType` from shared types
+### Core Pages
+- **Job Finder** - Submit job URLs for AI analysis
+- **Job Applications** - View and manage AI-matched jobs
+- **Document Builder** - Generate AI-powered resumes and cover letters
+- **Document History** - Browse and manage generated documents
+- **Content Items** - Manage experience, skills, and portfolio content
+- **Queue Management** - Admin interface for job processing queue
+- **System Health** - Monitor system status and logs
 
-#### Phase B2: Job Finder Config Page ✅
-- **Location:** `src/pages/job-finder-config/JobFinderConfigPage.tsx`
-- **Features:**
-  - 3-tab interface (Stop List, Queue Settings, AI Settings)
-  - Stop List CRUD operations for companies, keywords, domains
-  - Queue settings configuration (concurrency, retries, timeouts)
-  - AI model settings (model, temperature, max tokens, top_p)
-  - Editor-only access protection
-- **API Methods:** `getStopList`, `updateStopList`, `getQueueSettings`, `updateQueueSettings`, `getAISettings`, `updateAISettings`
+### Configuration Pages (Editor-Only)
+- **AI Prompts** - Customize AI prompts for all generation tasks
+- **Job Finder Config** - Manage stop lists, queue settings, AI settings
+- **Settings** - User preferences and defaults
 
-#### Phase B3: Document History Page ✅
-- **Location:** `src/pages/document-history/DocumentHistoryPage.tsx`
-- **Features:**
-  - Document list with search by title/company
-  - Filter by type (resume/cover letter)
-  - Sort by date, title, or company
-  - Download documents as PDF/DOCX
-  - Delete with confirmation dialog
-  - Empty state handling
-- **API Methods:** `getDocumentHistory`, `deleteDocument`, `downloadDocument`
+### Testing & CI/CD
+- **E2E Tests** - Playwright test suite covering all major workflows
+- **GitHub Actions** - Automated CI/CD for staging and production
+- **Type Safety** - Full TypeScript coverage with strict mode
 
-#### Phase B4: Settings Page ✅
-- **Location:** `src/pages/settings/SettingsPage.tsx`
-- **Features:**
-  - Account information display with role badges
-  - Theme switcher (light/dark) with localStorage persistence
-  - User defaults editor (resume style, font, AI settings override)
-  - Save functionality with success/error alerts
-- **API Methods:** `getUserDefaults`, `updateUserDefaults`
-
-#### Phase B5: E2E Test Suite ✅
-- **Location:** `e2e/` directory
-- **Configuration:** `playwright.config.ts`
-- **Test Files:**
-  - `authentication.spec.ts` - Auth flows and route protection
-  - `job-finder.spec.ts` - Job submission and queue status
-  - `job-applications.spec.ts` - Job matches and filtering
-  - `document-builder.spec.ts` - Document generation flow
-  - `accessibility.spec.ts` - A11y compliance tests
-  - `configuration.spec.ts` - Config pages testing
-- **Helpers:** `e2e/fixtures/helpers.ts` with mock utilities
-- **Note:** Tests use `test.skip()` for unauthenticated states
-
-#### Phase B6: CI/CD Pipeline ✅
-- **Location:** `.github/workflows/`
-- **Workflows:**
-  - `ci.yml` - Lint, type-check, test, build, E2E tests (on PR/push)
-  - `deploy-staging.yml` - Auto-deploy to staging (on push to staging branch)
-  - `deploy-production.yml` - Auto-deploy to production (on push to main branch)
-- **Documentation:** `.github/workflows/README.md` with setup instructions
-- **Note:** Uses committed .env files, requires Firebase service account secret
-
-#### Phase B7: Documentation ✅
-- **Updated Files:**
-  - `README.md` - Enhanced with new features and scripts
-  - `API.md` - Complete API client documentation
-  - `ARCHITECTURE.md` - System architecture and patterns
-  - `CLAUDE.md` - Worker B implementation summary (this section)
-- **Key Documentation:**
-  - All API clients with method signatures and examples
-  - Architecture patterns and data flow diagrams
-  - Testing strategy and examples
-  - Deployment architecture and security considerations
-
-### API Clients Created/Enhanced
-
-1. **PromptsClient** (`src/api/prompts-client.ts`)
-   - CRUD operations for AI prompts
-   - Default prompts constant
-   - Variable extraction utilities
-
-2. **ConfigClient** (enhanced)
-   - Stop list management
-   - Queue settings management
-   - AI settings management
-
-3. **GeneratorClient** (enhanced)
-   - User defaults CRUD
-
-### Components Created
-
-1. **UI Components:**
-   - `src/components/ui/checkbox.tsx` - Added for Worker A's queue management
-
-2. **Page Components:**
-   - `src/pages/ai-prompts/AIPromptsPage.tsx`
-   - Updated: `src/pages/job-finder-config/JobFinderConfigPage.tsx`
-   - Updated: `src/pages/document-history/DocumentHistoryPage.tsx`
-   - Updated: `src/pages/settings/SettingsPage.tsx`
-
-### Router Updates
-
-- Moved AI Prompts route to editor-only protected routes section
-- All new pages properly integrated with route protection
-
-### Dependencies Added
-
-- `@playwright/test` - E2E testing framework
-- `@radix-ui/react-checkbox` - Checkbox primitive for UI
-
-### Test Scripts Added
-
-```json
-"test:e2e": "playwright test",
-"test:e2e:ui": "playwright test --ui",
-"test:e2e:headed": "playwright test --headed",
-"test:e2e:debug": "playwright test --debug"
-```
-
-## Future Enhancements
-
-- [x] Add E2E tests (Playwright) - COMPLETED Worker B
-- [x] Add comprehensive documentation - COMPLETED Worker B
-- [ ] Add unit tests coverage to 80%+
-- [ ] Add Storybook for component development
-- [ ] Add performance monitoring
-- [ ] Add error tracking (Sentry)
-- [ ] Add analytics
-- [ ] Add PWA support
-- [ ] Add accessibility testing with axe-playwright
+For current feature development and roadmap, see [job-finder-app-manager](https://github.com/Jdubz/job-finder-app-manager)
