@@ -2,7 +2,7 @@
  * Content Items API Client
  *
  * Handles CRUD operations for content items (experience, projects, skills, etc.)
- * Integrates with Portfolio Firebase Functions content-items API.
+ * Integrates with job-finder-FE Backend Functions content-items API.
  */
 
 import { BaseApiClient, type RequestOptions } from "./base-client"
@@ -292,7 +292,7 @@ export class ContentItemsClient extends BaseApiClient {
   }
 }
 
-// Portfolio Functions URL from environment
+// job-finder-FE Functions URL from environment
 const portfolioFunctionsUrl =
   import.meta.env.VITE_PORTFOLIO_FUNCTIONS_URL ||
   "https://us-central1-static-sites-257923.cloudfunctions.net"

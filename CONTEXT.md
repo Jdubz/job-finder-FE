@@ -23,7 +23,7 @@ This document serves as the single source of truth for architectural decisions, 
 
 The Job Finder Frontend is a **standalone React application** that provides a modern UI for job search automation and AI-powered document generation. It integrates with two backend systems:
 
-1. **Portfolio Firebase Functions** - AI resume/cover letter generation
+1. **job-finder-FE Backend Functions** - AI resume/cover letter generation
 2. **Job-Finder Python Service** - Job scraping and matching
 
 ```
@@ -353,7 +353,7 @@ onSnapshot(query, (snapshot) => {
 
 ## Integration Points
 
-### 1. Portfolio Backend (Firebase Functions)
+### 1. job-finder-FE Backend (Firebase Functions)
 
 **Endpoints**:
 - `POST /manageGenerator` - AI resume/cover letter generation

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 This is the **Job Finder Frontend** - a standalone React application for job search automation, AI-powered resume generation, and job application management. It integrates with:
 
-- **Portfolio Backend** (Firebase Functions) - AI resume generation, contact form
+- **job-finder-FE Backend** (Firebase Functions) - AI resume generation, contact form
 - **Job-Finder Python Service** - Job scraping, matching, and queue management
 - **Shared Firestore Database** - Real-time data synchronization
 
@@ -321,7 +321,7 @@ import { cn } from '@/lib/utils'
 
 ## Cross-Project Integration
 
-### Portfolio Backend Functions
+### job-finder-FE Backend Functions
 
 **Endpoints:**
 - `POST /manageGenerator` - AI resume/cover letter generation
