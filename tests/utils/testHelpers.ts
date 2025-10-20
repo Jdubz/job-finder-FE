@@ -128,7 +128,7 @@ export async function waitFor<T>(
   while (Date.now() - startTime < timeout) {
     try {
       return await fn()
-    } catch (error) {
+    } catch {
       if (Date.now() - startTime >= timeout) {
         throw new Error(errorMessage)
       }
@@ -180,7 +180,7 @@ export async function parseJsonResponse<T>(response: Response): Promise<T> {
   const text = await response.text()
   try {
     return JSON.parse(text) as T
-  } catch (error) {
+  } catch {
     throw new Error(`Failed to parse JSON response: ${text}`)
   }
 }
