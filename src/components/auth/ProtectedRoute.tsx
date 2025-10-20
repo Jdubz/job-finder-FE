@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({
   requireEditor = false,
-  redirectTo = ROUTES.LOGIN,
+  redirectTo = ROUTES.HOME,
 }: ProtectedRouteProps) {
   const { user, loading, isEditor } = useAuth()
 
@@ -22,6 +22,7 @@ export function ProtectedRoute({
   }
 
   if (!user) {
+    // Redirect to home instead of login page (auth modal handles login)
     return <Navigate to={redirectTo} replace />
   }
 

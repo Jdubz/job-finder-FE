@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import { lazy, Suspense } from "react"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { PublicRoute } from "@/components/auth/PublicRoute"
 import { ROUTES } from "@/types/routes"
 
 // Lazy load pages for code splitting
@@ -58,9 +57,6 @@ const SystemHealthPage = lazy(() =>
     default: m.SystemHealthPage,
   }))
 )
-const LoginPage = lazy(() =>
-  import("@/pages/auth/LoginPage").then((m) => ({ default: m.LoginPage }))
-)
 const UnauthorizedPage = lazy(() =>
   import("@/pages/auth/UnauthorizedPage").then((m) => ({ default: m.UnauthorizedPage }))
 )
@@ -86,24 +82,34 @@ export const router = createBrowserRouter([
     children: [
       // Public routes
       {
-        element: <PublicRoute />,
+        path: ROUTES.HOME,
+        element: (
+          <LazyPage>
+            <HomePage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.HOW_IT_WORKS,
+        element: (
+          <LazyPage>
+            <HowItWorksPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.UNAUTHORIZED,
+        element: (
+          <LazyPage>
+            <UnauthorizedPage />
+          </LazyPage>
+        ),
+      },
+
+      // Protected routes (require authentication)
+      {
+        element: <ProtectedRoute />,
         children: [
-          {
-            path: ROUTES.HOME,
-            element: (
-              <LazyPage>
-                <HomePage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.HOW_IT_WORKS,
-            element: (
-              <LazyPage>
-                <HowItWorksPage />
-              </LazyPage>
-            ),
-          },
           {
             path: ROUTES.CONTENT_ITEMS,
             element: (
@@ -121,6 +127,14 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: ROUTES.DOCUMENT_HISTORY,
+            element: (
+              <LazyPage>
+                <DocumentHistoryPage />
+              </LazyPage>
+            ),
+          },
+          {
             path: ROUTES.SETTINGS,
             element: (
               <LazyPage>
@@ -128,26 +142,10 @@ export const router = createBrowserRouter([
               </LazyPage>
             ),
           },
-          {
-            path: ROUTES.LOGIN,
-            element: (
-              <LazyPage>
-                <LoginPage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.UNAUTHORIZED,
-            element: (
-              <LazyPage>
-                <UnauthorizedPage />
-              </LazyPage>
-            ),
-          },
         ],
       },
 
-      // Editor-only protected routes
+      // Editor-only protected routes (require editor role)
       {
         element: <ProtectedRoute requireEditor />,
         children: [
@@ -156,14 +154,6 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <AIPromptsPage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.DOCUMENT_HISTORY,
-            element: (
-              <LazyPage>
-                <DocumentHistoryPage />
               </LazyPage>
             ),
           },
