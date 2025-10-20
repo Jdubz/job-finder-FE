@@ -16,7 +16,7 @@ test.describe("Authentication @critical", () => {
 
   test("should redirect unauthenticated users from protected routes to home", async ({ page }) => {
     // Navigate to a protected route
-    await page.goto("/content-items")
+    await page.goto("/content-items", { waitUntil: "networkidle" })
 
     // Should redirect to home (no login page)
     await expect(page).toHaveURL("/")
