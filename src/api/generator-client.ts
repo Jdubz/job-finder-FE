@@ -104,6 +104,5 @@ export class GeneratorClient extends BaseApiClient {
 }
 
 // Export singleton instance
-const portfolioFunctionsUrl =
-  import.meta.env.VITE_GENERATOR_API_URL || import.meta.env.VITE_API_BASE_URL || ""
-export const generatorClient = new GeneratorClient(portfolioFunctionsUrl)
+import { api } from "@/config/api"
+export const generatorClient = new GeneratorClient(api.baseUrl)

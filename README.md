@@ -77,12 +77,23 @@ npm run type-check       # Run TypeScript type checking
 
 ## Environment Variables
 
-See `.env.template` for required environment variables.
+See `.env.example` for required environment variables.
 
 Key variables:
-- `VITE_FIREBASE_*` - Firebase configuration
-- `VITE_API_BASE_URL` - Backend API URL
+- `VITE_FIREBASE_*` - Firebase configuration (project-specific)
+- `VITE_API_BASE_URL` - Backend API URL (auto-configured by environment)
+- `VITE_USE_EMULATORS` - Enable Firebase emulators in development
 - `VITE_ENVIRONMENT` - Current environment (development/staging/production)
+
+### Environment Configuration
+
+The application uses environment-specific configuration:
+
+- **Development**: Uses Firebase emulators and `job-finder-dev` project
+- **Staging**: Uses `job-finder-staging` project and Cloud Functions
+- **Production**: Uses `job-finder-prod` project and Cloud Functions
+
+API endpoints are automatically configured based on the build mode. See `src/config/api.ts` for details.
 
 ## Deployment
 
@@ -134,6 +145,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for system architecture and component d
 
 ## Related Projects
 
+- **job-finder-BE** - Firebase Functions backend for document generation and content management
 - **job-finder** - Python queue worker for job discovery and scraping
 - **job-finder-shared-types** - Shared TypeScript types across all projects
 

@@ -292,10 +292,6 @@ export class ContentItemsClient extends BaseApiClient {
   }
 }
 
-// Firebase Functions URL from environment
-const portfolioFunctionsUrl =
-  import.meta.env.VITE_PORTFOLIO_FUNCTIONS_URL ||
-  "https://us-central1-static-sites-257923.cloudfunctions.net"
-
 // Create singleton instance
-export const contentItemsClient = new ContentItemsClient(portfolioFunctionsUrl)
+import { api } from "@/config/api"
+export const contentItemsClient = new ContentItemsClient(api.baseUrl)
