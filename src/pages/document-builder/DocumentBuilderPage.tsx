@@ -61,7 +61,10 @@ export function DocumentBuilderPage() {
 
   // Pre-fill form if job match is passed via navigation state
   useEffect(() => {
-    const state = location.state as { jobMatch?: JobMatch; documentType?: "resume" | "cover_letter" } | null
+    const state = location.state as {
+      jobMatch?: JobMatch
+      documentType?: "resume" | "cover_letter"
+    } | null
     if (state?.jobMatch) {
       const match = state.jobMatch
       setSelectedJobMatchId(match.id || "")
