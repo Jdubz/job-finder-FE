@@ -1,22 +1,15 @@
 {
   "projects": {
-    "default": "job-finder-prod",
-    "staging": "job-finder-staging",
-    "development": "job-finder-dev",
-    "production": "job-finder-prod"
+    "default": "static-sites-257923"
   },
   "targets": {
-    "job-finder-prod": {
-      "hosting": {
-        "production": [
-          "job-finder-production"
-        ]
-      }
-    },
-    "job-finder-staging": {
+    "static-sites-257923": {
       "hosting": {
         "staging": [
           "job-finder-staging"
+        ],
+        "production": [
+          "job-finder-production"
         ]
       }
     }

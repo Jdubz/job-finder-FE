@@ -10,6 +10,7 @@ const isStaging = import.meta.env.MODE === "staging"
 
 /**
  * Get the base URL for the current environment
+ * All environments now use static-sites-257923 project
  */
 const getBaseUrl = (): string => {
   if (isDevelopment) {
@@ -18,14 +19,19 @@ const getBaseUrl = (): string => {
       ? "http://localhost:5001/job-finder-dev/us-central1"
       : import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/job-finder-dev/us-central1"
   }
-  if (isStaging) {
-    return "https://us-central1-job-finder-staging.cloudfunctions.net"
-  }
-  // Production
-  return "https://us-central1-job-finder-prod.cloudfunctions.net"
+  // Both staging and production use static-sites-257923 project
+  // Function names are differentiated by suffix (-staging for staging, none for production)
+  return import.meta.env.VITE_API_BASE_URL || "https://us-central1-static-sites-257923.cloudfunctions.net"
 }
 
 const BASE_URL = getBaseUrl()
+
+/**
+ * Function name suffix for environment-specific functions
+ * Staging functions have -staging suffix (e.g., manageJobQueue-staging)
+ * Production functions have no suffix (e.g., manageJobQueue)
+ */
+const FUNCTION_SUFFIX = isStaging ? "-staging" : ""
 
 /**
  * API Configuration
@@ -39,6 +45,7 @@ export const API_CONFIG = {
 
 /**
  * Firebase Cloud Functions endpoints
+ * Note: Staging functions use -staging suffix, production has no suffix
  */
 export const api = {
   baseUrl: BASE_URL,
@@ -46,19 +53,22 @@ export const api = {
   // Firebase Functions endpoints
   functions: {
     // Document generation
-    manageGenerator: `${BASE_URL}/manageGenerator`,
+    manageGenerator: `${BASE_URL}/manageGenerator${FUNCTION_SUFFIX}`,
 
     // Content management
-    manageContentItems: `${BASE_URL}/manageContentItems`,
+    manageContentItems: `${BASE_URL}/manageContentItems${FUNCTION_SUFFIX}`,
 
     // Contact form
-    handleContactForm: `${BASE_URL}/handleContactForm`,
+    handleContactForm: `${BASE_URL}/contact-form${FUNCTION_SUFFIX}`,
 
     // Job queue management
-    manageJobQueue: `${BASE_URL}/manageJobQueue`,
+    manageJobQueue: `${BASE_URL}/manageJobQueue${FUNCTION_SUFFIX}`,
 
-    // Settings management
-    manageSettings: `${BASE_URL}/manageSettings`,
+    // Settings management (if exists)
+    manageSettings: `${BASE_URL}/manageSettings${FUNCTION_SUFFIX}`,
+
+    // Experience management
+    manageExperience: `${BASE_URL}/manageExperience${FUNCTION_SUFFIX}`,
   },
 
   // Firestore collections (accessed via Firebase SDK, not REST)

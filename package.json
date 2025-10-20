@@ -24,6 +24,7 @@
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
+    "check:env": "bash scripts/check-env.sh",
     "prepare": "husky"
   },
   "dependencies": {
