@@ -77,12 +77,39 @@ npm run type-check       # Run TypeScript type checking
 
 ## Environment Variables
 
-See `.env.template` for required environment variables.
+See `.env.template` for required environment variables and setup instructions.
 
-Key variables:
-- `VITE_FIREBASE_*` - Firebase configuration
-- `VITE_API_BASE_URL` - Backend API URL
-- `VITE_ENVIRONMENT` - Current environment (development/staging/production)
+**Quick Start**:
+```bash
+# 1. Copy template
+cp .env.template .env.development
+
+# 2. Fill in Firebase credentials
+# Get from: https://console.firebase.google.com/project/static-sites-257923/settings/general
+
+# 3. Validate configuration
+npm run check:env
+```
+
+**Key variables**:
+- `VITE_FIREBASE_*` - Firebase SDK configuration (required)
+- `VITE_API_BASE_URL` - Cloud Functions base URL (auto-configured)
+- `VITE_USE_EMULATORS` - Enable Firebase emulators in development
+- `VITE_ENVIRONMENT` - Environment metadata
+
+**Documentation**:
+- [Environment Troubleshooting Guide](docs/environment-troubleshooting.md) - Complete setup and debugging guide
+- [Environment Verification Matrix](docs/environment-verification-matrix.md) - Known issues and fixes
+
+### Environment Configuration
+
+All environments use the `static-sites-257923` Firebase project:
+
+- **Development**: Local Firebase emulators with `job-finder-dev` app config
+- **Staging**: Cloud Functions with `-staging` suffix (e.g., `manageJobQueue-staging`)
+- **Production**: Cloud Functions with no suffix (e.g., `manageJobQueue`)
+
+API endpoints are automatically configured based on build mode. See `src/config/api.ts` for implementation details.
 
 ## Deployment
 
@@ -134,6 +161,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for system architecture and component d
 
 ## Related Projects
 
+- **job-finder-BE** - Firebase Functions backend for document generation and content management
 - **job-finder** - Python queue worker for job discovery and scraping
 - **job-finder-shared-types** - Shared TypeScript types across all projects
 

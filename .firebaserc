@@ -1,8 +1,6 @@
 {
   "projects": {
-    "default": "static-sites-257923",
-    "staging": "static-sites-257923",
-    "production": "static-sites-257923"
+    "default": "static-sites-257923"
   },
   "targets": {
     "static-sites-257923": {

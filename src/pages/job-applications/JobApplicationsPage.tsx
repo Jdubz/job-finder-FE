@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { jobMatchesClient } from "@/api"
 import { Button } from "@/components/ui/button"
@@ -15,10 +16,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, Search, SlidersHorizontal } from "lucide-react"
 import { JobMatchCard } from "./components/JobMatchCard"
 import { JobDetailsDialog } from "./components/JobDetailsDialog"
+import { ROUTES } from "@/types/routes"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 
 export function JobApplicationsPage() {
   const { user, isEditor } = useAuth()
+  const navigate = useNavigate()
   const [matches, setMatches] = useState<JobMatch[]>([])
   const [filteredMatches, setFilteredMatches] = useState<JobMatch[]>([])
   const [loading, setLoading] = useState(true)
@@ -87,9 +90,13 @@ export function JobApplicationsPage() {
   }
 
   const handleGenerateResume = (match: JobMatch) => {
-    // TODO: Navigate to document builder with pre-filled job data
-    console.log("Generate resume for:", match.jobTitle)
-    // This will be implemented when we create the Document Builder page
+    // Navigate to document builder with pre-filled job data
+    navigate(ROUTES.DOCUMENT_BUILDER, {
+      state: {
+        jobMatch: match,
+        documentType: "resume",
+      },
+    })
   }
 
   if (!isEditor) {

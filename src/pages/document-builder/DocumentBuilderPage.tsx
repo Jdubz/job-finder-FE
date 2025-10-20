@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { jobMatchesClient } from "@/api/job-matches-client"
 import { generatorClient, type GenerateDocumentRequest } from "@/api/generator-client"
@@ -23,6 +24,7 @@ import { DocumentHistoryList } from "./components/DocumentHistoryList"
 
 export function DocumentBuilderPage() {
   const { user } = useAuth()
+  const location = useLocation()
   const [jobMatches, setJobMatches] = useState<JobMatch[]>([])
   const [selectedJobMatchId, setSelectedJobMatchId] = useState<string>("")
   const [documentType, setDocumentType] = useState<"resume" | "cover_letter">("resume")
@@ -56,6 +58,24 @@ export function DocumentBuilderPage() {
 
     loadMatches()
   }, [user?.uid])
+
+  // Pre-fill form if job match is passed via navigation state
+  useEffect(() => {
+    const state = location.state as {
+      jobMatch?: JobMatch
+      documentType?: "resume" | "cover_letter"
+    } | null
+    if (state?.jobMatch) {
+      const match = state.jobMatch
+      setSelectedJobMatchId(match.id || "")
+      setCustomJobTitle(match.jobTitle || "")
+      setCustomCompanyName(match.companyName || "")
+      setCustomJobDescription(match.jobDescription || "")
+      if (state.documentType) {
+        setDocumentType(state.documentType)
+      }
+    }
+  }, [location.state])
 
   // Auto-populate fields when job match is selected
   useEffect(() => {
