@@ -8,17 +8,13 @@ export function EnvironmentTest() {
       <Card>
         <CardHeader>
           <CardTitle>Frontend Environment Test</CardTitle>
-          <CardDescription>
-            All components working correctly
-          </CardDescription>
+          <CardDescription>All components working correctly</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              ✅ TypeScript with strict mode
-              ✅ Tailwind CSS styling
-              ✅ shadcn/ui components
-              ✅ Path aliases (@/)
+              ✅ TypeScript with strict mode ✅ Tailwind CSS styling ✅ shadcn/ui components ✅ Path
+              aliases (@/)
             </p>
             <Button>Test Button</Button>
           </div>
