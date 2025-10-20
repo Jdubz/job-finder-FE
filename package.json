@@ -20,6 +20,7 @@
     "test:e2e:debug": "playwright test --debug",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
+    "check:env": "bash scripts/check-env.sh",
     "prepare": "husky"
   },
   "dependencies": {

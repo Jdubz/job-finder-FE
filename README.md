@@ -77,23 +77,39 @@ npm run type-check       # Run TypeScript type checking
 
 ## Environment Variables
 
-See `.env.example` for required environment variables.
+See `.env.template` for required environment variables and setup instructions.
 
-Key variables:
-- `VITE_FIREBASE_*` - Firebase configuration (project-specific)
-- `VITE_API_BASE_URL` - Backend API URL (auto-configured by environment)
+**Quick Start**:
+```bash
+# 1. Copy template
+cp .env.template .env.development
+
+# 2. Fill in Firebase credentials
+# Get from: https://console.firebase.google.com/project/static-sites-257923/settings/general
+
+# 3. Validate configuration
+npm run check:env
+```
+
+**Key variables**:
+- `VITE_FIREBASE_*` - Firebase SDK configuration (required)
+- `VITE_API_BASE_URL` - Cloud Functions base URL (auto-configured)
 - `VITE_USE_EMULATORS` - Enable Firebase emulators in development
-- `VITE_ENVIRONMENT` - Current environment (development/staging/production)
+- `VITE_ENVIRONMENT` - Environment metadata
+
+**Documentation**:
+- [Environment Troubleshooting Guide](docs/environment-troubleshooting.md) - Complete setup and debugging guide
+- [Environment Verification Matrix](docs/environment-verification-matrix.md) - Known issues and fixes
 
 ### Environment Configuration
 
-The application uses environment-specific configuration:
+All environments use the `static-sites-257923` Firebase project:
 
-- **Development**: Uses Firebase emulators and `job-finder-dev` project
-- **Staging**: Uses `job-finder-staging` project and Cloud Functions
-- **Production**: Uses `job-finder-prod` project and Cloud Functions
+- **Development**: Local Firebase emulators with `job-finder-dev` app config
+- **Staging**: Cloud Functions with `-staging` suffix (e.g., `manageJobQueue-staging`)
+- **Production**: Cloud Functions with no suffix (e.g., `manageJobQueue`)
 
-API endpoints are automatically configured based on the build mode. See `src/config/api.ts` for details.
+API endpoints are automatically configured based on build mode. See `src/config/api.ts` for implementation details.
 
 ## Deployment
 
