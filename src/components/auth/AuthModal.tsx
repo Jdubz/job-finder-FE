@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth"
@@ -147,12 +153,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                 </div>
               )}
 
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                className="w-full"
-                size="lg"
-              >
+              <Button onClick={handleSignOut} variant="outline" className="w-full" size="lg">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
