@@ -54,8 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Features:**
 - Standalone frontend for job search automation
-- Integration points for Portfolio backend (AI generation)
-- Integration points for Job-Finder Python service (scraping)
+- Integration with Firebase Cloud Functions (AI generation, content management)
+- Integration with Job-Finder Python service (scraping, queue management)
 - Real-time data synchronization via Firestore
 - Protected routes with Firebase Auth
 - Responsive design with mobile-first approach
