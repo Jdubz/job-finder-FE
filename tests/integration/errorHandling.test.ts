@@ -11,11 +11,15 @@ import {
   makeUnauthenticatedRequest,
   cleanupTestAuth,
   signInTestUser,
+  getIntegrationDescribe,
 } from "../utils/testHelpers"
 import { mockErrorResponses } from "../fixtures/mockData"
 import { FUNCTION_URLS } from "@/config/api"
 
-describe("Error Handling Integration", () => {
+// Skip integration tests if Firebase is mocked (unit test mode)
+const describeIntegration = getIntegrationDescribe()
+
+describeIntegration("Error Handling Integration", () => {
   beforeEach(async () => {
     await cleanupTestAuth()
   })

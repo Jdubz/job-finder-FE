@@ -25,6 +25,7 @@ export function JobApplicationsPage() {
   const [matches, setMatches] = useState<JobMatch[]>([])
   const [filteredMatches, setFilteredMatches] = useState<JobMatch[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedMatch, setSelectedMatch] = useState<JobMatch | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -40,10 +41,20 @@ export function JobApplicationsPage() {
       return
     }
 
-    const unsubscribe = jobMatchesClient.subscribeToMatches(user.uid, (updatedMatches) => {
-      setMatches(updatedMatches)
-      setLoading(false)
-    })
+    const unsubscribe = jobMatchesClient.subscribeToMatches(
+      user.uid,
+      (updatedMatches) => {
+        setMatches(updatedMatches)
+        setLoading(false)
+        setError(null) // Clear any previous errors
+      },
+      undefined,
+      (err) => {
+        setError("Failed to load job matches. Please refresh the page.")
+        setLoading(false)
+        console.error("Job matches subscription error:", err)
+      }
+    )
 
     return () => unsubscribe()
   }, [user])
@@ -194,6 +205,14 @@ export function JobApplicationsPage() {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Error State */}
+      {error && !loading && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Loading State */}
       {loading && (
