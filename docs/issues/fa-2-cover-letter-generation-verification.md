@@ -6,9 +6,11 @@
 - **Labels**: priority-p0, repository-frontend, type-verification, status-todo
 
 ## What This Issue Covers
+
 Re-validate the Document Builder cover letter flow using only assets in `job-finder-FE`. You will capture evidence that local previews, staging builds, and production preview builds all render letters correctly and talk to the migrated backend endpoints.
 
 ## Tasks
+
 1. **Map the Flow**
    - Review `src/pages/document-builder/DocumentBuilderPage.tsx`, `src/components/document-builder/CoverLetterForm.tsx`, and related hooks under `src/hooks/document-builder/` to understand required environment variables and API calls.
    - Document the request payloads generated in `src/api/generator.ts` so that discrepancies can be reported without backend access.
@@ -29,6 +31,7 @@ Re-validate the Document Builder cover letter flow using only assets in `job-fin
    - Append a dated verification note to `COMPLETED.md` referencing the evidence you captured.
 
 ## Acceptance Criteria
+
 - [ ] Cover letter flow executes locally with mock data; screenshots or asset references recorded in this issue.
 - [ ] Staging and production preview builds tested; comparison table with outcomes committed here.
 - [ ] `.env.template` updated with any additional generator-related keys.
@@ -37,12 +40,14 @@ Re-validate the Document Builder cover letter flow using only assets in `job-fin
 - [ ] `npm run lint`, `npm run test`, and `npm run build` succeed.
 
 ## Test Commands
+
 - `npm run test -- cover-letter`
 - `npm run lint`
 - `npm run build`
 - `npm run preview`
 
 ## Useful Files
+
 - `src/pages/document-builder/DocumentBuilderPage.tsx`
 - `src/api/generator-client.ts`
 - `src/__tests__/api/generator-client.test.ts`

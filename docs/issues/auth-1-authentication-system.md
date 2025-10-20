@@ -37,6 +37,7 @@ Repository: job-finder-FE
 - **Firebase Config**: `src/config/firebase.ts` for Firebase initialization
 
 **Key concepts to understand**:
+
 - **AuthContext**: Global auth state using React Context
 - **Protected Routes**: Route guards requiring authentication
 - **Public Routes**: Routes that redirect authenticated users
@@ -47,6 +48,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Firebase Setup
+
 1. **Configure Firebase Authentication**
    - What: Initialize Firebase Auth in config file
    - Where: `src/config/firebase.ts`
@@ -60,6 +62,7 @@ Repository: job-finder-FE
    - Test: Environment variables load correctly
 
 ### Phase 2: Auth Context
+
 3. **Create AuthContext**
    - What: React Context for global auth state
    - Where: `src/contexts/AuthContext.tsx` (create)
@@ -73,6 +76,7 @@ Repository: job-finder-FE
    - Test: User state persists across page refreshes
 
 ### Phase 3: UI Components
+
 5. **Build login page**
    - What: Login form with email/password and social auth
    - Where: `src/pages/auth/LoginPage.tsx` (create)
@@ -114,6 +118,7 @@ REFERENCE:
 ### Key Implementation Notes
 
 **AuthContext Implementation**:
+
 ```typescript
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -191,6 +196,7 @@ export function useAuth() {
 ```
 
 **Protected Route Component**:
+
 ```typescript
 // src/components/auth/ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
@@ -215,6 +221,7 @@ export function ProtectedRoute() {
 ```
 
 **Login Page Component**:
+
 ```typescript
 // src/pages/auth/LoginPage.tsx
 import { useState } from 'react'
@@ -333,6 +340,7 @@ export function LoginPage() {
 ```
 
 **Integration Points**:
+
 - **Router**: Wrap protected routes with ProtectedRoute component
 - **App**: Wrap entire app with AuthProvider
 - **API Calls**: Use auth tokens for authenticated requests
@@ -457,12 +465,14 @@ Closes #7
 ## Resources
 
 ### Documentation
+
 - **Firebase Auth**: https://firebase.google.com/docs/auth/web/start
 - **Firebase Auth State**: https://firebase.google.com/docs/auth/web/manage-users
 - **Google OAuth**: https://firebase.google.com/docs/auth/web/google-signin
 - **Custom Claims**: https://firebase.google.com/docs/auth/admin/custom-claims
 
 ### External References
+
 - **React Context**: https://react.dev/reference/react/useContext
 - **React Router Auth**: https://reactrouter.com/en/main/start/concepts#protected-routes
 
@@ -471,6 +481,7 @@ Closes #7
 ## Success Metrics
 
 **How we'll measure success**:
+
 - **Login success rate**: > 99% for valid credentials
 - **Session persistence**: 100% of logins persist across refreshes
 - **Auth check speed**: < 500ms to determine auth state
@@ -481,11 +492,13 @@ Closes #7
 ## Notes
 
 **Questions? Need clarification?**
+
 - Comment on this issue with specific questions
 - Tag @PM for guidance
 - Reference CLAUDE.md for auth patterns
 
 **Implementation Tips**:
+
 - Use onAuthStateChanged for automatic auth state updates
 - Handle loading state to prevent flashing content
 - Store intended route in location state for post-login redirect

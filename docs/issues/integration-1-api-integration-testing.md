@@ -37,6 +37,7 @@ Repository: job-finder-FE
 - **[SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)** - Full system integration
 
 **Key concepts to understand**:
+
 - **API Endpoints**: All Firebase Functions in job-finder-BE
 - **Authentication**: Firebase Auth token validation
 - **Error Handling**: Network errors, validation errors, auth errors
@@ -48,6 +49,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Test Infrastructure Setup
+
 1. **Set up integration test framework**
    - What: Configure Vitest/Jest for integration tests
    - Where: `tests/integration/` directory (create)
@@ -61,6 +63,7 @@ Repository: job-finder-FE
    - Test: Utilities work across multiple test files
 
 ### Phase 2: Endpoint Testing
+
 3. **Test manageGenerator endpoint**
    - What: Test document generation (resume, cover letter)
    - Where: `tests/integration/documentGeneration.test.ts` (create)
@@ -80,6 +83,7 @@ Repository: job-finder-FE
    - Test: All auth scenarios work as expected
 
 ### Phase 3: Error Handling & Edge Cases
+
 6. **Test error scenarios**
    - What: Network errors, 4xx/5xx responses, validation errors
    - Where: Add error cases to existing test files
@@ -93,6 +97,7 @@ Repository: job-finder-FE
    - Test: Rate limits respected, UI shows appropriate messages
 
 ### Phase 4: End-to-End Testing
+
 8. **Create E2E test suite**
    - What: Complete user workflows with Playwright
    - Where: `tests/e2e/` directory (create)
@@ -131,17 +136,18 @@ REFERENCE:
 ### Key Implementation Notes
 
 **Test Helper Utilities**:
+
 ```typescript
 // tests/utils/testHelpers.ts
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { auth } from '@/config/firebase'
+import { signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { auth } from "@/config/firebase"
 
 export async function getTestAuthToken(): Promise<string> {
   const email = process.env.VITE_TEST_USER_EMAIL
   const password = process.env.VITE_TEST_USER_PASSWORD
 
   if (!email || !password) {
-    throw new Error('Test credentials not configured')
+    throw new Error("Test credentials not configured")
   }
 
   const userCredential = await signInWithEmailAndPassword(auth, email, password)
@@ -162,37 +168,38 @@ export async function makeAuthenticatedRequest(
     ...options,
     headers: {
       ...options.headers,
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   })
 }
 
 export const testData = {
   validJobMatch: {
-    jobTitle: 'Test Software Engineer',
-    company: 'Test Company',
+    jobTitle: "Test Software Engineer",
+    company: "Test Company",
     matchScore: 85,
-    url: 'https://example.com/job',
-    summary: 'Test job description',
+    url: "https://example.com/job",
+    summary: "Test job description",
   },
   validContentItem: {
-    type: 'experience',
-    title: 'Test Experience',
-    description: 'Test description',
-    skills: ['JavaScript', 'React'],
+    type: "experience",
+    title: "Test Experience",
+    description: "Test description",
+    skills: ["JavaScript", "React"],
   },
 }
 ```
 
 **Document Generation Integration Test**:
+
 ```typescript
 // tests/integration/documentGeneration.test.ts
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { api } from '@/config/api'
-import { getTestAuthToken, cleanupTestAuth, makeAuthenticatedRequest } from '../utils/testHelpers'
+import { describe, it, expect, beforeAll, afterAll } from "vitest"
+import { api } from "@/config/api"
+import { getTestAuthToken, cleanupTestAuth, makeAuthenticatedRequest } from "../utils/testHelpers"
 
-describe('Document Generation API', () => {
+describe("Document Generation API", () => {
   beforeAll(async () => {
     // Set up test environment
     await getTestAuthToken()
@@ -202,94 +209,82 @@ describe('Document Generation API', () => {
     await cleanupTestAuth()
   })
 
-  it('should generate a resume successfully', async () => {
-    const response = await makeAuthenticatedRequest(
-      api.functions.manageGenerator,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'generate',
-          documentType: 'resume',
-          jobMatchId: 'test-job-match-id',
-          contentItems: ['item-1', 'item-2'],
-          options: {
-            tone: 'professional',
-            length: 'standard',
-          },
-        }),
-      }
-    )
+  it("should generate a resume successfully", async () => {
+    const response = await makeAuthenticatedRequest(api.functions.manageGenerator, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "generate",
+        documentType: "resume",
+        jobMatchId: "test-job-match-id",
+        contentItems: ["item-1", "item-2"],
+        options: {
+          tone: "professional",
+          length: "standard",
+        },
+      }),
+    })
 
     expect(response.status).toBe(200)
     const data = await response.json()
-    expect(data).toHaveProperty('success', true)
-    expect(data).toHaveProperty('documentId')
-    expect(data).toHaveProperty('content')
+    expect(data).toHaveProperty("success", true)
+    expect(data).toHaveProperty("documentId")
+    expect(data).toHaveProperty("content")
   })
 
-  it('should generate a cover letter successfully', async () => {
-    const response = await makeAuthenticatedRequest(
-      api.functions.manageGenerator,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'generate',
-          documentType: 'coverLetter',
-          jobMatchId: 'test-job-match-id',
-          contentItems: ['item-1'],
-          options: {
-            tone: 'enthusiastic',
-            length: 'concise',
-          },
-        }),
-      }
-    )
+  it("should generate a cover letter successfully", async () => {
+    const response = await makeAuthenticatedRequest(api.functions.manageGenerator, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "generate",
+        documentType: "coverLetter",
+        jobMatchId: "test-job-match-id",
+        contentItems: ["item-1"],
+        options: {
+          tone: "enthusiastic",
+          length: "concise",
+        },
+      }),
+    })
 
     expect(response.status).toBe(200)
     const data = await response.json()
     expect(data.success).toBe(true)
   })
 
-  it('should reject unauthenticated requests', async () => {
+  it("should reject unauthenticated requests", async () => {
     const response = await fetch(api.functions.manageGenerator, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'generate' }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "generate" }),
     })
 
     expect(response.status).toBe(401)
   })
 
-  it('should validate required fields', async () => {
-    const response = await makeAuthenticatedRequest(
-      api.functions.manageGenerator,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'generate',
-          // Missing required fields
-        }),
-      }
-    )
+  it("should validate required fields", async () => {
+    const response = await makeAuthenticatedRequest(api.functions.manageGenerator, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "generate",
+        // Missing required fields
+      }),
+    })
 
     expect(response.status).toBe(400)
     const data = await response.json()
-    expect(data).toHaveProperty('error')
+    expect(data).toHaveProperty("error")
   })
 
-  it('should handle backend errors gracefully', async () => {
-    const response = await makeAuthenticatedRequest(
-      api.functions.manageGenerator,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'generate',
-          documentType: 'invalid-type', // Invalid type to trigger error
-          jobMatchId: 'test',
-          contentItems: [],
-        }),
-      }
-    )
+  it("should handle backend errors gracefully", async () => {
+    const response = await makeAuthenticatedRequest(api.functions.manageGenerator, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "generate",
+        documentType: "invalid-type", // Invalid type to trigger error
+        jobMatchId: "test",
+        contentItems: [],
+      }),
+    })
 
     expect([400, 500]).toContain(response.status)
   })
@@ -297,23 +292,24 @@ describe('Document Generation API', () => {
 ```
 
 **E2E Workflow Test**:
+
 ```typescript
 // tests/e2e/jobApplicationWorkflow.spec.ts
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test"
 
-test.describe('Job Application Workflow', () => {
+test.describe("Job Application Workflow", () => {
   test.beforeEach(async ({ page }) => {
     // Log in
-    await page.goto('/login')
+    await page.goto("/login")
     await page.fill('input[type="email"]', process.env.VITE_TEST_USER_EMAIL!)
     await page.fill('input[type="password"]', process.env.VITE_TEST_USER_PASSWORD!)
     await page.click('button[type="submit"]')
-    await page.waitForURL('/dashboard')
+    await page.waitForURL("/dashboard")
   })
 
-  test('should view job matches and generate resume', async ({ page }) => {
+  test("should view job matches and generate resume", async ({ page }) => {
     // Navigate to job applications
-    await page.goto('/job-applications')
+    await page.goto("/job-applications")
 
     // Wait for job matches to load
     await page.waitForSelector('[data-testid="job-match-card"]')
@@ -326,12 +322,12 @@ test.describe('Job Application Workflow', () => {
     await jobCards.first().click()
 
     // Navigate to document builder
-    await page.click('text=Generate Resume')
+    await page.click("text=Generate Resume")
     await page.waitForURL(/\/document-builder/)
 
     // Fill out generation form
-    await page.selectOption('select[name="documentType"]', 'resume')
-    await page.selectOption('select[name="tone"]', 'professional')
+    await page.selectOption('select[name="documentType"]', "resume")
+    await page.selectOption('select[name="tone"]', "professional")
     await page.click('button:has-text("Generate Document")')
 
     // Wait for generation to complete
@@ -344,14 +340,14 @@ test.describe('Job Application Workflow', () => {
     expect(await preview.isVisible()).toBe(true)
 
     // Download document
-    const downloadPromise = page.waitForEvent('download')
+    const downloadPromise = page.waitForEvent("download")
     await page.click('button:has-text("Download")')
     const download = await downloadPromise
     expect(download.suggestedFilename()).toMatch(/resume.*\.pdf/)
   })
 
-  test('should filter and sort job matches', async ({ page }) => {
-    await page.goto('/job-applications')
+  test("should filter and sort job matches", async ({ page }) => {
+    await page.goto("/job-applications")
 
     // Apply status filter
     await page.click('button:has-text("Filter")')
@@ -363,17 +359,18 @@ test.describe('Job Application Workflow', () => {
     expect(await cards.count()).toBeGreaterThan(0)
 
     // Change sort order
-    await page.selectOption('select[name="sort"]', 'matchScore')
+    await page.selectOption('select[name="sort"]', "matchScore")
 
     // Verify sorting applied
     const firstCard = cards.first()
-    const firstScore = await firstCard.getAttribute('data-match-score')
+    const firstScore = await firstCard.getAttribute("data-match-score")
     expect(parseInt(firstScore!)).toBeGreaterThan(70)
   })
 })
 ```
 
 **Integration Points**:
+
 - **All API Endpoints**: manageGenerator, manageContentItems, handleContactForm
 - **Firestore**: Real-time listeners and queries
 - **Authentication**: Token validation and refresh
@@ -505,12 +502,14 @@ Closes #10
 ## Resources
 
 ### Documentation
+
 - **Vitest**: https://vitest.dev/
 - **Playwright**: https://playwright.dev/
 - **Firebase Testing**: https://firebase.google.com/docs/rules/unit-tests
 - **Integration Testing Best Practices**: https://kentcdodds.com/blog/write-tests
 
 ### External References
+
 - **Testing Library**: https://testing-library.com/
 - **API Testing**: https://www.freecodecamp.org/news/how-to-test-your-api/
 
@@ -519,6 +518,7 @@ Closes #10
 ## Success Metrics
 
 **How we'll measure success**:
+
 - **Test Pass Rate**: 100% of integration tests pass
 - **Test Coverage**: > 80% coverage of API interactions
 - **E2E Success**: All critical workflows pass
@@ -530,11 +530,13 @@ Closes #10
 ## Notes
 
 **Questions? Need clarification?**
+
 - Comment on this issue with specific questions
 - Tag @PM for guidance
 - Reference BACKEND_MIGRATION_PLAN.md for API details
 
 **Implementation Tips**:
+
 - Use test user accounts, not production data
 - Mock external dependencies when appropriate
 - Clean up test data after each test run
@@ -545,6 +547,7 @@ Closes #10
 - Add performance benchmarks for API calls
 
 **Testing Checklist**:
+
 - [ ] All Firebase Functions endpoints tested
 - [ ] Authentication flows validated
 - [ ] Firestore queries and listeners tested

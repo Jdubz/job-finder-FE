@@ -50,6 +50,7 @@ npm install
 ### Environment Setup
 
 1. Copy the environment template:
+
    ```bash
    cp .env.template .env
    ```
@@ -131,6 +132,7 @@ See the main migration plan documentation for contribution guidelines.
 ## Features
 
 ### Core Features
+
 - **Job Applications:** View and manage job matches with filtering and search
 - **Job Finder:** Submit LinkedIn job URLs for automated processing
 - **Document Builder:** Generate AI-powered resumes and cover letters
@@ -138,11 +140,13 @@ See the main migration plan documentation for contribution guidelines.
 - **Queue Management:** Monitor job processing queue status
 
 ### Configuration Features (Editor Role Required)
+
 - **Job Finder Config:** Configure stop lists, queue settings, and AI parameters
 - **AI Prompts:** Customize AI prompts for document generation with variable interpolation
 - **Settings:** Manage user preferences, theme, and default settings
 
 ### Technical Features
+
 - Protected routes with Firebase Authentication
 - Role-based access control (user/editor roles)
 - Real-time Firestore updates

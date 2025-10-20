@@ -18,6 +18,7 @@ This is the **Job Finder Frontend** - a standalone React application for job sea
 ### Integration
 
 This frontend integrates with:
+
 - **job-finder** (Python Service) - Queue worker for job scraping and AI matching
 - **job-finder-BE** (Firebase Functions) - Backend API for document generation and content management
 - **job-finder-shared-types** - Shared TypeScript type definitions
@@ -153,47 +154,49 @@ import { PublicRoute } from '@/components/auth/PublicRoute'
 ### State Management
 
 **Auth State** (Context):
+
 ```typescript
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from "@/contexts/AuthContext"
 
 const { user, loading, isEditor, login, logout } = useAuth()
 ```
 
 **Component State** (useState/useReducer):
+
 - Local form state
 - UI state (modals, dropdowns)
 
 **Server State** (Firebase Realtime):
+
 - Firestore listeners for real-time updates
 - No client-side caching needed
 
 ### API Integration
 
 **Firebase Functions:**
+
 ```typescript
-import { api } from '@/config/api'
+import { api } from "@/config/api"
 
 // AI resume generation
 const response = await fetch(`${api.functions.generateResume}`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   },
-  body: JSON.stringify(data)
+  body: JSON.stringify(data),
 })
 ```
 
 **Firestore Direct Access:**
+
 ```typescript
-import { db } from '@/config/firebase'
-import { collection, query, where, onSnapshot } from 'firebase/firestore'
+import { db } from "@/config/firebase"
+import { collection, query, where, onSnapshot } from "firebase/firestore"
 
 // Real-time job matches
-const q = query(
-  collection(db, 'job-matches'),
-  where('userId', '==', user.uid)
-)
+const q = query(collection(db, "job-matches"), where("userId", "==", user.uid))
 onSnapshot(q, (snapshot) => {
   // Update UI
 })
@@ -233,15 +236,11 @@ VITE_API_BASE_URL=https://api.example.com
 This project uses types from `@jdubz/job-finder-shared-types`:
 
 ```typescript
-import type {
-  QueueItem,
-  JobMatch,
-  QueueSettings,
-  AISettings
-} from '@jdubz/job-finder-shared-types'
+import type { QueueItem, JobMatch, QueueSettings, AISettings } from "@jdubz/job-finder-shared-types"
 ```
 
 **Installing shared types:**
+
 ```bash
 npm install ../job-finder-shared-types
 ```
@@ -249,11 +248,13 @@ npm install ../job-finder-shared-types
 ## Git Workflow
 
 **Branch Strategy:**
+
 ```
 feature_branch → staging → main
 ```
 
 **Rules:**
+
 1. Create feature branches from `staging`
 2. Create PR: `feature → staging`
 3. Test on staging deployment
@@ -261,6 +262,7 @@ feature_branch → staging → main
 5. **Never push directly to `main`**
 
 **Deployment:**
+
 - Push to `staging` → auto-deploys to staging.example.com
 - Merge to `main` → auto-deploys to production
 
@@ -278,6 +280,7 @@ feature_branch → staging → main
 ## Component Library (shadcn/ui)
 
 Add new components:
+
 ```bash
 npx shadcn-ui@latest add button
 npx shadcn-ui@latest add card
@@ -289,11 +292,13 @@ Components are added to `src/components/ui/` and can be customized.
 ## Styling Guidelines
 
 **Use Tailwind utility classes:**
+
 ```tsx
 <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-md">
 ```
 
 **Use cn() helper for conditional classes:**
+
 ```tsx
 import { cn } from '@/lib/utils'
 
@@ -338,6 +343,7 @@ import { cn } from '@/lib/utils'
 ### Firebase Cloud Functions (Backend API)
 
 **Endpoints:**
+
 - `POST /manageGenerator` - AI resume/cover letter generation
 - `POST /handleContactForm` - Contact form submission
 - `POST /manageContentItems` - Content and experience management
@@ -345,11 +351,13 @@ import { cn } from '@/lib/utils'
 ### Job-Finder Python Service
 
 **Shared Firestore Collections:**
+
 - `job-queue` - Job processing queue
 - `job-matches` - AI-analyzed matches
 - `job-finder-config` - Settings and stop-lists
 
 **Data Flow:**
+
 1. User submits job URL (this app)
 2. Python service processes queue
 3. Creates JobMatch if score ≥ threshold
@@ -361,11 +369,13 @@ import { cn } from '@/lib/utils'
 ### Firebase Hosting
 
 **Staging:**
+
 ```bash
 npm run deploy:staging
 ```
 
 **Production:**
+
 ```bash
 npm run deploy:production
 ```
@@ -373,11 +383,13 @@ npm run deploy:production
 ### Alternative Hosting (Vercel/Netlify)
 
 **Vercel:**
+
 ```bash
 vercel --prod
 ```
 
 **Netlify:**
+
 ```bash
 netlify deploy --prod
 ```
@@ -401,6 +413,7 @@ netlify deploy --prod
 This repository contains a complete React frontend with the following features:
 
 ### Core Pages
+
 - **Job Finder** - Submit job URLs for AI analysis
 - **Job Applications** - View and manage AI-matched jobs
 - **Document Builder** - Generate AI-powered resumes and cover letters
@@ -410,11 +423,13 @@ This repository contains a complete React frontend with the following features:
 - **System Health** - Monitor system status and logs
 
 ### Configuration Pages (Editor-Only)
+
 - **AI Prompts** - Customize AI prompts for all generation tasks
 - **Job Finder Config** - Manage stop lists, queue settings, AI settings
 - **Settings** - User preferences and defaults
 
 ### Testing & CI/CD
+
 - **E2E Tests** - Playwright test suite covering all major workflows
 - **GitHub Actions** - Automated CI/CD for staging and production
 - **Type Safety** - Full TypeScript coverage with strict mode

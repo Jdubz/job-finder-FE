@@ -41,6 +41,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Initialize Project
+
 1. **Create Vite + React + TypeScript project**
    - What: Set up base project with Vite
    - Where: Root directory
@@ -54,6 +55,7 @@ Repository: job-finder-FE
    - Test: No TypeScript errors in IDE
 
 ### Phase 2: Install Dependencies
+
 3. **Install core dependencies**
    - What: React Router v7, Firebase SDK, Tailwind CSS
    - Where: `package.json`
@@ -67,6 +69,7 @@ Repository: job-finder-FE
    - Test: Components render correctly
 
 ### Phase 3: Configure Tooling
+
 5. **Set up ESLint and Prettier**
    - What: Configure linting and formatting rules
    - Where: `.eslintrc.js`, `.prettierrc`
@@ -80,6 +83,7 @@ Repository: job-finder-FE
    - Test: Tailwind classes work in components
 
 ### Phase 4: Development Scripts
+
 7. **Create npm scripts**
    - What: dev, build, preview, lint, test scripts
    - Where: `package.json`
@@ -119,26 +123,28 @@ CREATE:
 ### Key Implementation Notes
 
 **Vite Configuration**:
+
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import path from "path"
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   server: {
-    port: 5173
-  }
+    port: 5173,
+  },
 })
 ```
 
 **Package.json Scripts**:
+
 ```json
 {
   "scripts": {
@@ -245,6 +251,7 @@ Closes #4
 ## Resources
 
 ### Documentation
+
 - **Vite**: https://vitejs.dev/
 - **React**: https://react.dev/
 - **Tailwind CSS**: https://tailwindcss.com/
@@ -256,6 +263,7 @@ Closes #4
 ## Success Metrics
 
 **How we'll measure success**:
+
 - Dev server starts in < 5 seconds
 - Hot reload updates in < 1 second
 - Production build completes in < 30 seconds

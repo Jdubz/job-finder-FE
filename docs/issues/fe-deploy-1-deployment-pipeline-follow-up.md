@@ -6,9 +6,11 @@
 - **Labels**: priority-p1, repository-frontend, type-maintenance, status-todo
 
 ## What This Issue Covers
+
 Ensure the GitHub Actions deployment workflows in this repository are healthy from a frontend perspective and backed by automated UI smoke checks. Everything should be reproducible with only the files under `job-finder-FE`.
 
 ## Tasks
+
 1. **Understand Existing Workflows**
    - Review `.github/workflows/` (expect `deploy-staging.yml` and `deploy-production.yml`). Document each job, required secrets, and cache strategy in a new section of `docs/DEPLOYMENT_RUNBOOK.md`.
    - Use the “Run workflow” button in GitHub to dispatch a staging deploy. Record the commit SHA, generated URL, and attach logs to this issue (summary is fine if direct attachment impossible).
@@ -26,12 +28,14 @@ Ensure the GitHub Actions deployment workflows in this repository are healthy fr
    - Append to the runbook a short checklist for frontend reviewers covering: verifying deploy logs, running smoke tests locally (`npm run test:e2e -- --project smoke`), and confirming environment variables.
 
 ## Acceptance Criteria
+
 - [ ] GitHub Actions deploy workflow has an accompanying description in `docs/DEPLOYMENT_RUNBOOK.md` and a recorded manual dispatch result.
 - [ ] A Playwright smoke project exists and is invoked automatically by the deploy workflow.
 - [ ] Deploy documentation contains DNS verification instructions based solely on files in this repo.
 - [ ] `npm run lint`, `npm run test`, and `npm run test:e2e -- --project smoke` succeed locally.
 
 ## Useful Files
+
 - `.github/workflows/`
 - `playwright.config.ts`
 - `e2e/` test directory

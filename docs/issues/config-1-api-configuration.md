@@ -37,8 +37,9 @@ Repository: job-finder-FE
 - **[SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)** - Backend architecture
 
 **Key concepts to understand**:
+
 - **API Config**: Centralized configuration in `src/config/api.ts`
-- **Environment Variables**: Vite env vars with VITE_ prefix
+- **Environment Variables**: Vite env vars with VITE\_ prefix
 - **Firebase Functions**: New job-finder-BE function endpoints
 - **CORS Configuration**: Backend must allow frontend origins
 
@@ -47,6 +48,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Update API Configuration
+
 1. **Update api.ts configuration file**
    - What: Replace Portfolio URLs with job-finder-BE URLs
    - Where: `src/config/api.ts`
@@ -60,6 +62,7 @@ Repository: job-finder-FE
    - Test: No remaining Portfolio mentions in config
 
 ### Phase 2: Environment Variables
+
 3. **Update environment variable files**
    - What: Add job-finder-BE URLs for each environment
    - Where: `.env.development`, `.env.staging`, `.env.production`, `.env.example`
@@ -73,6 +76,7 @@ Repository: job-finder-FE
    - Test: Firebase SDK connects to correct project
 
 ### Phase 3: Code Updates
+
 5. **Update API service imports**
    - What: Verify all services use updated api config
    - Where: `src/services/` directory
@@ -113,24 +117,25 @@ REFERENCE:
 ### Key Implementation Notes
 
 **Updated API Configuration**:
+
 ```typescript
 // src/config/api.ts
-const isDevelopment = import.meta.env.MODE === 'development'
-const isStaging = import.meta.env.MODE === 'staging'
+const isDevelopment = import.meta.env.MODE === "development"
+const isStaging = import.meta.env.MODE === "staging"
 
 // Base URLs for different environments
 const getBaseUrl = () => {
   if (isDevelopment) {
     // Local Firebase emulator or development backend
-    return import.meta.env.VITE_USE_EMULATORS === 'true'
-      ? 'http://localhost:5001/job-finder-dev/us-central1'
+    return import.meta.env.VITE_USE_EMULATORS === "true"
+      ? "http://localhost:5001/job-finder-dev/us-central1"
       : import.meta.env.VITE_API_BASE_URL
   }
   if (isStaging) {
-    return 'https://us-central1-job-finder-staging.cloudfunctions.net'
+    return "https://us-central1-job-finder-staging.cloudfunctions.net"
   }
   // Production
-  return 'https://us-central1-job-finder-prod.cloudfunctions.net'
+  return "https://us-central1-job-finder-prod.cloudfunctions.net"
 }
 
 const BASE_URL = getBaseUrl()
@@ -156,12 +161,12 @@ export const api = {
 
   // Firestore collections (accessed via Firebase SDK, not REST)
   collections: {
-    jobMatches: 'job-matches',
-    jobQueue: 'job-queue',
-    contentItems: 'content-items',
-    documents: 'generated-documents',
-    settings: 'job-finder-config',
-  }
+    jobMatches: "job-matches",
+    jobQueue: "job-queue",
+    contentItems: "content-items",
+    documents: "generated-documents",
+    settings: "job-finder-config",
+  },
 }
 
 // Helper function for authenticated requests
@@ -174,14 +179,15 @@ export async function authenticatedFetch(
     ...options,
     headers: {
       ...options.headers,
-      'Authorization': `Bearer ${authToken}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+      "Content-Type": "application/json",
     },
   })
 }
 ```
 
 **Environment Variables Template**:
+
 ```bash
 # .env.example
 
@@ -204,6 +210,7 @@ VITE_GA_TRACKING_ID=your-ga-id
 ```
 
 **.env.development**:
+
 ```bash
 VITE_FIREBASE_PROJECT_ID=job-finder-dev
 VITE_FIREBASE_AUTH_DOMAIN=localhost
@@ -212,6 +219,7 @@ VITE_API_BASE_URL=http://localhost:5001/job-finder-dev/us-central1
 ```
 
 **.env.staging**:
+
 ```bash
 VITE_FIREBASE_PROJECT_ID=job-finder-staging
 VITE_FIREBASE_AUTH_DOMAIN=staging.jobfinder.app
@@ -220,6 +228,7 @@ VITE_API_BASE_URL=https://us-central1-job-finder-staging.cloudfunctions.net
 ```
 
 **.firebaserc Update**:
+
 ```json
 {
   "projects": {
@@ -231,6 +240,7 @@ VITE_API_BASE_URL=https://us-central1-job-finder-staging.cloudfunctions.net
 ```
 
 **Integration Points**:
+
 - **All API Services**: Update to use new base URLs
 - **Firebase Functions**: New project-specific function URLs
 - **CORS**: Backend must allow new frontend URLs
@@ -353,11 +363,13 @@ Closes #9
 ## Resources
 
 ### Documentation
+
 - **Vite Env Variables**: https://vitejs.dev/guide/env-and-mode.html
 - **Firebase Projects**: https://firebase.google.com/docs/projects/learn-more
 - **CORS Configuration**: https://firebase.google.com/docs/functions/http-events#cors
 
 ### Internal Documentation
+
 - **BACKEND_MIGRATION_PLAN.md**: Details on new backend structure
 - **SYSTEM_ARCHITECTURE.md**: System-wide architecture
 
@@ -366,6 +378,7 @@ Closes #9
 ## Success Metrics
 
 **How we'll measure success**:
+
 - **Zero CORS errors**: All API calls succeed without CORS issues
 - **Correct routing**: 100% of API calls reach intended backend
 - **Build success**: All environment builds complete without errors
@@ -376,11 +389,13 @@ Closes #9
 ## Notes
 
 **Questions? Need clarification?**
+
 - Comment on this issue with specific questions
 - Tag @PM for guidance
 - Check BACKEND_MIGRATION_PLAN.md for URL details
 
 **Implementation Tips**:
+
 - Use search/replace carefully to avoid breaking working code
 - Test each environment after updating
 - Verify CORS settings on backend match frontend URLs
@@ -390,6 +405,7 @@ Closes #9
 - Document any custom headers or auth requirements
 
 **Before Deploying**:
+
 - [ ] Test all API endpoints in staging
 - [ ] Verify CORS configuration on backend
 - [ ] Confirm Firebase project access permissions
