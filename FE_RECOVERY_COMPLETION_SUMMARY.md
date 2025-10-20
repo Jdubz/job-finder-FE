@@ -32,7 +32,7 @@ Successfully completed all three P0-CRITICAL frontend recovery tasks, restoring 
    - Synced with staging branch (pulled latest changes)
    - Installed 473 dependencies (zero vulnerabilities)
    - Built production bundle: 48 static assets, 4.13s build time
-   - Deployed to https://job-finder-staging.web.app
+   - Deployed to https://job-finder-staging.joshwentworth.com (Cloudflare proxy for https://job-finder-staging.web.app)
    - Verified HTTP 200 accessibility
 
 3. **Backend Integration Verification**
@@ -271,8 +271,8 @@ Successfully completed all three P0-CRITICAL frontend recovery tasks, restoring 
 ## Current State
 
 ### Infrastructure
-- ✅ Staging: https://job-finder-staging.web.app (LIVE)
-- ⏳ Production: https://job-finder-production.web.app (READY, not deployed)
+- ✅ Staging: https://job-finder-staging.joshwentworth.com (Cloudflare front door) → origin https://job-finder-staging.web.app (LIVE)
+- ⏳ Production: https://job-finder.joshwentworth.com (Cloudflare front door) → origin https://job-finder-production.web.app (READY, not deployed)
 
 ### CI/CD Pipeline
 - ✅ GitHub Actions workflows configured and tested
@@ -404,12 +404,12 @@ Successfully completed all three P0-CRITICAL frontend recovery tasks, restoring 
 
 ### Key URLs
 
-**Staging**:
-- Site: https://job-finder-staging.web.app
+- Public URL: https://job-finder-staging.joshwentworth.com (Cloudflare)
+- Firebase Origin: https://job-finder-staging.web.app
 - Firebase Console: https://console.firebase.google.com/project/static-sites-257923/hosting/sites/job-finder-staging
 
-**Production**:
-- Site: https://job-finder-production.web.app
+- Public URL: https://job-finder.joshwentworth.com (Cloudflare)
+- Firebase Origin: https://job-finder-production.web.app
 - Firebase Console: https://console.firebase.google.com/project/static-sites-257923/hosting/sites/job-finder-production
 
 **GitHub**:
@@ -435,9 +435,9 @@ firebase deploy --only hosting:production
 firebase hosting:rollback --site job-finder-staging
 firebase hosting:rollback --site job-finder-production
 
-# Verification
-curl -I https://job-finder-staging.web.app
-curl -I https://job-finder-production.web.app
+# Verification (Cloudflare front door; origin URLs in parentheses)
+curl -I https://job-finder-staging.joshwentworth.com   # origin https://job-finder-staging.web.app
+curl -I https://job-finder.joshwentworth.com          # origin https://job-finder-production.web.app
 ```
 
 ---

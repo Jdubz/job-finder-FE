@@ -4,6 +4,8 @@ import { ROUTES } from "@/types/routes"
 import { cn } from "@/lib/utils"
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
+import { AuthIcon } from "@/components/auth/AuthIcon"
+import { AuthModal } from "@/components/auth/AuthModal"
 
 const publicLinks = [
   { to: ROUTES.HOME, label: "Home" },
@@ -24,16 +26,12 @@ const editorLinks = [
 ]
 
 export function Navigation() {
-  const { user, isEditor, signOut } = useAuth()
+  const { isEditor } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
 
   const isActive = (path: string) => location.pathname === path
-
-  const handleSignOut = async () => {
-    await signOut()
-    setMobileMenuOpen(false)
-  }
 
   return (
     <nav className="border-b bg-card">
@@ -77,27 +75,21 @@ export function Navigation() {
               </>
             )}
 
-            {user && (
-              <>
-                <div className="h-6 w-px bg-border" />
-                <button
-                  onClick={handleSignOut}
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Sign Out
-                </button>
-              </>
-            )}
+            <div className="h-6 w-px bg-border" />
+            <AuthIcon onClick={() => setAuthModalOpen(true)} />
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile Menu Button and Auth Icon */}
+          <div className="md:hidden flex items-center gap-3">
+            <AuthIcon onClick={() => setAuthModalOpen(true)} />
+            <button
+              className="p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -138,21 +130,11 @@ export function Navigation() {
                 ))}
               </>
             )}
-
-            {user && (
-              <>
-                <div className="h-px bg-border my-2" />
-                <button
-                  onClick={handleSignOut}
-                  className="block w-full text-left px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-md transition-colors"
-                >
-                  Sign Out
-                </button>
-              </>
-            )}
           </div>
         )}
       </div>
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </nav>
   )
 }

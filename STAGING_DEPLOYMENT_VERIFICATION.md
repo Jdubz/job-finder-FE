@@ -9,7 +9,7 @@
 
 ## Summary
 
-Successfully restored and deployed the Job Finder frontend to Firebase Hosting staging environment. The application is now live at https://job-finder-staging.web.app and configured to connect to Cloud Functions staging endpoints.
+Successfully restored and deployed the Job Finder frontend to Firebase Hosting staging environment. The application now serves publicly at https://job-finder-staging.joshwentworth.com via Cloudflare (proxying the Firebase origin at https://job-finder-staging.web.app) and is configured to connect to Cloud Functions staging endpoints.
 
 ---
 
@@ -18,7 +18,8 @@ Successfully restored and deployed the Job Finder frontend to Firebase Hosting s
 ### Environment Configuration
 - **Firebase Project**: static-sites-257923
 - **Hosting Site**: job-finder-staging
-- **Hosting URL**: https://job-finder-staging.web.app
+- **Public URL (Cloudflare)**: https://job-finder-staging.joshwentworth.com
+- **Firebase Hosting Origin**: https://job-finder-staging.web.app
 - **Environment**: staging
 - **Build Tool**: Vite 7.1.10
 - **Node Version**: 20+
@@ -229,7 +230,7 @@ i  hosting[job-finder-staging]: releasing new version...
 ✔  Deploy complete!
 
 Project Console: https://console.firebase.google.com/project/static-sites-257923/overview
-Hosting URL: https://job-finder-staging.web.app
+Hosting URL: https://job-finder-staging.web.app (Firebase origin; public Cloudflare domain https://job-finder-staging.joshwentworth.com)
 ```
 
 ---
@@ -249,6 +250,6 @@ Hosting URL: https://job-finder-staging.web.app
 ## References
 
 - Firebase Console: https://console.firebase.google.com/project/static-sites-257923/overview
-- Staging URL: https://job-finder-staging.web.app
+- Staging URL: https://job-finder-staging.joshwentworth.com (Cloudflare) → origin https://job-finder-staging.web.app
 - Deployment Plan: `/docs/architecture/FE_DEPLOYMENT_PLAN.md`
 - Worker A Tasks: `/CLAUDE_WORKER_A.md`

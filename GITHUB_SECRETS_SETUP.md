@@ -130,7 +130,7 @@ This ensures production deployments require manual approval.
 3. Go to **Actions** tab in GitHub
 4. Watch the **"Deploy to Staging"** workflow run
 5. Verify it completes successfully
-6. Check https://job-finder-staging.web.app
+6. Check https://job-finder-staging.joshwentworth.com (Cloudflare) — fallback origin: https://job-finder-staging.web.app
 
 ### Test Production Deployment
 
@@ -142,7 +142,7 @@ This ensures production deployments require manual approval.
 6. **Environment approval** will be required
 7. PM approves the deployment
 8. Workflow continues and deploys
-9. Verify https://job-finder-production.web.app
+9. Verify https://job-finder.joshwentworth.com (Cloudflare) — fallback origin: https://job-finder-production.web.app
 
 ---
 
