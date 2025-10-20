@@ -71,23 +71,27 @@ feature_branch → staging → main
 ### Creating a New Feature
 
 1. **Start from staging:**
+
    ```bash
    git checkout staging
    git pull origin staging
    ```
 
 2. **Create feature branch:**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 3. **Make changes and commit:**
+
    ```bash
    git add .
    git commit -m "feat: your feature description"
    ```
 
 4. **Push to remote:**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -119,6 +123,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat:` New feature
 - `fix:` Bug fix
 - `docs:` Documentation changes
@@ -128,6 +133,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` Maintenance tasks
 
 **Examples:**
+
 ```bash
 feat(job-finder): add bulk job submission
 
@@ -150,6 +156,7 @@ refactor(components): extract reusable button component
 - Use type inference where possible
 
 **Good:**
+
 ```typescript
 interface ButtonProps {
   label: string
@@ -163,6 +170,7 @@ const Button: React.FC<ButtonProps> = ({ label, onClick, variant = 'primary' }) 
 ```
 
 **Bad:**
+
 ```typescript
 const Button = (props: any) => {
   return <button onClick={props.onClick}>{props.label}</button>
@@ -177,6 +185,7 @@ const Button = (props: any) => {
 - Export default at the bottom
 
 **Structure:**
+
 ```typescript
 // Imports
 import React from 'react'
@@ -218,6 +227,7 @@ export default ComponentName
 - Use consistent spacing scale
 
 **Good:**
+
 ```typescript
 import { cn } from '@/lib/utils'
 
@@ -232,6 +242,7 @@ import { cn } from '@/lib/utils'
 ```
 
 **Bad:**
+
 ```typescript
 <button style={{
   padding: '8px 16px',
@@ -249,6 +260,7 @@ import { cn } from '@/lib/utils'
 - Keep components small and focused
 
 **Example:**
+
 ```
 src/components/job-finder/
 ├── index.ts              # Re-exports
@@ -259,12 +271,12 @@ src/components/job-finder/
 
 ```typescript
 // src/components/job-finder/index.ts
-export { JobSubmissionForm } from './JobSubmissionForm'
-export { JobList } from './JobList'
-export { JobCard } from './JobCard'
+export { JobSubmissionForm } from "./JobSubmissionForm"
+export { JobList } from "./JobList"
+export { JobCard } from "./JobCard"
 
 // Usage:
-import { JobSubmissionForm, JobList } from '@/components/job-finder'
+import { JobSubmissionForm, JobList } from "@/components/job-finder"
 ```
 
 ---
@@ -287,6 +299,7 @@ npm test -- --coverage
 ### Writing Tests
 
 **Component Tests:**
+
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Button } from './Button'
@@ -319,16 +332,19 @@ describe('Button', () => {
 ### Before Creating a PR
 
 1. **Run tests:**
+
    ```bash
    npm test
    ```
 
 2. **Run linting:**
+
    ```bash
    npm run lint
    ```
 
 3. **Build successfully:**
+
    ```bash
    npm run build
    ```
@@ -344,24 +360,29 @@ When creating a PR, include:
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tested locally
 - [ ] Added/updated tests
 - [ ] All tests passing
 - [ ] Linting passes
 
 ## Screenshots (if applicable)
+
 [Add screenshots]
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-reviewed code
 - [ ] Commented complex logic
@@ -383,6 +404,7 @@ Brief description of changes
 ### Adding a New Page
 
 1. **Create page component:**
+
    ```typescript
    // src/pages/new-feature/NewFeaturePage.tsx
    const NewFeaturePage: React.FC = () => {
@@ -397,6 +419,7 @@ Brief description of changes
    ```
 
 2. **Add route:**
+
    ```typescript
    // src/router.tsx
    import NewFeaturePage from '@/pages/new-feature/NewFeaturePage'
@@ -426,17 +449,20 @@ This adds the component to `src/components/ui/`.
 ### Adding Dependencies
 
 **Before installing:**
+
 - Check if dependency is necessary
 - Consider bundle size impact
 - Check for lighter alternatives
 
 **Install:**
+
 ```bash
 npm install package-name
 npm install -D @types/package-name  # If TypeScript types needed
 ```
 
 **Update documentation:**
+
 - Add to README if user-facing
 - Document usage in CLAUDE.md if development-facing
 
@@ -447,11 +473,13 @@ npm install -D @types/package-name  # If TypeScript types needed
 ### Adding Environment Variable
 
 1. **Add to `.env.example`:**
+
    ```env
    VITE_NEW_VARIABLE=example-value
    ```
 
 2. **Update TypeScript types:**
+
    ```typescript
    // src/vite-env.d.ts
    interface ImportMetaEnv {
@@ -460,6 +488,7 @@ npm install -D @types/package-name  # If TypeScript types needed
    ```
 
 3. **Use in code:**
+
    ```typescript
    const newVariable = import.meta.env.VITE_NEW_VARIABLE
    ```
@@ -471,19 +500,23 @@ npm install -D @types/package-name  # If TypeScript types needed
 ### Debugging
 
 **React DevTools:**
+
 - Install browser extension
 - Inspect component tree and props
 
 **Redux DevTools (if using):**
+
 - Install browser extension
 - Monitor state changes
 
 **Console Logging:**
+
 ```typescript
-console.log('[ComponentName]', 'Debug message', { data })
+console.log("[ComponentName]", "Debug message", { data })
 ```
 
 **Vite Dev Tools:**
+
 - Network tab for API requests
 - Sources tab for breakpoints
 

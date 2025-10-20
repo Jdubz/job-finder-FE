@@ -6,12 +6,15 @@
 - **Labels**: priority-p0, repository-frontend, type-bug, status-todo
 
 ## Context
+
 All environment-specific configuration for the frontend lives inside this repository. Environment variables are defined in `.env.template`, `.env.development`, `.env.staging`, and `.env.production`. API clients consume URLs from `src/config/api.ts`, while Firebase SDK configuration is read from `src/config/firebase.ts`. Recent migrations changed backend endpoints and hosting routes, so we must validate every environment without assuming knowledge of other repositories.
 
 ## Problem Statement
+
 Developers have reported that certain features (job queue actions, document builder, generator history) fail depending on which environment the app targets. The working theory is that the `.env.*` files no longer match what the code expects. We need a comprehensive verification pass that can be executed using only the code and documentation present in `job-finder-FE`.
 
 ## What “Done” Looks Like
+
 1. **Environment Matrix**: A markdown table committed to `docs/issues/fe-bug-2-environment-verification.md` listing each API client under `src/api/`, the environment variables it requires, and the observed status (✅/⚠️) for:
    - Local development using `npm run dev` with `.env.development`.
    - Preview mode (`npm run preview`) simulating staging values from `.env.staging`.
@@ -22,6 +25,7 @@ Developers have reported that certain features (job queue actions, document buil
 5. **Tracking Regressions**: Leave issue comments summarizing any environment mismatches. If fixes require backend work, capture the failing request/response payload so someone without backend access understands the dependency.
 
 ## Suggested Implementation Steps
+
 1. **Audit Configuration Files**
    - Review `src/config/api.ts` and note every `VITE_*` variable consumed.
    - Review `firebase.json` and Hosting rewrites to understand expected routes.
@@ -31,7 +35,7 @@ Developers have reported that certain features (job queue actions, document buil
    - Document generation via `/src/pages/document-builder/DocumentBuilderPage.tsx`.
    - Queue management via `/src/pages/queue-management/QueueManagementPage.tsx`.
    - Auth indicator (header icon) to confirm Firebase Auth works with provided config.
-   Use browser dev tools or the console to capture network errors and include them in the matrix.
+     Use browser dev tools or the console to capture network errors and include them in the matrix.
 3. **Update Templates and Docs**
    - Align `.env.template` with the variables actually consumed.
    - Ensure `.env.staging` and `.env.production` mention placeholders for function URLs and hosting origins, even if values are redacted.
@@ -44,6 +48,7 @@ Developers have reported that certain features (job queue actions, document buil
    - Attach screenshots or console logs if possible (for future debugging).
 
 ## Acceptance Criteria
+
 - [ ] Environment matrix table populated with pass/fail for development, staging-preview, and production-preview modes.
 - [ ] `.env.template` matches all required `VITE_*` variables used in the codebase.
 - [ ] `docs/environment-troubleshooting.md` created and linked from `README.md`.
@@ -51,12 +56,14 @@ Developers have reported that certain features (job queue actions, document buil
 - [ ] `npm run lint` and `npm run test` pass after your changes.
 
 ## Test Commands
+
 - `npm run check:env`
 - `npm run lint`
 - `npm run test`
 - `npm run build && npm run preview`
 
 ## Useful References Inside This Repo
+
 - `src/config/api.ts` — list of environment-driven base URLs.
 - `src/api/` — the clients that rely on those URLs.
 - `src/config/firebase.ts` — Firebase web app configuration surface.

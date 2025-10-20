@@ -37,6 +37,7 @@ Repository: job-finder-FE
 - **API Config**: `src/config/api.ts` for function endpoints
 
 **Key concepts to understand**:
+
 - **Firebase Functions**: `/manageGenerator` endpoint for document generation
 - **Content Items**: User's experience/skills pulled from Firestore
 - **Document Types**: Resume vs Cover Letter generation
@@ -47,6 +48,7 @@ Repository: job-finder-FE
 ## Tasks
 
 ### Phase 1: Job Selection
+
 1. **Create job selector component**
    - What: Dropdown/list to select which job match to generate for
    - Where: `src/components/document-builder/JobSelector.tsx` (create)
@@ -60,6 +62,7 @@ Repository: job-finder-FE
    - Test: Hook returns user's content items
 
 ### Phase 3: Generation Form
+
 3. **Build generation form**
    - What: Form with document type, tone, length, focus options
    - Where: `src/components/document-builder/GenerationForm.tsx` (create)
@@ -73,6 +76,7 @@ Repository: job-finder-FE
    - Test: Successfully calls function and receives document
 
 ### Phase 4: Results Display
+
 5. **Create document preview component**
    - What: Display generated document with formatting
    - Where: `src/components/document-builder/DocumentPreview.tsx` (create)
@@ -116,18 +120,19 @@ REFERENCE:
 ### Key Implementation Notes
 
 **Document Service API Call**:
+
 ```typescript
 // src/services/documentService.ts
-import { auth } from '@/config/firebase'
-import { api } from '@/config/api'
+import { auth } from "@/config/firebase"
+import { api } from "@/config/api"
 
 interface GenerateDocumentRequest {
   jobMatchId: string
-  documentType: 'resume' | 'coverLetter'
+  documentType: "resume" | "coverLetter"
   contentItems: string[] // Array of content item IDs
   options: {
-    tone?: 'professional' | 'casual' | 'enthusiastic'
-    length?: 'concise' | 'standard' | 'detailed'
+    tone?: "professional" | "casual" | "enthusiastic"
+    length?: "concise" | "standard" | "detailed"
     focusAreas?: string[]
   }
 }
@@ -143,20 +148,20 @@ export async function generateDocument(
   request: GenerateDocumentRequest
 ): Promise<GenerateDocumentResponse> {
   const user = auth.currentUser
-  if (!user) throw new Error('User not authenticated')
+  if (!user) throw new Error("User not authenticated")
 
   const token = await user.getIdToken()
 
   const response = await fetch(api.functions.manageGenerator, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      action: 'generate',
-      ...request
-    })
+      action: "generate",
+      ...request,
+    }),
   })
 
   if (!response.ok) {
@@ -168,6 +173,7 @@ export async function generateDocument(
 ```
 
 **Generation Form Component**:
+
 ```typescript
 // src/components/document-builder/GenerationForm.tsx
 import { useState } from 'react'
@@ -251,6 +257,7 @@ export function GenerationForm({ onGenerate, loading }: GenerationFormProps) {
 ```
 
 **Integration Points**:
+
 - **Firebase Functions**: `/manageGenerator` endpoint
 - **Firestore**: Fetch content items and job matches
 - **Auth**: Required for API authentication
@@ -373,12 +380,14 @@ Closes #6
 ## Resources
 
 ### Documentation
+
 - **Firebase Functions**: https://firebase.google.com/docs/functions/callable
 - **Firebase Auth Tokens**: https://firebase.google.com/docs/auth/admin/verify-id-tokens
 - **PDF Generation**: https://www.npmjs.com/package/jspdf
 - **DOCX Generation**: https://www.npmjs.com/package/docx
 
 ### External References
+
 - **React File Download**: https://www.npmjs.com/package/file-saver
 - **Markdown Rendering**: https://www.npmjs.com/package/react-markdown
 
@@ -387,6 +396,7 @@ Closes #6
 ## Success Metrics
 
 **How we'll measure success**:
+
 - **Generation time**: Documents generated in < 10 seconds
 - **Success rate**: > 95% successful generations
 - **User satisfaction**: Documents require minimal manual editing
@@ -397,11 +407,13 @@ Closes #6
 ## Notes
 
 **Questions? Need clarification?**
+
 - Comment on this issue with specific questions
 - Tag @PM for guidance
 - Reference BACKEND_MIGRATION_PLAN.md for API structure
 
 **Implementation Tips**:
+
 - Show progress indicator during generation (can take 5-10 seconds)
 - Cache content items to avoid re-fetching on each generation
 - Consider allowing users to edit generated content before download

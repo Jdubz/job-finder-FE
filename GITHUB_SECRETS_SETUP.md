@@ -33,6 +33,7 @@ This guide walks through setting up the required GitHub secrets for automated de
 5. Open the file and copy **the entire JSON content**
 
 6. The JSON should look like this (with real values):
+
 ```json
 {
   "type": "service_account",
@@ -48,7 +49,8 @@ This guide walks through setting up the required GitHub secrets for automated de
 }
 ```
 
-**⚠️ IMPORTANT**: 
+**⚠️ IMPORTANT**:
+
 - Keep this file secure - it has full access to your Firebase project
 - Never commit this file to git
 - Use the JSON content **exactly as is** (including all newlines in private_key)
@@ -70,12 +72,12 @@ This guide walks through setting up the required GitHub secrets for automated de
 2. Fill in the form:
    - **Name**: `FIREBASE_SERVICE_ACCOUNT`
    - **Value**: Paste the **entire JSON content** from the service account file
-   
 3. Click **"Add secret"**
 
 ### Step 3: Verify Secret
 
 The secret should now appear in the list with:
+
 - Name: `FIREBASE_SERVICE_ACCOUNT`
 - Updated: Today's date
 - ✅ Available to all workflows
@@ -153,6 +155,7 @@ This ensures production deployments require manual approval.
 **Problem**: Workflow can't access `FIREBASE_SERVICE_ACCOUNT`
 
 **Solutions**:
+
 1. Verify secret name is exactly `FIREBASE_SERVICE_ACCOUNT` (case-sensitive)
 2. Check secret is in **Repository secrets**, not Environment secrets
 3. Verify the workflow file uses `${{ secrets.FIREBASE_SERVICE_ACCOUNT }}`
@@ -162,6 +165,7 @@ This ensures production deployments require manual approval.
 **Problem**: Firebase authentication fails
 
 **Solutions**:
+
 1. Regenerate service account key in Firebase Console
 2. Ensure you copied the **entire JSON** (no truncation)
 3. Verify the JSON is valid (use a JSON validator)
@@ -172,6 +176,7 @@ This ensures production deployments require manual approval.
 **Problem**: Service account lacks permissions
 
 **Solutions**:
+
 1. Go to [IAM & Admin](https://console.cloud.google.com/iam-admin/iam?project=static-sites-257923)
 2. Find your service account email (ends with `@static-sites-257923.iam.gserviceaccount.com`)
 3. Ensure it has these roles:
@@ -183,6 +188,7 @@ This ensures production deployments require manual approval.
 **Problem**: Workflow references environment that doesn't exist
 
 **Solutions**:
+
 1. Create the environment as described above
 2. Ensure environment name matches workflow file exactly
 3. Environment names are case-sensitive
@@ -192,6 +198,7 @@ This ensures production deployments require manual approval.
 ## Security Best Practices
 
 ### DO ✅
+
 - Rotate service account keys every 90 days
 - Use least-privilege permissions
 - Enable environment protection for production
@@ -199,6 +206,7 @@ This ensures production deployments require manual approval.
 - Store keys in GitHub Secrets only
 
 ### DON'T ❌
+
 - Commit service account JSON to repository
 - Share service account keys via email/Slack
 - Use same key for multiple projects
@@ -222,10 +230,12 @@ Service account keys should be rotated regularly for security.
 7. Revoke old key in Firebase Console
 
 ### Recommended Schedule
+
 - **Production keys**: Rotate every 90 days
 - **Staging keys**: Can use same key, rotate quarterly
 
 ### Next Rotation Due
+
 - [ ] 2025-01-19 (90 days from setup)
 
 ---

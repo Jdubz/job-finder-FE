@@ -89,6 +89,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 #### Critical User Flows to Test
 
 ##### Authentication Flow
+
 - [ ] User can access login page
 - [ ] User can sign in with Google
 - [ ] User can sign in with email/password
@@ -97,6 +98,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Unauthorized access redirects to login
 
 ##### Job Applications Page
+
 - [ ] Page loads without errors
 - [ ] Job matches display correctly
 - [ ] Filters work (score, status, date)
@@ -106,6 +108,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Real-time updates work (if implemented)
 
 ##### Job Finder Page
+
 - [ ] Page loads without errors
 - [ ] LinkedIn URL input accepts valid URLs
 - [ ] Form validation works
@@ -114,6 +117,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Submitted job appears in queue
 
 ##### Document Builder Page
+
 - [ ] Page loads without errors
 - [ ] Job selection works
 - [ ] Experience selection works
@@ -123,6 +127,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Document preview works
 
 ##### Document History Page
+
 - [ ] Page loads without errors
 - [ ] Document list displays
 - [ ] Document download works
@@ -130,6 +135,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Document search works
 
 ##### Queue Management Page
+
 - [ ] Page loads without errors
 - [ ] Queue items display
 - [ ] Queue status updates
@@ -137,6 +143,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Real-time updates work
 
 ##### Settings & Configuration (Editor Role)
+
 - [ ] Settings page accessible
 - [ ] Job Finder Config page accessible
 - [ ] AI Prompts page accessible
@@ -144,6 +151,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Validation works
 
 #### Performance Tests
+
 - [ ] Page load time < 3 seconds
 - [ ] Time to Interactive < 5 seconds
 - [ ] No layout shift on load
@@ -151,6 +159,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [ ] Lazy loading works
 
 #### Browser Compatibility
+
 - [ ] Chrome/Chromium latest
 - [ ] Firefox latest
 - [ ] Safari latest (if Mac available)
@@ -176,6 +185,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 **Time**: Deployment execution
 
 1. [ ] **Create Production PR**
+
    ```bash
    # In job-finder-FE repository
    git checkout staging
@@ -191,24 +201,29 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
    - Watch workflow at: https://github.com/Jdubz/job-finder-FE/actions
    - Verify quality checks pass
    - Provide environment approval when prompted
-   
 3. [ ] **Verify Deployment Success**
    ```bash
-  # Check HTTP status (Cloudflare front door; origin remains https://job-finder-production.web.app)
-  curl -I https://job-finder.joshwentworth.com
-   
-   # Check Cloud Functions
-   for func in manageJobQueue manageGenerator manageExperience manageContentItems contact-form; do
-     echo -n "$func: "
-     curl -s -o /dev/null -w "%{http_code}\n" "https://us-central1-static-sites-257923.cloudfunctions.net/$func"
-   done
+
    ```
 
+# Check HTTP status (Cloudflare front door; origin remains https://job-finder-production.web.app)
+
+curl -I https://job-finder.joshwentworth.com
+
+# Check Cloud Functions
+
+for func in manageJobQueue manageGenerator manageExperience manageContentItems contact-form; do
+echo -n "$func: "
+     curl -s -o /dev/null -w "%{http_code}\n" "https://us-central1-static-sites-257923.cloudfunctions.net/$func"
+done
+
+````
+
 4. [ ] **Tag Deployment**
-   ```bash
-   git tag -a "v1.0.0-production" -m "Initial production deployment"
-   git push origin --tags
-   ```
+```bash
+git tag -a "v1.0.0-production" -m "Initial production deployment"
+git push origin --tags
+````
 
 ### Phase 3: Verification (H+15 min)
 
@@ -238,6 +253,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 ### When to Rollback
 
 Execute rollback immediately if:
+
 - ❌ Site returns 404 or 500 errors
 - ❌ Authentication completely broken
 - ❌ Critical user flow completely broken
@@ -282,6 +298,7 @@ echo "Production rolled back at $(date)" >> deployment.log
 **Audience**: Team  
 **Channel**: Slack/Discord  
 **Message Template**:
+
 ```
 🚀 DEPLOYMENT NOTICE 🚀
 
@@ -299,6 +316,7 @@ We'll update this thread with progress.
 ### During Deployment
 
 **Updates every 5 minutes**:
+
 - ✅ Quality checks passed
 - ✅ Deployment started
 - ✅ Deployment completed
@@ -308,6 +326,7 @@ We'll update this thread with progress.
 ### Post-Deployment
 
 **Success Message**:
+
 ```
 ✅ DEPLOYMENT COMPLETE ✅
 
@@ -326,6 +345,7 @@ Monitoring will continue for the next hour.
 ```
 
 **Failure Message**:
+
 ```
 ⚠️ DEPLOYMENT ISSUE ⚠️
 
@@ -389,13 +409,13 @@ Deployment is considered successful when:
 
 ### High Risk Items
 
-| Risk | Mitigation | Rollback Time |
-|------|-----------|---------------|
-| Authentication failure | Pre-test in staging | 2 minutes |
-| API endpoint errors | Verify staging CF first | 2 minutes |
-| Build/deployment failure | Automated tests | 2 minutes |
-| Performance degradation | Load test staging | 5 minutes |
-| Browser compatibility | Test multiple browsers | N/A (client-side) |
+| Risk                     | Mitigation              | Rollback Time     |
+| ------------------------ | ----------------------- | ----------------- |
+| Authentication failure   | Pre-test in staging     | 2 minutes         |
+| API endpoint errors      | Verify staging CF first | 2 minutes         |
+| Build/deployment failure | Automated tests         | 2 minutes         |
+| Performance degradation  | Load test staging       | 5 minutes         |
+| Browser compatibility    | Test multiple browsers  | N/A (client-side) |
 
 ### Low Risk Items
 
@@ -418,18 +438,21 @@ Deployment is considered successful when:
 ### Team Coordination
 
 **Worker B** (Frontend Specialist):
+
 - [ ] Conduct comprehensive UI smoke tests
 - [ ] Test all user flows in staging
 - [ ] Verify mobile responsiveness
 - [ ] Report any issues found
 
 **PM** (Project Manager):
+
 - [ ] Provide final deployment approval
 - [ ] Approve environment protection in GitHub
 - [ ] Monitor deployment progress
 - [ ] Coordinate with stakeholders
 
 **Worker A** (You):
+
 - [x] Infrastructure and deployment setup
 - [ ] Execute deployment
 - [ ] Monitor and verify
@@ -445,14 +468,12 @@ Deployment is considered successful when:
 
 - [ ] **Deployment Window**: When should we do the production cutover?
   - Recommended: Low-traffic period (weekend or evening)
-  
 - [ ] **User Communication**: Do we need to notify existing users?
   - If yes: Need to draft communication
 
 - [ ] **Analytics Setup**: Which analytics platform?
   - Google Analytics 4?
   - Custom solution?
-  
 - [ ] **Monitoring**: What level of monitoring is required?
   - Basic: Firebase Console
   - Advanced: Sentry, DataDog, etc.?
@@ -467,6 +488,7 @@ Deployment is considered successful when:
 ## Next Actions
 
 ### For Worker A
+
 - [x] Create this cutover checklist
 - [ ] Configure GitHub Environments
 - [ ] Add FIREBASE_SERVICE_ACCOUNT secret
@@ -475,12 +497,14 @@ Deployment is considered successful when:
 - [ ] Schedule deployment with PM
 
 ### For Worker B
+
 - [ ] Review smoke test plan
 - [ ] Execute smoke tests on staging
 - [ ] Report any issues found
 - [ ] Prepare for production verification
 
 ### For PM
+
 - [ ] Review and approve checklist
 - [ ] Answer open questions above
 - [ ] Set deployment date/time

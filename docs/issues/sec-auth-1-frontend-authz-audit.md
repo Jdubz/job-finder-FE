@@ -6,9 +6,11 @@
 - **Labels**: priority-p1, repository-frontend, type-security, status-todo
 
 ## What This Issue Covers
+
 Audit every place the frontend reads Firebase Auth state or custom claims, make sure UI gating matches the backend contract, and provide tooling/tests that prove the behaviors using only files inside `job-finder-FE`.
 
 ## Tasks
+
 1. **Catalog Role Gates**
    - Review `src/context/auth/` (especially `AuthProvider.tsx`), `src/components/navigation/TopNav.tsx`, and any `useHasRole` helpers to list all places roles influence rendering.
    - Update this issue with a table mapping UI component → required role → claim key used → notes (e.g., viewer/editor/admin).
@@ -28,6 +30,7 @@ Audit every place the frontend reads Firebase Auth state or custom claims, make 
    - Link the doc from `README.md` and `docs/ARCHITECTURE.md` so new contributors can discover the auth model quickly.
 
 ## Acceptance Criteria
+
 - [ ] Role gating table completed within this issue and all checks point to helpers in `src/utils/auth/roles.ts`.
 - [ ] Unit and E2E tests covering viewer/editor/admin run successfully in CI (`npm run test`, `npm run test:e2e -- --project auth-emulator`).
 - [ ] Staging verification notes recorded with evidence of each role behaving correctly.
@@ -35,11 +38,13 @@ Audit every place the frontend reads Firebase Auth state or custom claims, make 
 - [ ] Unauthorized states surface user-facing feedback without console errors.
 
 ## Test Commands
+
 - `npm run test -- roles`
 - `npm run test:e2e -- --project auth-emulator`
 - `npm run lint`
 
 ## Useful Files
+
 - `src/context/auth/`
 - `src/utils/auth/roles.ts`
 - `e2e/auth/`
