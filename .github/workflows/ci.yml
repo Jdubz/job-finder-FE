@@ -167,6 +167,10 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -193,8 +197,8 @@ jobs:
           echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> .env
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
 
-      - name: Run E2E tests
-        run: npx playwright test --project=chromium
+      - name: Run E2E tests (shard ${{ matrix.shard }})
+        run: npx playwright test --project=chromium --shard=${{ matrix.shard }}/2
 
       - name: Upload test results
         if: always()

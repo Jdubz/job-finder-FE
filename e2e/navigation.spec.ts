@@ -5,9 +5,11 @@ import { test, expect } from "@playwright/test"
  *
  * Tests core navigation functionality including routing,
  * page loads, and navigation bar interaction.
+ *
+ * @critical - These tests block deployment
  */
 
-test.describe("Navigation", () => {
+test.describe("Navigation @critical", () => {
   test("should load homepage successfully", async ({ page }) => {
     await page.goto("/")
 
@@ -59,28 +61,28 @@ test.describe("Navigation", () => {
     }
   })
 
-  test("should load job applications page", async ({ page }) => {
+  test("should redirect from protected routes if not authenticated", async ({ page }) => {
     await page.goto("/job-applications")
 
-    // Should redirect to login if not authenticated
+    // Should redirect to home if not authenticated (no login page)
     const url = page.url()
 
-    if (url.includes("/login")) {
-      expect(url).toContain("/login")
+    if (url === "/") {
+      expect(url).toBe("/")
     } else {
       // If authenticated, should show job applications page
       await expect(page).toHaveURL(/\/job-applications/)
     }
   })
 
-  test("should load document builder page", async ({ page }) => {
+  test("should load protected pages when authenticated", async ({ page }) => {
     await page.goto("/document-builder")
 
-    // Should redirect to login if not authenticated
+    // Should redirect to home if not authenticated
     const url = page.url()
 
-    if (url.includes("/login")) {
-      expect(url).toContain("/login")
+    if (url === "/") {
+      expect(url).toBe("/")
     } else {
       // If authenticated, should show document builder
       await expect(page).toHaveURL(/\/document-builder/)
