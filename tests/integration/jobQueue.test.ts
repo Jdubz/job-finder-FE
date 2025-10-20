@@ -4,9 +4,9 @@
  * Tests for job queue submission and management
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { jobQueueClient } from "@/api/job-queue-client"
-import { signInTestUser, cleanupTestAuth } from "../utils/testHelpers"
+import { signInTestUser, cleanupTestAuth, getIntegrationDescribe } from "../utils/testHelpers"
 import {
   mockQueueItem,
   mockProcessingQueueItem,
@@ -17,8 +17,7 @@ import {
 import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
-const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
-const describeIntegration = isFirebaseMocked ? describe.skip : describe
+const describeIntegration = getIntegrationDescribe()
 
 describeIntegration("Job Queue API Integration", () => {
   beforeAll(async () => {

@@ -5,12 +5,17 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest"
-import { signInTestUser, cleanupTestAuth, getTestAuthToken, TEST_USERS } from "../utils/testHelpers"
+import {
+  signInTestUser,
+  cleanupTestAuth,
+  getTestAuthToken,
+  TEST_USERS,
+  getIntegrationDescribe,
+} from "../utils/testHelpers"
 import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
-const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
-const describeIntegration = isFirebaseMocked ? describe.skip : describe
+const describeIntegration = getIntegrationDescribe()
 
 describeIntegration("Authentication Integration", () => {
   beforeEach(async () => {

@@ -4,15 +4,14 @@
  * Tests for content items (experience, projects, skills) CRUD operations
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { contentItemsClient } from "@/api/content-items-client"
-import { signInTestUser, cleanupTestAuth } from "../utils/testHelpers"
+import { signInTestUser, cleanupTestAuth, getIntegrationDescribe } from "../utils/testHelpers"
 import { mockExperienceItem, mockProjectItem, mockSkillItem } from "../fixtures/mockData"
 import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
-const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
-const describeIntegration = isFirebaseMocked ? describe.skip : describe
+const describeIntegration = getIntegrationDescribe()
 
 describeIntegration("Content Items API Integration", () => {
   beforeAll(async () => {
