@@ -64,7 +64,7 @@ test.describe("Authentication @critical", () => {
 
   test("should protect editor-only routes", async ({ page }) => {
     // Navigate to editor-only route (e.g., AI Prompts)
-    await page.goto("/ai-prompts")
+    await page.goto("/ai-prompts", { waitUntil: "networkidle" })
 
     // Should redirect to home or unauthorized (not stay on /ai-prompts)
     const url = page.url()
