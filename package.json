@@ -14,7 +14,7 @@
     "test:ci": "vitest run",
     "test:unit": "vitest run src",
     "test:integration": "vitest run tests/integration",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
