@@ -6,6 +6,23 @@
 
 import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/config/firebase"
+import { describe } from "vitest"
+
+/**
+ * Check if Firebase is mocked (running in unit test mode)
+ * Uses environment variable for configuration instead of runtime type checking
+ */
+export function isFirebaseMocked(): boolean {
+  return process.env.FIREBASE_MOCKED === "true"
+}
+
+/**
+ * Get the appropriate describe function for integration tests
+ * Returns describe.skip if Firebase is mocked, otherwise returns describe
+ */
+export function getIntegrationDescribe() {
+  return isFirebaseMocked() ? describe.skip : describe
+}
 
 /**
  * Test user credentials
