@@ -4,15 +4,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { GeneratorClient } from '@/api/generator-client'
 import { mockCoverLetterRequest, mockSuccessResponse, mockErrorResponse } from '@/mocks/generator'
 
 describe('GeneratorClient', () => {
-  let client: GeneratorClient
-  const mockBaseUrl = 'https://us-central1-static-sites-257923.cloudfunctions.net'
-
   beforeEach(() => {
-    client = new GeneratorClient(mockBaseUrl)
     // Clear any previous mocks
     vi.restoreAllMocks()
   })
