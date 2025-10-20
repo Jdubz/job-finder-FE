@@ -21,7 +21,10 @@ const getBaseUrl = (): string => {
   }
   // Both staging and production use static-sites-257923 project
   // Function names are differentiated by suffix (-staging for staging, none for production)
-  return import.meta.env.VITE_API_BASE_URL || "https://us-central1-static-sites-257923.cloudfunctions.net"
+  return (
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://us-central1-static-sites-257923.cloudfunctions.net"
+  )
 }
 
 const BASE_URL = getBaseUrl()
