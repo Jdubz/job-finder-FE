@@ -86,14 +86,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Firebase Tools
+        run: npm install -g firebase-tools
+
+      - name: Setup Firebase Service Account
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > ${{ runner.temp }}/service-account.json
+
+      - name: Start Firebase Emulators
+        run: |
+          firebase emulators:start --only auth --project demo-test-project &
+          echo "Waiting for emulators to start..."
+          sleep 10
+          # Verify emulator is running
+          curl -f http://localhost:9099 || (echo "Auth emulator failed to start" && exit 1)
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/service-account.json
+
       - name: Run integration tests
         run: npm run test:integration
         env:
-          # Integration tests validate structure/configuration without backend
-          # Full backend integration requires Firebase emulator (optional)
+          # Use Firebase Auth emulator for integration tests
           VITE_FIREBASE_PROJECT_ID: demo-test-project
-          VITE_FIREBASE_API_KEY: test-api-key
-          VITE_USE_EMULATORS: false
+          VITE_FIREBASE_API_KEY: fake-api-key-for-emulator
+          VITE_FIREBASE_AUTH_DOMAIN: localhost
+          VITE_FIREBASE_STORAGE_BUCKET: demo-test-project.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
+          VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
+          VITE_USE_EMULATORS: true
+          VITE_API_BASE_URL: http://localhost:5001/demo-test-project/us-central1
+          FIRESTORE_EMULATOR_HOST: localhost:8080
+          FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
 
   build:
     name: Build
