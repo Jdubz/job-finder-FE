@@ -97,32 +97,39 @@ function getSeverity(level: LogLevel): 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' {
 }
 
 /**
- * Send critical errors to backend Cloud Logging
- * (Optional feature for production environments)
+ * Send logs to dev-monitor backend for centralized file-based logging
+ * In development: Sends to dev-monitor backend (http://localhost:5000/api/logs/frontend)
+ * In production: Skipped (logs stay in browser only)
  */
 async function sendToBackend(entry: StructuredLogEntry, level: LogLevel): Promise<void> {
-  // Only send errors and warnings to backend in production
-  if (isDevelopment() || (level !== 'error' && level !== 'warning')) {
+  // Only send to backend in development (dev-monitor running locally)
+  if (!isDevelopment()) {
     return
   }
 
   try {
-    // TODO: Implement backend logging endpoint
-    // This would be a Firebase Cloud Function that accepts structured log entries
-    // and writes them to Cloud Logging
-    //
-    // const response = await fetch('/api/logs', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ level, ...entry })
-    // })
-    //
-    // if (!response.ok) {
-    //   console.error('Failed to send log to backend:', response.statusText)
-    // }
+    const DEV_MONITOR_URL = import.meta.env.VITE_DEV_MONITOR_URL || 'http://localhost:5000'
+
+    const response = await fetch(`${DEV_MONITOR_URL}/api/logs/frontend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        severity: getSeverity(level),
+        timestamp: new Date().toISOString(),
+        environment: getEnvironment(),
+        service: 'frontend',
+        ...entry,
+      }),
+    })
+
+    if (!response.ok) {
+      // Only log to console debug in development, don't spam errors
+      console.debug('Failed to send log to dev-monitor:', response.statusText)
+    }
   } catch (err) {
     // Silently fail - don't break the app if logging fails
-    console.debug('Failed to send log to backend:', err)
+    // Dev-monitor might not be running, which is fine
+    console.debug('Dev-monitor not available:', err)
   }
 }
 
