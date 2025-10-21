@@ -23,8 +23,11 @@ install: ## Install dependencies
 	@npm install
 	@echo "$(GREEN)✓ Dependencies installed$(RESET)"
 
-dev: ## Start Vite development server (port 5173)
-	@echo "$(CYAN)Starting Vite development server (port 5173)...$(RESET)"
+dev: ## Start Vite development server (port 5173, network accessible)
+	@echo "$(CYAN)Starting Vite development server...$(RESET)"
+	@echo "  Local:   http://localhost:5173"
+	@echo "  Network: http://0.0.0.0:5173"
+	@echo ""
 	@npm run dev
 
 dev-stop: ## Stop Vite development server
