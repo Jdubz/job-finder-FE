@@ -38,7 +38,10 @@ export class ContentItemsClient extends BaseApiClient {
       if (filters.offset) params.append("offset", filters.offset.toString())
     }
 
-    const url = params.toString() ? `${this.baseEndpoint}?${params}` : this.baseEndpoint
+    // Backend route is /content-items
+    const url = params.toString()
+      ? `${this.baseEndpoint}/content-items?${params}`
+      : `${this.baseEndpoint}/content-items`
     const response = await this.get<ContentItemApiResponse>(url, options)
 
     if (!response.success || !response.data?.items) {
@@ -56,7 +59,7 @@ export class ContentItemsClient extends BaseApiClient {
     options?: RequestOptions
   ): Promise<ContentItemWithChildren[]> {
     const params = new URLSearchParams()
-    params.append("hierarchy", "true")
+    // Backend route is /content-items/hierarchy, not query parameter
 
     if (filters) {
       if (filters.type) params.append("type", filters.type.join(","))
@@ -65,10 +68,11 @@ export class ContentItemsClient extends BaseApiClient {
       if (filters.search) params.append("search", filters.search)
     }
 
-    const response = await this.get<ContentItemApiResponse>(
-      `${this.baseEndpoint}?${params}`,
-      options
-    )
+    const url = params.toString()
+      ? `${this.baseEndpoint}/content-items/hierarchy?${params}`
+      : `${this.baseEndpoint}/content-items/hierarchy`
+
+    const response = await this.get<ContentItemApiResponse>(url, options)
 
     if (!response.success || !response.data?.hierarchy) {
       throw new Error(response.error || "Failed to fetch content items hierarchy")
