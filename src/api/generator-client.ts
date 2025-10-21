@@ -77,8 +77,9 @@ export class GeneratorClient extends BaseApiClient {
    * Get document generation history
    */
   async getHistory(userId?: string): Promise<DocumentHistoryItem[]> {
+    // Backend route is /generator/requests, not /generator/history
     const params = userId ? `?userId=${userId}` : ""
-    return this.get<DocumentHistoryItem[]>(`/manageGenerator/generator/history${params}`)
+    return this.get<DocumentHistoryItem[]>(`/manageGenerator/generator/requests${params}`)
   }
 
   /**
