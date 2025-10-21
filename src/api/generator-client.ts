@@ -6,33 +6,26 @@
  */
 
 import { BaseApiClient } from "./base-client"
+import type {
+  GenerationType,
+  AIProviderType,
+  JobInfo,
+} from "@jsdubzw/job-finder-shared-types"
 
+/**
+ * Generate Document Request
+ * Matches backend validation schema in generator.ts
+ */
 export interface GenerateDocumentRequest {
-  type: "resume" | "cover_letter"
-  jobMatchId?: string
-  jobUrl?: string
-  jobTitle?: string
-  companyName?: string
-  jobDescription?: string
-  customization?: {
-    targetSummary?: string
-    skillsPriority?: string[]
-    experienceHighlights?: Array<{
-      company: string
-      title: string
-      pointsToEmphasize: string[]
-    }>
-    projectsToInclude?: Array<{
-      name: string
-      whyRelevant: string
-      pointsToHighlight: string[]
-    }>
-  }
+  generateType: GenerationType
+  provider?: AIProviderType
+  job: JobInfo
   preferences?: {
-    provider?: "openai" | "gemini"
-    tone?: string
-    includeProjects?: boolean
+    style?: "modern" | "traditional" | "technical" | "executive"
+    emphasize?: string[]
   }
+  date?: string
+  jobMatchId?: string
 }
 
 export interface GenerateDocumentResponse {
@@ -70,7 +63,7 @@ export class GeneratorClient extends BaseApiClient {
    * Generate a resume or cover letter
    */
   async generateDocument(request: GenerateDocumentRequest): Promise<GenerateDocumentResponse> {
-    return this.post<GenerateDocumentResponse>("/manageGenerator", request)
+    return this.post<GenerateDocumentResponse>("/manageGenerator/generator/generate", request)
   }
 
   /**

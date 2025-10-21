@@ -85,7 +85,7 @@ export class ContentItemsClient extends BaseApiClient {
    * Get a single content item by ID
    */
   async getItem(id: string, options?: RequestOptions): Promise<ContentItem> {
-    const response = await this.get<ContentItemApiResponse>(`${this.baseEndpoint}/${id}`, options)
+    const response = await this.get<ContentItemApiResponse>(`${this.baseEndpoint}/content-items/${id}`, options)
 
     if (!response.success || !response.data?.item) {
       throw new Error(response.error || "Failed to fetch content item")
@@ -99,11 +99,8 @@ export class ContentItemsClient extends BaseApiClient {
    */
   async createItem(data: CreateContentItemData, options?: RequestOptions): Promise<ContentItem> {
     const response = await this.post<ContentItemApiResponse>(
-      this.baseEndpoint,
-      {
-        action: "create",
-        ...data,
-      },
+      `${this.baseEndpoint}/content-items`,
+      data,
       options
     )
 
@@ -123,11 +120,8 @@ export class ContentItemsClient extends BaseApiClient {
     options?: RequestOptions
   ): Promise<ContentItem> {
     const response = await this.put<ContentItemApiResponse>(
-      `${this.baseEndpoint}/${id}`,
-      {
-        action: "update",
-        ...data,
-      },
+      `${this.baseEndpoint}/content-items/${id}`,
+      data,
       options
     )
 
@@ -146,12 +140,9 @@ export class ContentItemsClient extends BaseApiClient {
     deleteChildren?: boolean,
     options?: RequestOptions
   ): Promise<number> {
-    const params = new URLSearchParams()
-    if (deleteChildren) params.append("deleteChildren", "true")
-
-    const url = params.toString()
-      ? `${this.baseEndpoint}/${id}?${params}`
-      : `${this.baseEndpoint}/${id}`
+    const url = deleteChildren
+      ? `${this.baseEndpoint}/content-items/${id}/cascade`
+      : `${this.baseEndpoint}/content-items/${id}`
 
     const response = await this.delete<ContentItemApiResponse>(url, options)
 
@@ -169,8 +160,8 @@ export class ContentItemsClient extends BaseApiClient {
     items: Array<{ id: string; order: number }>,
     options?: RequestOptions
   ): Promise<void> {
-    const response = await this.patch<ContentItemApiResponse>(
-      `${this.baseEndpoint}/reorder`,
+    const response = await this.post<ContentItemApiResponse>(
+      `${this.baseEndpoint}/content-items/reorder`,
       {
         items,
       },
