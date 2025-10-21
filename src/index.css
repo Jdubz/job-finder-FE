@@ -1,49 +1,76 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: oklch(100% 0 0);
-  --color-foreground: oklch(9.6% 0.006 285.75);
+  /* Light Mode - Modern Minimal Green Theme */
+  --color-background: oklch(99% 0.005 160);
+  --color-foreground: oklch(15% 0.02 160);
   --color-card: oklch(100% 0 0);
-  --color-card-foreground: oklch(9.6% 0.006 285.75);
+  --color-card-foreground: oklch(15% 0.02 160);
   --color-popover: oklch(100% 0 0);
-  --color-popover-foreground: oklch(9.6% 0.006 285.75);
-  --color-primary: oklch(22.59% 0.016 285.88);
-  --color-primary-foreground: oklch(98% 0 0);
-  --color-secondary: oklch(96.08% 0.004 286);
-  --color-secondary-foreground: oklch(22.59% 0.016 285.88);
-  --color-muted: oklch(96.08% 0.004 286);
-  --color-muted-foreground: oklch(54.87% 0.013 285.82);
-  --color-accent: oklch(96.08% 0.004 286);
-  --color-accent-foreground: oklch(22.59% 0.016 285.88);
+  --color-popover-foreground: oklch(15% 0.02 160);
+
+  /* Primary - Emerald Green */
+  --color-primary: oklch(55% 0.18 160);
+  --color-primary-foreground: oklch(99% 0 0);
+
+  /* Secondary - Light Green */
+  --color-secondary: oklch(95% 0.03 160);
+  --color-secondary-foreground: oklch(30% 0.08 160);
+
+  /* Muted - Soft Green */
+  --color-muted: oklch(96% 0.02 160);
+  --color-muted-foreground: oklch(50% 0.04 160);
+
+  /* Accent - Vibrant Green */
+  --color-accent: oklch(92% 0.05 160);
+  --color-accent-foreground: oklch(30% 0.08 160);
+
+  /* Destructive - Red (unchanged) */
   --color-destructive: oklch(55.81% 0.228 29.23);
   --color-destructive-foreground: oklch(98% 0 0);
-  --color-border: oklch(89.37% 0.005 286.07);
-  --color-input: oklch(89.37% 0.005 286.07);
-  --color-ring: oklch(22.59% 0.016 285.88);
+
+  /* Borders & Inputs - Subtle Green */
+  --color-border: oklch(88% 0.02 160);
+  --color-input: oklch(88% 0.02 160);
+  --color-ring: oklch(55% 0.18 160);
+
   --radius: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
   @theme {
-    --color-background: oklch(9.6% 0.006 285.75);
-    --color-foreground: oklch(98% 0 0);
-    --color-card: oklch(9.6% 0.006 285.75);
-    --color-card-foreground: oklch(98% 0 0);
-    --color-popover: oklch(9.6% 0.006 285.75);
-    --color-popover-foreground: oklch(98% 0 0);
-    --color-primary: oklch(98% 0 0);
-    --color-primary-foreground: oklch(22.59% 0.016 285.88);
-    --color-secondary: oklch(24.91% 0.013 285.82);
-    --color-secondary-foreground: oklch(98% 0 0);
-    --color-muted: oklch(24.91% 0.013 285.82);
-    --color-muted-foreground: oklch(64.93% 0.012 285.83);
-    --color-accent: oklch(24.91% 0.013 285.82);
-    --color-accent-foreground: oklch(98% 0 0);
-    --color-destructive: oklch(38.42% 0.162 29.7);
+    /* Dark Mode - Modern Minimal Green Theme */
+    --color-background: oklch(12% 0.02 160);
+    --color-foreground: oklch(95% 0.01 160);
+    --color-card: oklch(15% 0.02 160);
+    --color-card-foreground: oklch(95% 0.01 160);
+    --color-popover: oklch(15% 0.02 160);
+    --color-popover-foreground: oklch(95% 0.01 160);
+
+    /* Primary - Bright Emerald Green */
+    --color-primary: oklch(65% 0.20 160);
+    --color-primary-foreground: oklch(10% 0.02 160);
+
+    /* Secondary - Dark Green */
+    --color-secondary: oklch(22% 0.05 160);
+    --color-secondary-foreground: oklch(95% 0.01 160);
+
+    /* Muted - Muted Green */
+    --color-muted: oklch(22% 0.05 160);
+    --color-muted-foreground: oklch(70% 0.04 160);
+
+    /* Accent - Vibrant Green */
+    --color-accent: oklch(28% 0.08 160);
+    --color-accent-foreground: oklch(95% 0.01 160);
+
+    /* Destructive - Red (unchanged) */
+    --color-destructive: oklch(45% 0.20 29.23);
     --color-destructive-foreground: oklch(98% 0 0);
-    --color-border: oklch(24.91% 0.013 285.82);
-    --color-input: oklch(24.91% 0.013 285.82);
-    --color-ring: oklch(83.08% 0.012 285.79);
+
+    /* Borders & Inputs - Dark Green */
+    --color-border: oklch(25% 0.04 160);
+    --color-input: oklch(25% 0.04 160);
+    --color-ring: oklch(65% 0.20 160);
   }
 }
 
