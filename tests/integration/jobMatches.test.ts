@@ -13,7 +13,6 @@ import {
   mockLowScoreJobMatch,
   mockAppliedJobMatch,
 } from "../fixtures/mockData"
-import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
 const describeIntegration = getIntegrationDescribe()

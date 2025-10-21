@@ -33,10 +33,7 @@ import type {
   SourceDiscoveryConfig,
   QueueStats,
 } from "@jsdubzw/job-finder-shared-types"
-import {
-  convertTimestamps,
-  withErrorHandling,
-} from "./utils"
+import { convertTimestamps, withErrorHandling } from "./utils"
 
 const COLLECTION_NAME = "job-queue"
 
@@ -92,9 +89,7 @@ export class JobQueueService {
       "fetch queue items",
       async () => {
         const userId = this.getCurrentUserId()
-        const constraints: QueryConstraint[] = [
-          where("submitted_by", "==", userId),
-        ]
+        const constraints: QueryConstraint[] = [where("submitted_by", "==", userId)]
 
         // Apply filters
         if (filters) {
@@ -348,11 +343,7 @@ export class JobQueueService {
   /**
    * Submit a job URL to the queue
    */
-  async submitJob(
-    url: string,
-    companyName: string,
-    companyId?: string | null
-  ): Promise<QueueItem> {
+  async submitJob(url: string, companyName: string, companyId?: string | null): Promise<QueueItem> {
     return this.createItem({
       type: "job",
       url,
@@ -379,10 +370,7 @@ export class JobQueueService {
   /**
    * Submit a company URL to the queue
    */
-  async submitCompany(
-    companyName: string,
-    websiteUrl: string
-  ): Promise<QueueItem> {
+  async submitCompany(companyName: string, websiteUrl: string): Promise<QueueItem> {
     return this.createItem({
       type: "company",
       url: websiteUrl,
@@ -401,9 +389,7 @@ export class JobQueueService {
     onError?: (error: Error) => void
   ): Unsubscribe {
     const userId = this.getCurrentUserId()
-    const constraints: QueryConstraint[] = [
-      where("submitted_by", "==", userId),
-    ]
+    const constraints: QueryConstraint[] = [where("submitted_by", "==", userId)]
 
     // Apply filters
     if (filters.type && filters.type.length > 0) {

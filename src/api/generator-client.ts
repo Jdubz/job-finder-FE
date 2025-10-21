@@ -6,11 +6,7 @@
  */
 
 import { BaseApiClient } from "./base-client"
-import type {
-  GenerationType,
-  AIProviderType,
-  JobInfo,
-} from "@jsdubzw/job-finder-shared-types"
+import type { GenerationType, AIProviderType, JobInfo } from "@jsdubzw/job-finder-shared-types"
 
 /**
  * Generate Document Request

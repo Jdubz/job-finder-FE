@@ -8,7 +8,6 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { contentItemsClient } from "@/api/content-items-client"
 import { signInTestUser, cleanupTestAuth, getIntegrationDescribe } from "../utils/testHelpers"
 import { mockExperienceItem, mockProjectItem, mockSkillItem } from "../fixtures/mockData"
-import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
 const describeIntegration = getIntegrationDescribe()

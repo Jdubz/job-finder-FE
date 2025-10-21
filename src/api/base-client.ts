@@ -64,8 +64,8 @@ export class BaseApiClient {
       return await user.getIdToken()
     } catch (error) {
       logError("Failed to get auth token", error, {
-        category: 'auth',
-        action: 'token_fetch_failed',
+        category: "auth",
+        action: "token_fetch_failed",
         userId: user.uid,
       })
       return null
@@ -86,8 +86,8 @@ export class BaseApiClient {
     } = options
 
     // Ensure proper URL construction with exactly one '/' separator
-    const baseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl
-    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+    const baseUrl = this.baseUrl.endsWith("/") ? this.baseUrl.slice(0, -1) : this.baseUrl
+    const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
     const url = `${baseUrl}${path}`
 
     // Get auth token

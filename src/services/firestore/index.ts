@@ -11,15 +11,9 @@ export { jobMatchesService, JobMatchesService } from "./job-matches.service"
 export { jobQueueService, JobQueueService } from "./job-queue.service"
 
 // Service-specific types
-export type {
-  ContentItemFilters,
-  ContentItemWithChildren,
-} from "./content-items.service"
+export type { ContentItemFilters, ContentItemWithChildren } from "./content-items.service"
 
-export type {
-  JobMatchFilters,
-  JobMatchStats,
-} from "./job-matches.service"
+export type { JobMatchFilters, JobMatchStats } from "./job-matches.service"
 
 export type {
   QueueItemFilters,

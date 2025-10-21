@@ -22,10 +22,7 @@ import {
 import { db } from "@/config/firebase"
 import { auth } from "@/config/firebase"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
-import {
-  convertTimestamps,
-  withErrorHandling,
-} from "./utils"
+import { convertTimestamps, withErrorHandling } from "./utils"
 
 const COLLECTION_NAME = "job-matches"
 
@@ -65,9 +62,7 @@ export class JobMatchesService {
       "fetch job matches",
       async () => {
         const userId = this.getCurrentUserId()
-        const constraints: QueryConstraint[] = [
-          where("submittedBy", "==", userId),
-        ]
+        const constraints: QueryConstraint[] = [where("submittedBy", "==", userId)]
 
         // Apply filters
         if (filters) {
@@ -216,9 +211,7 @@ export class JobMatchesService {
     onError?: (error: Error) => void
   ): Unsubscribe {
     const userId = this.getCurrentUserId()
-    const constraints: QueryConstraint[] = [
-      where("submittedBy", "==", userId),
-    ]
+    const constraints: QueryConstraint[] = [where("submittedBy", "==", userId)]
 
     // Apply filters
     if (filters.minScore !== undefined) {

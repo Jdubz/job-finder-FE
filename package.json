@@ -28,7 +28,7 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "check:env": "bash scripts/check-env.sh",
-    "prepare": "husky || exit 0"
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

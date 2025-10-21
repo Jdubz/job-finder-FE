@@ -409,10 +409,7 @@ export class ContentItemsService {
     callback: (items: ContentItem[]) => void
   ): Unsubscribe {
     const userId = this.getCurrentUserId()
-    const constraints: QueryConstraint[] = [
-      where("userId", "==", userId),
-      orderBy("order", "asc"),
-    ]
+    const constraints: QueryConstraint[] = [where("userId", "==", userId), orderBy("order", "asc")]
 
     if (filters.type && filters.type.length > 0) {
       constraints.push(where("type", "in", filters.type))

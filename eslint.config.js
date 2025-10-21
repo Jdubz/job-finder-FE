@@ -22,8 +22,19 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+    },
+  },
+  // Disable react-refresh rule for UI components (shadcn/ui patterns) and router
+  {
+    files: [
+      "src/components/ui/**/*.{ts,tsx}",
+      "src/router.tsx",
+      "src/contexts/**/*.tsx",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
     },
   },
 ])

@@ -13,10 +13,7 @@ export type {
 } from "@jsdubzw/job-finder-shared-types"
 
 // Job Matches
-export type {
-  JobMatchDocument,
-  JobMatchStatus,
-} from "@jsdubzw/job-finder-shared-types"
+export type { JobMatchDocument, JobMatchStatus } from "@jsdubzw/job-finder-shared-types"
 
 // Queue Items
 export type {
@@ -27,15 +24,10 @@ export type {
 } from "@jsdubzw/job-finder-shared-types"
 
 // Companies
-export type {
-  CompanyDocument,
-  CompanyTier,
-} from "@jsdubzw/job-finder-shared-types"
+export type { CompanyDocument, CompanyTier } from "@jsdubzw/job-finder-shared-types"
 
 // Job Sources
-export type {
-  JobSourceDocument,
-} from "@jsdubzw/job-finder-shared-types"
+export type { JobSourceDocument } from "@jsdubzw/job-finder-shared-types"
 
 // Firestore common types
 export type { TimestampLike } from "@jsdubzw/job-finder-shared-types"
@@ -43,7 +35,7 @@ export type { TimestampLike } from "@jsdubzw/job-finder-shared-types"
 /**
  * Frontend-specific type for content items with client-side metadata
  */
-export interface ContentItemWithMeta extends Omit<ContentItemDocument, 'createdAt' | 'updatedAt'> {
+export interface ContentItemWithMeta extends Omit<ContentItemDocument, "createdAt" | "updatedAt"> {
   id: string
   createdAt: Date
   updatedAt: Date
@@ -52,7 +44,8 @@ export interface ContentItemWithMeta extends Omit<ContentItemDocument, 'createdA
 /**
  * Frontend-specific type for job matches with client-side metadata
  */
-export interface JobMatchWithMeta extends Omit<JobMatchDocument, 'createdAt' | 'updatedAt' | 'matchedAt'> {
+export interface JobMatchWithMeta
+  extends Omit<JobMatchDocument, "createdAt" | "updatedAt" | "matchedAt"> {
   id: string
   createdAt: Date
   updatedAt: Date
@@ -62,7 +55,8 @@ export interface JobMatchWithMeta extends Omit<JobMatchDocument, 'createdAt' | '
 /**
  * Frontend-specific type for queue items with client-side metadata
  */
-export interface QueueItemWithMeta extends Omit<QueueItemDocument, 'created_at' | 'updated_at' | 'processed_at' | 'completed_at'> {
+export interface QueueItemWithMeta
+  extends Omit<QueueItemDocument, "created_at" | "updated_at" | "processed_at" | "completed_at"> {
   id: string
   created_at: Date
   updated_at: Date
@@ -75,7 +69,7 @@ export interface QueueItemWithMeta extends Omit<QueueItemDocument, 'created_at' 
  */
 export interface SortOptions {
   field: string
-  direction: 'asc' | 'desc'
+  direction: "asc" | "desc"
 }
 
 /**

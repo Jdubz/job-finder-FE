@@ -19,7 +19,7 @@ export function timestampToDate(timestamp: unknown): Date {
   if (timestamp instanceof Date) {
     return timestamp
   }
-  if (typeof timestamp === 'string') {
+  if (typeof timestamp === "string") {
     return new Date(timestamp)
   }
   // Fallback to current date if invalid
@@ -41,13 +41,16 @@ export function convertTimestamps<T extends Record<string, unknown>>(data: T): T
       converted[key] = value.toDate() as T[Extract<keyof T, string>]
     }
     // Recursively handle nested objects
-    else if (value && typeof value === 'object' && !Array.isArray(value)) {
-      converted[key] = convertTimestamps(value as Record<string, unknown>) as T[Extract<keyof T, string>]
+    else if (value && typeof value === "object" && !Array.isArray(value)) {
+      converted[key] = convertTimestamps(value as Record<string, unknown>) as T[Extract<
+        keyof T,
+        string
+      >]
     }
     // Handle arrays of objects
     else if (Array.isArray(value)) {
-      converted[key] = value.map(item =>
-        item && typeof item === 'object' ? convertTimestamps(item as Record<string, unknown>) : item
+      converted[key] = value.map((item) =>
+        item && typeof item === "object" ? convertTimestamps(item as Record<string, unknown>) : item
       ) as T[Extract<keyof T, string>]
     }
   }
@@ -63,26 +66,22 @@ export class FirestoreError extends Error {
   operation: string
   collection?: string
 
-  constructor(
-    message: string,
-    operation: string,
-    originalError?: unknown,
-    collection?: string
-  ) {
+  constructor(message: string, operation: string, originalError?: unknown, collection?: string) {
     super(message)
     this.name = "FirestoreError"
 
     // Extract error code if available
-    const errorCode = originalError instanceof Error && 'code' in originalError
-      ? String((originalError as { code?: string }).code)
-      : "unknown"
+    const errorCode =
+      originalError instanceof Error && "code" in originalError
+        ? String((originalError as { code?: string }).code)
+        : "unknown"
     this.code = errorCode
     this.operation = operation
     this.collection = collection
 
     // Log the error
     logError(message, originalError, {
-      category: 'firestore',
+      category: "firestore",
       action: operation,
       collection,
     })
@@ -100,12 +99,7 @@ export async function withErrorHandling<T>(
   try {
     return await fn()
   } catch (error) {
-    throw new FirestoreError(
-      `Failed to ${operation}`,
-      operation,
-      error,
-      collection
-    )
+    throw new FirestoreError(`Failed to ${operation}`, operation, error, collection)
   }
 }
 
@@ -116,7 +110,7 @@ export async function withErrorHandling<T>(
 export function sanitizeInput(input: string): string {
   return input
     .trim()
-    .replace(/[^\w\s-]/gi, '') // Remove special characters except spaces and hyphens
+    .replace(/[^\w\s-]/gi, "") // Remove special characters except spaces and hyphens
     .substring(0, 500) // Limit length
 }
 
@@ -124,8 +118,8 @@ export function sanitizeInput(input: string): string {
  * Build a safe Firestore document path
  */
 export function buildDocPath(collection: string, ...segments: string[]): string {
-  const sanitized = segments.map(s => sanitizeInput(s))
-  return `${collection}/${sanitized.join('/')}`
+  const sanitized = segments.map((s) => sanitizeInput(s))
+  return `${collection}/${sanitized.join("/")}`
 }
 
 /**
@@ -145,26 +139,24 @@ export async function retryOperation<T>(
       lastError = error instanceof Error ? error : new Error(String(error))
 
       // Don't retry on permission errors or not found errors
-      const errorCode = error instanceof Error && 'code' in error
-        ? String((error as { code?: string }).code)
-        : undefined
+      const errorCode =
+        error instanceof Error && "code" in error
+          ? String((error as { code?: string }).code)
+          : undefined
 
-      if (
-        errorCode === 'permission-denied' ||
-        errorCode === 'not-found'
-      ) {
+      if (errorCode === "permission-denied" || errorCode === "not-found") {
         throw error
       }
 
       // Wait before retrying (exponential backoff)
       if (attempt < maxRetries - 1) {
         const delay = baseDelay * Math.pow(2, attempt)
-        await new Promise(resolve => setTimeout(resolve, delay))
+        await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
   }
 
-  throw lastError || new Error('Operation failed after retries')
+  throw lastError || new Error("Operation failed after retries")
 }
 
 /**

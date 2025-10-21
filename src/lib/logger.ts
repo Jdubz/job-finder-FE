@@ -35,14 +35,14 @@
  * ```
  */
 
-import type { StructuredLogEntry, LogLevel } from '@jsdubzw/job-finder-shared-types'
+import type { StructuredLogEntry, LogLevel } from "@jsdubzw/job-finder-shared-types"
 
 /**
  * Generate a session ID for correlating logs across page loads
  * Stored in sessionStorage for the duration of the browser session
  */
 function getSessionId(): string {
-  const SESSION_KEY = 'job-finder-session-id'
+  const SESSION_KEY = "job-finder-session-id"
 
   let sessionId = sessionStorage.getItem(SESSION_KEY)
   if (!sessionId) {
@@ -57,28 +57,28 @@ function getSessionId(): string {
  * Check if running in development mode
  */
 function isDevelopment(): boolean {
-  return import.meta.env.DEV || import.meta.env.MODE === 'development'
+  return import.meta.env.DEV || import.meta.env.MODE === "development"
 }
 
 /**
  * Get environment from Vite env
  */
-function getEnvironment(): 'development' | 'staging' | 'production' {
+function getEnvironment(): "development" | "staging" | "production" {
   const mode = import.meta.env.MODE
-  if (mode === 'production') return 'production'
-  if (mode === 'staging') return 'staging'
-  return 'development'
+  if (mode === "production") return "production"
+  if (mode === "staging") return "staging"
+  return "development"
 }
 
 /**
  * Map LogLevel to console methods
  */
-function getConsoleMethod(level: LogLevel): 'debug' | 'log' | 'warn' | 'error' {
-  const methodMap: Record<LogLevel, 'debug' | 'log' | 'warn' | 'error'> = {
-    debug: 'debug',
-    info: 'log',
-    warning: 'warn',
-    error: 'error',
+function getConsoleMethod(level: LogLevel): "debug" | "log" | "warn" | "error" {
+  const methodMap: Record<LogLevel, "debug" | "log" | "warn" | "error"> = {
+    debug: "debug",
+    info: "log",
+    warning: "warn",
+    error: "error",
   }
   return methodMap[level]
 }
@@ -86,12 +86,12 @@ function getConsoleMethod(level: LogLevel): 'debug' | 'log' | 'warn' | 'error' {
 /**
  * Map LogLevel to severity (for Cloud Logging compatibility)
  */
-function getSeverity(level: LogLevel): 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' {
-  const severityMap: Record<LogLevel, 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR'> = {
-    debug: 'DEBUG',
-    info: 'INFO',
-    warning: 'WARNING',
-    error: 'ERROR',
+function getSeverity(level: LogLevel): "DEBUG" | "INFO" | "WARNING" | "ERROR" {
+  const severityMap: Record<LogLevel, "DEBUG" | "INFO" | "WARNING" | "ERROR"> = {
+    debug: "DEBUG",
+    info: "INFO",
+    warning: "WARNING",
+    error: "ERROR",
   }
   return severityMap[level]
 }
@@ -108,28 +108,28 @@ async function sendToBackend(entry: StructuredLogEntry, level: LogLevel): Promis
   }
 
   try {
-    const DEV_MONITOR_URL = import.meta.env.VITE_DEV_MONITOR_URL || 'http://localhost:5000'
+    const DEV_MONITOR_URL = import.meta.env.VITE_DEV_MONITOR_URL || "http://localhost:5000"
 
     const response = await fetch(`${DEV_MONITOR_URL}/api/logs/frontend`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         severity: getSeverity(level),
         timestamp: new Date().toISOString(),
         environment: getEnvironment(),
-        service: 'frontend',
+        service: "frontend",
         ...entry,
       }),
     })
 
     if (!response.ok) {
       // Only log to console debug in development, don't spam errors
-      console.debug('Failed to send log to dev-monitor:', response.statusText)
+      console.debug("Failed to send log to dev-monitor:", response.statusText)
     }
   } catch (err) {
     // Silently fail - don't break the app if logging fails
     // Dev-monitor might not be running, which is fine
-    console.debug('Dev-monitor not available:', err)
+    console.debug("Dev-monitor not available:", err)
   }
 }
 
@@ -137,10 +137,26 @@ async function sendToBackend(entry: StructuredLogEntry, level: LogLevel): Promis
  * Browser logger interface
  */
 export interface BrowserLogger {
-  debug(entry: Omit<StructuredLogEntry, 'category' | 'sessionId'> & { category?: StructuredLogEntry['category'] }): void
-  info(entry: Omit<StructuredLogEntry, 'category' | 'sessionId'> & { category?: StructuredLogEntry['category'] }): void
-  warning(entry: Omit<StructuredLogEntry, 'category' | 'sessionId'> & { category?: StructuredLogEntry['category'] }): void
-  error(entry: Omit<StructuredLogEntry, 'category' | 'sessionId'> & { category?: StructuredLogEntry['category'] }): void
+  debug(
+    entry: Omit<StructuredLogEntry, "category" | "sessionId"> & {
+      category?: StructuredLogEntry["category"]
+    }
+  ): void
+  info(
+    entry: Omit<StructuredLogEntry, "category" | "sessionId"> & {
+      category?: StructuredLogEntry["category"]
+    }
+  ): void
+  warning(
+    entry: Omit<StructuredLogEntry, "category" | "sessionId"> & {
+      category?: StructuredLogEntry["category"]
+    }
+  ): void
+  error(
+    entry: Omit<StructuredLogEntry, "category" | "sessionId"> & {
+      category?: StructuredLogEntry["category"]
+    }
+  ): void
 }
 
 /**
@@ -153,11 +169,16 @@ function createBrowserLogger(): BrowserLogger {
   /**
    * Write a structured log entry to console
    */
-  function writeLog(level: LogLevel, entry: Omit<StructuredLogEntry, 'category' | 'sessionId'> & { category?: StructuredLogEntry['category'] }): void {
+  function writeLog(
+    level: LogLevel,
+    entry: Omit<StructuredLogEntry, "category" | "sessionId"> & {
+      category?: StructuredLogEntry["category"]
+    }
+  ): void {
     // Default category to 'client' for frontend logs
     const fullEntry: StructuredLogEntry = {
       ...entry,
-      category: entry.category || 'client',
+      category: entry.category || "client",
       sessionId,
     }
 
@@ -176,10 +197,10 @@ function createBrowserLogger(): BrowserLogger {
     if (isDevelopment()) {
       // Development mode: Pretty formatted output
       const styles = {
-        debug: 'color: #6B7280',
-        info: 'color: #3B82F6',
-        warning: 'color: #F59E0B',
-        error: 'color: #EF4444; font-weight: bold',
+        debug: "color: #6B7280",
+        info: "color: #3B82F6",
+        warning: "color: #F59E0B",
+        error: "color: #EF4444; font-weight: bold",
       }
 
       console[consoleMethod](
@@ -191,7 +212,7 @@ function createBrowserLogger(): BrowserLogger {
 
       // Show full object in collapsed group for details
       if (logObject.error || logObject.http || Object.keys(logObject.details || {}).length > 0) {
-        console.groupCollapsed('%cDetails', 'color: #9CA3AF')
+        console.groupCollapsed("%cDetails", "color: #9CA3AF")
         console.log(logObject)
         console.groupEnd()
       }
@@ -207,10 +228,10 @@ function createBrowserLogger(): BrowserLogger {
   }
 
   return {
-    debug: (entry) => writeLog('debug', entry),
-    info: (entry) => writeLog('info', entry),
-    warning: (entry) => writeLog('warning', entry),
-    error: (entry) => writeLog('error', entry),
+    debug: (entry) => writeLog("debug", entry),
+    info: (entry) => writeLog("info", entry),
+    warning: (entry) => writeLog("warning", entry),
+    error: (entry) => writeLog("error", entry),
   }
 }
 
@@ -228,26 +249,27 @@ export function logError(
   error: Error | unknown,
   context?: {
     action?: string
-    category?: StructuredLogEntry['category']
+    category?: StructuredLogEntry["category"]
     userId?: string
     requestId?: string
     details?: Record<string, string | number | boolean | null | undefined>
   }
 ): void {
-  const errorObj = error instanceof Error
-    ? {
-        type: error.name,
-        message: error.message,
-        stack: error.stack,
-      }
-    : {
-        type: 'UnknownError',
-        message: String(error),
-      }
+  const errorObj =
+    error instanceof Error
+      ? {
+          type: error.name,
+          message: error.message,
+          stack: error.stack,
+        }
+      : {
+          type: "UnknownError",
+          message: String(error),
+        }
 
   logger.error({
-    category: context?.category || 'client',
-    action: context?.action || 'failed',
+    category: context?.category || "client",
+    action: context?.action || "failed",
     message,
     userId: context?.userId,
     requestId: context?.requestId,
@@ -265,8 +287,8 @@ export function logPageView(
   details?: Record<string, string | number | boolean | null | undefined>
 ): void {
   logger.info({
-    category: 'client',
-    action: 'page_view',
+    category: "client",
+    action: "page_view",
     message: `User viewed ${page}`,
     userId,
     details: {
@@ -286,7 +308,7 @@ export function logUserAction(
   details?: Record<string, string | number | boolean | null | undefined>
 ): void {
   logger.info({
-    category: 'client',
+    category: "client",
     action,
     message,
     userId,
