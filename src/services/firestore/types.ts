@@ -71,43 +71,6 @@ export interface QueueItemWithMeta extends Omit<QueueItemDocument, 'created_at' 
 }
 
 /**
- * Filter options for querying content items
- */
-export interface ContentItemFilters {
-  type?: ContentItemType[]
-  parentId?: string | null
-  visibility?: ContentItemVisibility[]
-  tags?: string[]
-  search?: string
-  limit?: number
-  offset?: number
-}
-
-/**
- * Filter options for querying job matches
- */
-export interface JobMatchFilters {
-  status?: JobMatchStatus[]
-  minScore?: number
-  maxScore?: number
-  companyName?: string
-  search?: string
-  limit?: number
-  offset?: number
-}
-
-/**
- * Filter options for querying queue items
- */
-export interface QueueItemFilters {
-  type?: QueueItemDocumentType[]
-  status?: QueueItemDocumentStatus[]
-  source?: QueueDocumentSource[]
-  limit?: number
-  offset?: number
-}
-
-/**
  * Sort options for queries
  */
 export interface SortOptions {
