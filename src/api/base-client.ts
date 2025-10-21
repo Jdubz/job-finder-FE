@@ -85,7 +85,10 @@ export class BaseApiClient {
       retryDelay = this.defaultRetryDelay,
     } = options
 
-    const url = `${this.baseUrl}${endpoint}`
+    // Ensure proper URL construction with exactly one '/' separator
+    const baseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl
+    const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+    const url = `${baseUrl}${path}`
 
     // Get auth token
     const token = await this.getAuthToken()
