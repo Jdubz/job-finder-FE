@@ -6,19 +6,22 @@ test.describe("Authentication Flow", () => {
   })
 
   // Skip authentication tests for now due to Firebase emulator setup requirements
-  test.skip("should redirect unauthenticated users to login page", async ({ page }) => {
+  test.skip("should redirect unauthenticated users to home page", async ({ page }) => {
     await page.goto("/job-applications")
-    await expect(page).toHaveURL("/login")
+    // Unauthenticated users are redirected to home instead of login (auth modal handles login)
+    await expect(page).toHaveURL("/")
   })
 
-  test("should display login page correctly", async ({ page }) => {
-    await page.goto("/login")
+  test("should display auth modal when clicking auth icon", async ({ page }) => {
+    await page.goto("/")
 
-    // Check for login page elements with more flexible selectors
-    await expect(page.getByRole("heading", { name: /sign in/i })).toBeVisible({ timeout: 10000 })
-    await expect(page.getByRole("button", { name: /continue with google/i })).toBeVisible({
-      timeout: 10000,
-    })
+    // Click the auth icon in the navigation to open the modal
+    await page.getByRole("button", { name: /authentication/i }).click()
+
+    // Check for auth modal elements
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole("heading", { name: /authentication/i })).toBeVisible()
+    await expect(page.getByRole("button", { name: /sign in with google/i })).toBeVisible()
   })
 
   test.skip("should show unauthorized page for non-editor users", async ({ page }) => {
@@ -36,9 +39,9 @@ test.describe("Authentication Flow", () => {
     // For now, check that the route redirects appropriately
     await page.goto("/ai-prompts")
 
-    // Should redirect to either login or unauthorized
+    // Should redirect to either home or unauthorized
     const url = page.url()
-    expect(url.includes("/login") || url.includes("/unauthorized")).toBeTruthy()
+    expect(url === "/" || url.includes("/unauthorized")).toBeTruthy()
   })
 
   test("should have accessible navigation for authenticated users", async ({ page }) => {
@@ -69,8 +72,8 @@ test.describe("Protected Routes", () => {
     test.skip(`should protect route: ${route}`, async ({ page }) => {
       await page.goto(route)
 
-      // Should redirect to login if not authenticated
-      await expect(page).toHaveURL(/\/(login|unauthorized)/)
+      // Should redirect to home if not authenticated (auth modal handles login)
+      await expect(page).toHaveURL("/")
     })
   })
 
@@ -78,8 +81,8 @@ test.describe("Protected Routes", () => {
     test.skip(`should protect editor-only route: ${route}`, async ({ page }) => {
       await page.goto(route)
 
-      // Should redirect to login or unauthorized
-      await expect(page).toHaveURL(/\/(login|unauthorized)/)
+      // Should redirect to home or unauthorized (depending on auth status)
+      await expect(page).toHaveURL(/\/(home|unauthorized|\/)/)
     })
   })
 })

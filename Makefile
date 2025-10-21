@@ -82,8 +82,8 @@ firebase-login:
 # Deployment
 deploy-staging:
 	@echo "Deploying to staging..."
-	@echo "Building application..."
-	npm run build
+	@echo "Building application with staging environment..."
+	npm run build:staging
 	@echo "Deploying to Firebase Hosting (staging target)..."
 	firebase deploy --only hosting:staging
 
@@ -91,8 +91,8 @@ deploy-prod:
 	@echo "Deploying to production..."
 	@echo "WARNING: This will deploy to production!"
 	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
-	@echo "Building application..."
-	npm run build
+	@echo "Building application with production environment..."
+	npm run build:production
 	@echo "Deploying to Firebase Hosting (production target)..."
 	firebase deploy --only hosting:production
 

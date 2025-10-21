@@ -100,7 +100,8 @@ export class JobMatchesClient {
   subscribeToMatches(
     userId: string,
     callback: (matches: JobMatch[]) => void,
-    filters?: JobMatchFilters
+    filters?: JobMatchFilters,
+    onError?: (error: Error) => void
   ): Unsubscribe {
     let q: Query = collection(db, this.collectionName)
 
@@ -126,10 +127,19 @@ export class JobMatchesClient {
       q = query(q, limit(filters.limit))
     }
 
-    return onSnapshot(q, (snapshot) => {
-      const matches = snapshot.docs.map((doc) => this.convertDoc({ id: doc.id, ...doc.data() }))
-      callback(matches)
-    })
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const matches = snapshot.docs.map((doc) => this.convertDoc({ id: doc.id, ...doc.data() }))
+        callback(matches)
+      },
+      (error) => {
+        console.error("Error fetching job matches:", error)
+        if (onError) {
+          onError(error as Error)
+        }
+      }
+    )
   }
 
   /**

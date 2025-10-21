@@ -1,5 +1,10 @@
 # Production Cutover Readiness Checklist
 
+> **Readiness Summary (2025-10-20 18:00 UTC)**
+> - Frontend: ⚠️ — Deploy workflows structured; GitHub environments/secrets provisioned, environment matrix pending DATA-QA-1 handoff.
+> - Backend: ⚠️ — Staging Cloud Functions verified; production workflow pending CI repair and auth validation.
+> - Worker: 🚫 — Queue smoke test and monitoring baseline not yet executed (DATA-QA-1 outstanding).
+
 **Task**: FE-RECOVERY-3  
 **Owner**: Worker A (coordinating with Worker B and PM)  
 **Target Date**: TBD by PM  

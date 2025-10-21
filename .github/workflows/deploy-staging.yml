@@ -51,10 +51,54 @@ jobs:
         if: github.event.inputs.skip-tests != 'true'
         run: npm run test:unit
 
+  e2e-tests:
+    name: E2E Tests (Critical Path)
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    if: github.event.inputs.skip-tests != 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium only
+        run: npx playwright install --with-deps chromium
+
+      - name: Copy staging environment file for E2E tests
+        run: cp .env.staging .env
+
+      - name: Run critical E2E tests
+        run: npx playwright test --project=chromium --grep @critical
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-critical-results
+          path: playwright-report/
+          retention-days: 7
+
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: quality-checks
+    needs: [quality-checks, e2e-tests]
     environment:
       name: staging
       url: https://job-finder-staging.web.app
@@ -80,11 +124,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Copy staging environment file
-        run: cp .env.staging .env
-
       - name: Build application for staging
-        run: npm run build
+        run: npm run build:staging
         env:
           NODE_ENV: production
 

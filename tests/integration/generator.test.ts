@@ -4,15 +4,14 @@
  * Tests for document generation (resume and cover letter) API
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { generatorClient } from "@/api/generator-client"
-import { signInTestUser, cleanupTestAuth, generateTestId } from "../utils/testHelpers"
+import { signInTestUser, cleanupTestAuth, generateTestId, getIntegrationDescribe } from "../utils/testHelpers"
 import { mockGenerateResumeRequest, mockGenerateCoverLetterRequest } from "../fixtures/mockData"
 import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
-const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
-const describeIntegration = isFirebaseMocked ? describe.skip : describe
+const describeIntegration = getIntegrationDescribe()
 
 describeIntegration("Generator API Integration", () => {
   beforeAll(async () => {

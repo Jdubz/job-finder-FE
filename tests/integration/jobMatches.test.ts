@@ -4,9 +4,9 @@
  * Tests for job match retrieval and management
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { jobMatchesClient } from "@/api/job-matches-client"
-import { signInTestUser, cleanupTestAuth } from "../utils/testHelpers"
+import { signInTestUser, cleanupTestAuth, getIntegrationDescribe } from "../utils/testHelpers"
 import {
   mockJobMatch,
   mockHighScoreJobMatch,
@@ -16,8 +16,7 @@ import {
 import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
-const isFirebaseMocked = typeof vi !== "undefined" && vi.isMockFunction(auth.currentUser as never)
-const describeIntegration = isFirebaseMocked ? describe.skip : describe
+const describeIntegration = getIntegrationDescribe()
 
 describeIntegration("Job Matches API Integration", () => {
   beforeAll(async () => {
