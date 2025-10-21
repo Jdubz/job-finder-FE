@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { contentItemsClient } from "@/api"
+import { contentItemsService } from "@/services/firestore"
+import type { ContentItemWithChildren } from "@/services/firestore"
 import type {
   ContentItem,
   ContentItemType,
-  ContentItemWithChildren,
   CreateContentItemData,
-} from "@/types/content-items"
+  UpdateContentItemData,
+} from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -69,7 +70,7 @@ export function ContentItemsPage() {
   const loadContentItems = async () => {
     try {
       setLoading(true)
-      const data = await contentItemsClient.getHierarchy({
+      const data = await contentItemsService.getHierarchy({
         visibility: ["published", "draft"],
       })
       setHierarchy(data)
@@ -147,7 +148,7 @@ export function ContentItemsPage() {
 
   const handleDeleteItem = async (id: string) => {
     try {
-      await contentItemsClient.deleteItem(id, true) // Delete children too
+      await contentItemsService.deleteItem(id, true) // Delete children too
       setAlert({
         type: "success",
         message: "Content item deleted successfully",
@@ -164,7 +165,7 @@ export function ContentItemsPage() {
 
   const handleExportItems = async () => {
     try {
-      const items = await contentItemsClient.exportItems()
+      const items = await contentItemsService.getItems()
       const dataStr = JSON.stringify(items, null, 2)
       const dataBlob = new Blob([dataStr], { type: "application/json" })
       const url = URL.createObjectURL(dataBlob)
@@ -206,10 +207,20 @@ export function ContentItemsPage() {
             throw new Error("Invalid file format: expected array of content items")
           }
 
-          const imported = await contentItemsClient.importItems(items)
+          // Import each item individually
+          const imported = []
+          for (const itemData of items) {
+            try {
+              const item = await contentItemsService.createItem(itemData)
+              imported.push(item)
+            } catch (error) {
+              console.error("Failed to import item:", itemData, error)
+            }
+          }
+
           setAlert({
             type: "success",
-            message: `Imported ${imported.length} content items successfully`,
+            message: `Imported ${imported.length} of ${items.length} content items successfully`,
           })
           await loadContentItems()
         } catch (error) {

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { contentItemsClient } from "@/api"
+import { contentItemsService } from "@/services/firestore"
 import type {
   ContentItem,
   ContentItemType,
   CreateContentItemData,
   UpdateContentItemData,
   ContentItemVisibility,
-} from "@/types/content-items"
+} from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -336,9 +336,9 @@ export function ContentItemDialog({
       }
 
       if (item) {
-        await contentItemsClient.updateItem(item.id, data as UpdateContentItemData)
+        await contentItemsService.updateItem(item.id, data as UpdateContentItemData)
       } else {
-        await contentItemsClient.createItem(data as CreateContentItemData)
+        await contentItemsService.createItem(data as CreateContentItemData)
       }
 
       onSave()
