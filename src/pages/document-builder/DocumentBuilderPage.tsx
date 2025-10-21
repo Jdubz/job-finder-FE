@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobMatchesClient } from "@/api/job-matches-client"
+import { jobMatchesService } from "@/services/firestore"
 import { generatorClient, type GenerateDocumentRequest } from "@/api/generator-client"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
@@ -44,7 +44,7 @@ export function DocumentBuilderPage() {
     const loadMatches = async () => {
       try {
         setLoadingMatches(true)
-        const matches = await jobMatchesClient.getMatches(user.uid, {
+        const matches = await jobMatchesService.getMatches({
           minScore: 70, // Only show good matches
           limit: 50,
         })
