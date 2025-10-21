@@ -20,14 +20,24 @@ output "production_custom_domain" {
 }
 
 # Cloudflare Outputs
-output "cloudflare_staging_record_id" {
-  description = "Cloudflare DNS record ID for staging CNAME"
-  value       = cloudflare_record.staging_cname.id
+output "cloudflare_staging_a_record_id" {
+  description = "Cloudflare DNS A record ID for staging"
+  value       = cloudflare_record.staging_a.id
 }
 
-output "cloudflare_production_record_id" {
-  description = "Cloudflare DNS record ID for production CNAME"
-  value       = cloudflare_record.production_cname.id
+output "cloudflare_staging_txt_record_id" {
+  description = "Cloudflare DNS TXT record ID for staging"
+  value       = cloudflare_record.staging_txt.id
+}
+
+output "cloudflare_production_a_record_id" {
+  description = "Cloudflare DNS A record ID for production"
+  value       = cloudflare_record.production_a.id
+}
+
+output "cloudflare_production_txt_record_id" {
+  description = "Cloudflare DNS TXT record ID for production"
+  value       = cloudflare_record.production_txt.id
 }
 
 # Service Account Outputs

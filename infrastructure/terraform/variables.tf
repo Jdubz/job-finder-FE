@@ -31,6 +31,12 @@ variable "cloudflare_zone_id" {
   sensitive   = true
 }
 
+variable "firebase_hosting_ip" {
+  description = "Firebase Hosting IP address for A records (proxied through Cloudflare)"
+  type        = string
+  default     = "199.36.158.100"
+}
+
 variable "cloudflare_staging_domain" {
   description = "Custom domain for staging environment"
   type        = string

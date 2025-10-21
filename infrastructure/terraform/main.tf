@@ -27,30 +27,54 @@ resource "google_project_iam_member" "service_account_user" {
 }
 
 # Cloudflare DNS Records
-# These DNS records point custom domains to Firebase Hosting
+# These DNS records point custom domains to Firebase Hosting via Cloudflare proxy
 
-# Staging CNAME record
-resource "cloudflare_record" "staging_cname" {
+# Staging A record (proxied through Cloudflare)
+resource "cloudflare_record" "staging_a" {
   zone_id = var.cloudflare_zone_id
   name    = "job-finder-staging"
-  type    = "CNAME"
-  content = "${var.staging_site_id}.web.app"
+  type    = "A"
+  content = var.firebase_hosting_ip
   ttl     = 1 # Auto (Cloudflare proxy enabled)
   proxied = true
 
-  comment = "Managed by Terraform - Points to Firebase Hosting staging site"
+  comment = "Managed by Terraform - Points to Firebase Hosting via Cloudflare proxy"
 }
 
-# Production CNAME record
-resource "cloudflare_record" "production_cname" {
+# Staging TXT record for Firebase Hosting verification
+resource "cloudflare_record" "staging_txt" {
+  zone_id = var.cloudflare_zone_id
+  name    = "job-finder-staging"
+  type    = "TXT"
+  content = "hosting-site=${var.staging_site_id}"
+  ttl     = 1
+  proxied = false
+
+  comment = "Managed by Terraform - Firebase Hosting site verification"
+}
+
+# Production A record (proxied through Cloudflare)
+resource "cloudflare_record" "production_a" {
   zone_id = var.cloudflare_zone_id
   name    = "job-finder"
-  type    = "CNAME"
-  content = "${var.production_site_id}.web.app"
+  type    = "A"
+  content = var.firebase_hosting_ip
   ttl     = 1 # Auto (Cloudflare proxy enabled)
   proxied = true
 
-  comment = "Managed by Terraform - Points to Firebase Hosting production site"
+  comment = "Managed by Terraform - Points to Firebase Hosting via Cloudflare proxy"
+}
+
+# Production TXT record for Firebase Hosting verification
+resource "cloudflare_record" "production_txt" {
+  zone_id = var.cloudflare_zone_id
+  name    = "job-finder"
+  type    = "TXT"
+  content = "hosting-site=${var.production_site_id}"
+  ttl     = 1
+  proxied = false
+
+  comment = "Managed by Terraform - Firebase Hosting site verification"
 }
 
 # Cloudflare Page Rules (optional - for advanced caching/security)
