@@ -23,6 +23,9 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   const [error, setError] = useState<string | null>(null)
   const [debugInfo, setDebugInfo] = useState<string[]>([])
 
+  // Show debug mode in development and staging, but NOT in production
+  const isDebugMode = import.meta.env.VITE_ENVIRONMENT !== 'production'
+
   const addDebugLog = (message: string) => {
     const timestamp = new Date().toISOString().split("T")[1].split(".")[0]
     const logMessage = `[${timestamp}] ${message}`
@@ -165,7 +168,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            Authentication {import.meta.env.DEV && "(Debug Mode)"}
+            Authentication {isDebugMode && "(Debug Mode)"}
           </DialogTitle>
           <DialogDescription>
             {user ? "Manage your account" : "Sign in to get started"}
@@ -271,7 +274,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
           )}
 
           {/* Debug Info Section */}
-          {import.meta.env.DEV && debugInfo.length > 0 && (
+          {isDebugMode && debugInfo.length > 0 && (
             <div className="bg-slate-900 text-slate-100 rounded-lg p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-mono font-semibold">Debug Log</p>
@@ -290,7 +293,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
           )}
 
           {/* Environment Info */}
-          {import.meta.env.DEV && (
+          {isDebugMode && (
             <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-3 text-xs space-y-1">
               <p className="font-semibold text-blue-900 dark:text-blue-100">Environment Info</p>
               <div className="text-blue-800 dark:text-blue-200 space-y-0.5 font-mono">
