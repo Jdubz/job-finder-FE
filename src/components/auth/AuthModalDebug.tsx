@@ -24,18 +24,18 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   const [debugInfo, setDebugInfo] = useState<string[]>([])
 
   const addDebugLog = (message: string) => {
-    const timestamp = new Date().toISOString().split('T')[1].split('.')[0]
+    const timestamp = new Date().toISOString().split("T")[1].split(".")[0]
     const logMessage = `[${timestamp}] ${message}`
     console.log(`🔐 ${logMessage}`)
-    setDebugInfo(prev => [...prev, logMessage])
+    setDebugInfo((prev) => [...prev, logMessage])
   }
 
   useEffect(() => {
     if (open) {
-      addDebugLog('Auth modal opened')
+      addDebugLog("Auth modal opened")
       addDebugLog(`Firebase Project: ${import.meta.env.VITE_FIREBASE_PROJECT_ID}`)
       addDebugLog(`Auth Domain: ${import.meta.env.VITE_FIREBASE_AUTH_DOMAIN}`)
-      addDebugLog(`Environment: ${import.meta.env.VITE_ENVIRONMENT || 'development'}`)
+      addDebugLog(`Environment: ${import.meta.env.VITE_ENVIRONMENT || "development"}`)
       addDebugLog(`Current URL: ${window.location.href}`)
       addDebugLog(`User signed in: ${!!user}`)
     }
@@ -47,19 +47,19 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
     setDebugInfo([]) // Clear previous logs
 
     try {
-      addDebugLog('Starting Google sign-in...')
+      addDebugLog("Starting Google sign-in...")
 
       const provider = new GoogleAuthProvider()
-      addDebugLog('GoogleAuthProvider created')
+      addDebugLog("GoogleAuthProvider created")
 
       // Add custom parameters for better debugging
       provider.setCustomParameters({
-        prompt: 'select_account',
+        prompt: "select_account",
         // hd: 'yourdomain.com' // Uncomment to restrict to specific domain
       })
-      addDebugLog('Provider configured with custom parameters')
+      addDebugLog("Provider configured with custom parameters")
 
-      addDebugLog('Opening popup...')
+      addDebugLog("Opening popup...")
       const result = await signInWithPopup(auth, provider)
 
       addDebugLog(`✅ Sign-in successful!`)
@@ -69,7 +69,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
       // Get the credential
       const credential = GoogleAuthProvider.credentialFromResult(result)
       if (credential) {
-        addDebugLog(`Token acquired: ${credential.accessToken ? 'Yes' : 'No'}`)
+        addDebugLog(`Token acquired: ${credential.accessToken ? "Yes" : "No"}`)
       }
 
       onOpenChange(false)
@@ -88,29 +88,33 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
           // Provide user-friendly error messages
           let userMessage = err.message
           switch (errorCode) {
-            case 'auth/popup-blocked':
-              userMessage = 'Popup was blocked. Please allow popups for this site.'
-              addDebugLog('💡 Solution: Enable popups in browser settings')
+            case "auth/popup-blocked":
+              userMessage = "Popup was blocked. Please allow popups for this site."
+              addDebugLog("💡 Solution: Enable popups in browser settings")
               break
-            case 'auth/popup-closed-by-user':
-              userMessage = 'Sign-in was cancelled.'
-              addDebugLog('User closed the popup window')
+            case "auth/popup-closed-by-user":
+              userMessage = "Sign-in was cancelled."
+              addDebugLog("User closed the popup window")
               break
-            case 'auth/unauthorized-domain':
+            case "auth/unauthorized-domain":
               userMessage = `Domain not authorized. Current domain: ${window.location.hostname}`
-              addDebugLog(`💡 Solution: Add ${window.location.hostname} to Firebase Console → Authentication → Settings → Authorized domains`)
+              addDebugLog(
+                `💡 Solution: Add ${window.location.hostname} to Firebase Console → Authentication → Settings → Authorized domains`
+              )
               break
-            case 'auth/operation-not-allowed':
-              userMessage = 'Google sign-in is not enabled. Please contact administrator.'
-              addDebugLog('💡 Solution: Enable Google provider in Firebase Console → Authentication → Sign-in method')
+            case "auth/operation-not-allowed":
+              userMessage = "Google sign-in is not enabled. Please contact administrator."
+              addDebugLog(
+                "💡 Solution: Enable Google provider in Firebase Console → Authentication → Sign-in method"
+              )
               break
-            case 'auth/network-request-failed':
-              userMessage = 'Network error. Please check your internet connection.'
-              addDebugLog('💡 Check: Internet connection, Firebase status, CORS settings')
+            case "auth/network-request-failed":
+              userMessage = "Network error. Please check your internet connection."
+              addDebugLog("💡 Check: Internet connection, Firebase status, CORS settings")
               break
-            case 'auth/internal-error':
-              userMessage = 'Internal error. This might be a configuration issue.'
-              addDebugLog('💡 Check: Firebase configuration, API keys, authorized domains')
+            case "auth/internal-error":
+              userMessage = "Internal error. This might be a configuration issue."
+              addDebugLog("💡 Check: Firebase configuration, API keys, authorized domains")
               break
             default:
               addDebugLog(`Unhandled error code: ${errorCode}`)
@@ -133,12 +137,12 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
 
   const handleSignOut = async () => {
     try {
-      addDebugLog('Signing out...')
+      addDebugLog("Signing out...")
       await signOut()
-      addDebugLog('✅ Sign-out successful')
+      addDebugLog("✅ Sign-out successful")
       onOpenChange(false)
     } catch (err: unknown) {
-      addDebugLog('❌ Sign-out failed')
+      addDebugLog("❌ Sign-out failed")
       console.error("Sign out error:", err)
       if (err instanceof Error) {
         addDebugLog(`Error: ${err.message}`)
@@ -150,9 +154,9 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   }
 
   const copyDebugInfo = () => {
-    const debugText = debugInfo.join('\n')
+    const debugText = debugInfo.join("\n")
     navigator.clipboard.writeText(debugText)
-    addDebugLog('Debug info copied to clipboard')
+    addDebugLog("Debug info copied to clipboard")
   }
 
   return (
@@ -271,12 +275,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
             <div className="bg-slate-900 text-slate-100 rounded-lg p-3 space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-mono font-semibold">Debug Log</p>
-                <Button
-                  onClick={copyDebugInfo}
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs"
-                >
+                <Button onClick={copyDebugInfo} variant="ghost" size="sm" className="h-6 text-xs">
                   Copy
                 </Button>
               </div>
@@ -297,7 +296,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
               <div className="text-blue-800 dark:text-blue-200 space-y-0.5 font-mono">
                 <p>Project: {import.meta.env.VITE_FIREBASE_PROJECT_ID}</p>
                 <p>Auth Domain: {import.meta.env.VITE_FIREBASE_AUTH_DOMAIN}</p>
-                <p>Environment: {import.meta.env.VITE_ENVIRONMENT || 'development'}</p>
+                <p>Environment: {import.meta.env.VITE_ENVIRONMENT || "development"}</p>
                 <p>Current Domain: {window.location.hostname}</p>
               </div>
             </div>
