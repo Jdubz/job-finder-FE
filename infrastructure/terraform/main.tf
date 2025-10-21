@@ -35,7 +35,8 @@ resource "cloudflare_record" "staging_a" {
   name    = "job-finder-staging"
   type    = "A"
   content = var.firebase_hosting_ip
-  ttl     = 1 # Auto (Cloudflare proxy enabled)
+  # Auto (Cloudflare proxy enabled)
+  ttl     = 1
   proxied = true
 
   comment = "Managed by Terraform - Points to Firebase Hosting via Cloudflare proxy"
@@ -59,7 +60,8 @@ resource "cloudflare_record" "production_a" {
   name    = "job-finder"
   type    = "A"
   content = var.firebase_hosting_ip
-  ttl     = 1 # Auto (Cloudflare proxy enabled)
+  # Auto (Cloudflare proxy enabled)
+  ttl     = 1
   proxied = true
 
   comment = "Managed by Terraform - Points to Firebase Hosting via Cloudflare proxy"
@@ -84,11 +86,11 @@ resource "cloudflare_page_rule" "staging_cache" {
   priority = 1
 
   actions {
-    cache_level         = "cache_everything"
-    edge_cache_ttl      = 3600
-    browser_cache_ttl   = 3600
-    security_level      = "medium"
-    ssl                 = "flexible"
+    cache_level              = "cache_everything"
+    edge_cache_ttl           = 3600
+    browser_cache_ttl        = 3600
+    security_level           = "medium"
+    ssl                      = "flexible"
     automatic_https_rewrites = "on"
   }
 }
@@ -99,11 +101,12 @@ resource "cloudflare_page_rule" "production_cache" {
   priority = 1
 
   actions {
-    cache_level         = "cache_everything"
-    edge_cache_ttl      = 86400 # 24 hours
-    browser_cache_ttl   = 86400
-    security_level      = "high"
-    ssl                 = "strict"
+    cache_level              = "cache_everything"
+    # 24 hours
+    edge_cache_ttl           = 86400
+    browser_cache_ttl        = 86400
+    security_level           = "high"
+    ssl                      = "strict"
     automatic_https_rewrites = "on"
   }
 }
