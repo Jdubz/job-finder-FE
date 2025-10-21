@@ -279,7 +279,7 @@ VITE_FIREBASE_APP_ID=1:789847666726:web:PRODUCTION_APP_ID_HERE
 VITE_API_BASE_URL=https://us-central1-static-sites-257923.cloudfunctions.net
 
 # Firestore Database ID
-VITE_FIRESTORE_DATABASE_ID=(default)
+VITE_FIRESTORE_DATABASE_ID=portfolio
 
 # Disable emulators in production
 VITE_USE_EMULATORS=false
@@ -338,6 +338,7 @@ VITE_USE_EMULATORS=true  # Set to true for local dev, false for staging/producti
 VITE_EMULATOR_HOST=localhost
 
 # Firestore Database ID
+# (default) is ONLY for local emulators - use portfolio for production, portfolio-staging for staging
 VITE_FIRESTORE_DATABASE_ID=(default)
 
 # Environment metadata

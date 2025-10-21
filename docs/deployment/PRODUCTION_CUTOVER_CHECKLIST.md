@@ -71,7 +71,7 @@ This checklist ensures the Job Finder frontend is ready for production deploymen
 - [x] Environment variables correct for both environments
 - [x] Firestore database IDs correct
   - Staging: `portfolio-staging`
-  - Production: `(default)`
+  - Production: `portfolio`
 
 ### 5. Authentication & Security
 

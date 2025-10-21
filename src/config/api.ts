@@ -6,9 +6,12 @@
  * Supports environment-specific URLs for development, staging, and production.
  *
  * Environment Configuration:
- * - Development: Firebase emulators (static-sites-257923 project, default database)
+ * - Development: Firebase emulators (static-sites-257923 project, (default) database)
  * - Staging: static-sites-257923 Firebase project (portfolio-staging database)
  * - Production: static-sites-257923 Firebase project (portfolio database)
+ *
+ * IMPORTANT: The "(default)" database is ONLY for local emulators.
+ * Production and staging must use named databases: portfolio or portfolio-staging
  */
 
 const isDevelopment = import.meta.env.MODE === "development"

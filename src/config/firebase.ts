@@ -11,10 +11,18 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
+/**
+ * Firestore Database ID
+ * - Development (emulators): (default)
+ * - Staging: portfolio-staging
+ * - Production: portfolio
+ */
+const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)"
+
 // Initialize Firebase
 export const app: FirebaseApp = initializeApp(firebaseConfig)
 export const auth: Auth = getAuth(app)
-export const db: Firestore = getFirestore(app)
+export const db: Firestore = getFirestore(app, databaseId)
 
 // Connect to Firebase emulators in development/test environments
 if (import.meta.env.VITE_USE_EMULATORS === "true") {
@@ -31,4 +39,9 @@ if (import.meta.env.VITE_USE_EMULATORS === "true") {
   console.log("🔧 Connected to Firebase emulators")
   console.log(`  Auth: ${authHost}:${authPort}`)
   console.log(`  Firestore: ${firestoreHost}:${firestorePort}`)
+  console.log(`  Database: ${databaseId}`)
+} else {
+  console.log(`🔥 Firebase initialized`)
+  console.log(`  Project: ${firebaseConfig.projectId}`)
+  console.log(`  Database: ${databaseId}`)
 }

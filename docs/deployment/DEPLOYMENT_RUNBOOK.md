@@ -578,7 +578,7 @@ VITE_ENVIRONMENT=staging
 VITE_FIREBASE_PROJECT_ID=static-sites-257923
 VITE_FIREBASE_AUTH_DOMAIN=joshwentworth.com
 VITE_API_BASE_URL=https://us-central1-static-sites-257923.cloudfunctions.net
-VITE_FIRESTORE_DATABASE_ID=(default)
+VITE_FIRESTORE_DATABASE_ID=portfolio
 VITE_ENVIRONMENT=production
 ```
 
