@@ -72,16 +72,24 @@ export function DocumentHistoryPage() {
 
     try {
       const history = await generatorClient.getHistory(user?.uid)
-      setDocuments(history)
+      // Ensure history is an array
+      setDocuments(Array.isArray(history) ? history : [])
     } catch (err) {
       setError("Failed to load document history")
       console.error("Error loading documents:", err)
+      setDocuments([]) // Ensure documents is always an array on error
     } finally {
       setIsLoading(false)
     }
   }
 
   const applyFiltersAndSort = () => {
+    // Ensure documents is an array
+    if (!Array.isArray(documents)) {
+      setFilteredDocuments([])
+      return
+    }
+
     let filtered = [...documents]
 
     // Apply search filter
