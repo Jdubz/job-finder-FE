@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobQueueClient } from "@/api"
+import { jobQueueService } from "@/services/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -41,7 +41,7 @@ export function JobFinderPage() {
         companyUrl: companyUrl.trim() || undefined,
       }
 
-      const response = await jobQueueClient.submitJob(request)
+      const response = await jobQueueService.submitJob(request)
 
       if (response.status === "success") {
         setSuccess(response.message || "Job submitted successfully!")
