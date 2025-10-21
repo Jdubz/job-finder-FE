@@ -92,14 +92,18 @@ type-check: ## Run TypeScript type checking
 # Frontend-Specific Targets
 # ============================================================================
 
-emulators: ## Start Firebase emulators (Firestore, Auth, Functions, UI)
-	@echo "$(CYAN)Starting Firebase emulators...$(RESET)"
-	@echo "  Firestore:  http://localhost:8080"
-	@echo "  Auth:       http://localhost:9099"
-	@echo "  Functions:  http://localhost:5001"
-	@echo "  Hosting:    http://localhost:5000"
-	@echo "  UI:         http://localhost:4000"
+emulators: ## Start Firebase emulators (NOTE: Should be started from BE repo)
+	@echo "$(YELLOW)⚠ WARNING: Firebase emulators should be started from the BE repo$(RESET)"
+	@echo "  The BE repo contains firestore.rules, firestore.indexes.json, and functions code"
 	@echo ""
+	@echo "  Run this instead:"
+	@echo "    cd ../job-finder-BE && make emulators"
+	@echo ""
+	@echo "  Or from the manager repo:"
+	@echo "    make dev-backend"
+	@echo ""
+	@read -p "Continue anyway? (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
+	@echo "$(CYAN)Starting Firebase emulators from FE repo...$(RESET)"
 	@firebase emulators:start
 
 emulators-stop: ## Stop Firebase emulators
