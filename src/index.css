@@ -48,7 +48,7 @@
     --color-popover-foreground: oklch(95% 0.01 160);
 
     /* Primary - Bright Emerald Green */
-    --color-primary: oklch(65% 0.20 160);
+    --color-primary: oklch(65% 0.2 160);
     --color-primary-foreground: oklch(10% 0.02 160);
 
     /* Secondary - Dark Green */
@@ -64,13 +64,13 @@
     --color-accent-foreground: oklch(95% 0.01 160);
 
     /* Destructive - Red (unchanged) */
-    --color-destructive: oklch(45% 0.20 29.23);
+    --color-destructive: oklch(45% 0.2 29.23);
     --color-destructive-foreground: oklch(98% 0 0);
 
     /* Borders & Inputs - Dark Green */
     --color-border: oklch(25% 0.04 160);
     --color-input: oklch(25% 0.04 160);
-    --color-ring: oklch(65% 0.20 160);
+    --color-ring: oklch(65% 0.2 160);
   }
 }
 
