@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobQueueClient } from "@/api"
+import { jobQueueService } from "@/services/firestore"
 import type { QueueItem, QueueStats } from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -66,8 +66,8 @@ export function QueueManagementPage() {
   const loadQueueData = async () => {
     try {
       const [items, stats] = await Promise.all([
-        jobQueueClient.getQueueItems(),
-        jobQueueClient.getQueueStats(),
+        jobQueueService.getItems(),
+        jobQueueService.getStats(),
       ])
 
       setQueueItems(items)
@@ -148,7 +148,12 @@ export function QueueManagementPage() {
 
   const handleRetryItem = async (id: string) => {
     try {
-      await jobQueueClient.retryQueueItem(id)
+      // Get current item to increment retry count
+      const item = await jobQueueService.getItem(id)
+      await jobQueueService.updateItem(id, {
+        status: "pending",
+        retry_count: (item.retry_count || 0) + 1,
+      })
       setAlert({
         type: "success",
         message: "Queue item queued for retry",
@@ -165,7 +170,8 @@ export function QueueManagementPage() {
 
   const handleCancelItem = async (id: string) => {
     try {
-      await jobQueueClient.cancelQueueItem(id)
+      // Delete the queue item (only works for pending items per security rules)
+      await jobQueueService.deleteItem(id)
       setAlert({
         type: "success",
         message: "Queue item cancelled",
@@ -175,7 +181,7 @@ export function QueueManagementPage() {
       console.error("Failed to cancel item:", error)
       setAlert({
         type: "error",
-        message: "Failed to cancel queue item",
+        message: "Failed to cancel queue item. Only pending items can be cancelled.",
       })
     }
   }
@@ -184,9 +190,17 @@ export function QueueManagementPage() {
     if (selectedItems.size === 0) return
 
     try {
-      const promises = Array.from(selectedItems).map((id) =>
-        action === "retry" ? jobQueueClient.retryQueueItem(id) : jobQueueClient.cancelQueueItem(id)
-      )
+      const promises = Array.from(selectedItems).map(async (id) => {
+        if (action === "retry") {
+          const item = await jobQueueService.getItem(id)
+          return jobQueueService.updateItem(id, {
+            status: "pending",
+            retry_count: (item.retry_count || 0) + 1,
+          })
+        } else {
+          return jobQueueService.deleteItem(id)
+        }
+      })
 
       await Promise.all(promises)
       setAlert({
