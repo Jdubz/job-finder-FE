@@ -51,38 +51,11 @@
           ]
         },
         {
-          "source": "**/*.@(css|js|map)",
+          "source": "**",
           "headers": [
             {
               "key": "Cache-Control",
-              "value": "public, max-age=3600"
-            }
-          ]
-        },
-        {
-          "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|avif|ico|woff|woff2|ttf|eot)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "public, max-age=86400"
-            }
-          ]
-        },
-        {
-          "source": "**/*.@(woff|woff2)",
-          "headers": [
-            {
-              "key": "Access-Control-Allow-Origin",
-              "value": "*"
-            }
-          ]
-        },
-        {
-          "source": "**/*.@(html|json|xml|txt)",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-cache, no-store, must-revalidate"
+              "value": "no-cache, no-store, must-revalidate, max-age=0"
             }
           ]
         }
@@ -174,11 +147,14 @@
     }
   ],
   "emulators": {
-    "hosting": {
-      "port": 5000
+    "firestore": {
+      "port": 8080
     },
     "auth": {
       "port": 9099
+    },
+    "functions": {
+      "port": 5001
     },
     "ui": {
       "enabled": true,

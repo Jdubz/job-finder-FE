@@ -38,8 +38,9 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
-          <Link to={ROUTES.HOME} className="text-lg font-semibold">
-            Job Finder
+          <Link to={ROUTES.HOME} className="flex items-center gap-2">
+            <img src="/logo.png" alt="Job Finder" className="h-10 w-auto" />
+            <span className="text-lg font-semibold">Job Finder</span>
           </Link>
 
           {/* Desktop Navigation */}

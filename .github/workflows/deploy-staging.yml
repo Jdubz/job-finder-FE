@@ -124,10 +124,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION"
+
       - name: Build application for staging
         run: npm run build:staging
         env:
           NODE_ENV: production
+          VITE_APP_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Verify build output
         run: |
@@ -170,8 +178,13 @@ jobs:
           echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: Staging" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **URL**: https://job-finder-staging.web.app" >> $GITHUB_STEP_SUMMARY
+          echo "- **Custom Domain**: https://job-finder-staging.joshwentworth.com" >> $GITHUB_STEP_SUMMARY
           echo "- **Project**: ${{ env.FIREBASE_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Note" >> $GITHUB_STEP_SUMMARY
+          echo "Staging has no-cache headers. Hard refresh (Ctrl+Shift+R) may be needed." >> $GITHUB_STEP_SUMMARY

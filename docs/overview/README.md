@@ -116,10 +116,71 @@ API endpoints are automatically configured based on build mode. See `src/config/
 
 The application is deployed to Firebase Hosting with two environments:
 
-- **Staging:** `staging.job-finder.joshwentworth.com`
+- **Staging:** `job-finder-staging.joshwentworth.com`
 - **Production:** `job-finder.joshwentworth.com`
 
 Deployment is automated via GitHub Actions on branch merges.
+
+### Deployment Resources
+
+- [Deployment Runbook](./DEPLOYMENT_RUNBOOK.md) - Complete deployment procedures
+- [GitHub Secrets Setup](./GITHUB_SECRETS_SETUP.md) - CI/CD secret configuration
+- [Production Cutover Checklist](./PRODUCTION_CUTOVER_CHECKLIST.md) - Production deployment guide
+
+## Infrastructure as Code
+
+This project uses Terraform to manage Firebase Hosting and Cloudflare DNS infrastructure. This ensures deployments are reproducible and infrastructure changes are version-controlled.
+
+### Infrastructure Components
+
+- **Firebase Hosting**: Sites for staging and production
+- **Cloudflare DNS**: Custom domain CNAME records
+- **Google Secret Manager**: Secure configuration storage
+- **IAM Permissions**: Service account access control
+
+### Quick Start with Terraform
+
+```bash
+# Navigate to Terraform directory
+cd infrastructure/terraform
+
+# Set required credentials
+export CLOUDFLARE_API_TOKEN="your-token"
+gcloud auth application-default login
+
+# Initialize Terraform
+terraform init
+
+# Create configuration file
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your Cloudflare Zone ID
+
+# Validate configuration
+terraform fmt
+terraform validate
+
+# Plan changes (review before applying)
+terraform plan
+
+# Apply changes (requires confirmation)
+terraform apply
+```
+
+### Infrastructure Documentation
+
+- [Terraform Hosting Guide](./docs/infrastructure/terraform-hosting.md) - Complete Terraform setup and usage
+- [Terraform README](./infrastructure/terraform/README.md) - Quick reference guide
+- Infrastructure code: `infrastructure/terraform/` directory
+
+### Terraform CI/CD
+
+Terraform validation runs automatically on pull requests:
+- ✅ Format checking (`terraform fmt`)
+- ✅ Configuration validation (`terraform validate`)
+- ✅ Security scanning (Checkov)
+- ✅ Dry-run planning
+
+See `.github/workflows/terraform-validate.yml` for workflow details.
 
 ## Shared Types
 
