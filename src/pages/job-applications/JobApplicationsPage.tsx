@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobMatchesClient } from "@/api"
+import { jobMatchesService } from "@/services/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -41,14 +41,13 @@ export function JobApplicationsPage() {
       return
     }
 
-    const unsubscribe = jobMatchesClient.subscribeToMatches(
-      user.uid,
+    const unsubscribe = jobMatchesService.subscribeToMatches(
+      {}, // No filters - get all matches for current user
       (updatedMatches) => {
         setMatches(updatedMatches)
         setLoading(false)
         setError(null) // Clear any previous errors
       },
-      undefined,
       (err) => {
         setError("Failed to load job matches. Please refresh the page.")
         setLoading(false)
