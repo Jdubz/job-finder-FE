@@ -8,6 +8,7 @@
  */
 
 import { auth } from "@/config/firebase"
+import { logError } from "@/lib/logger"
 
 export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
@@ -62,7 +63,11 @@ export class BaseApiClient {
     try {
       return await user.getIdToken()
     } catch (error) {
-      console.error("Failed to get auth token:", error)
+      logError("Failed to get auth token", error, {
+        category: 'auth',
+        action: 'token_fetch_failed',
+        userId: user.uid,
+      })
       return null
     }
   }
