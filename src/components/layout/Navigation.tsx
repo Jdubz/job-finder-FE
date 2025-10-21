@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
 import { AuthIcon } from "@/components/auth/AuthIcon"
-import { AuthModal } from "@/components/auth/AuthModalDebug"
+import { AuthModalDebug as AuthModal } from "@/components/auth/AuthModalDebug"
 
 const publicLinks = [
   { to: ROUTES.HOME, label: "Home" },
