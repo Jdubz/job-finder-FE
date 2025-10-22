@@ -179,7 +179,7 @@ export const ContentItem: React.FC<ContentItemProps> = ({
         {item.type === "timeline-event" && <TimelineEventView item={item} />}
 
         {/* Render children (nested items) */}
-        {children && <div className="mt-6 pl-4 border-l-2 border-muted space-y-4">{children}</div>}
+        {children && <div className="mt-6 space-y-4">{children}</div>}
 
         {/* Editor Actions */}
         {isEditor && (
