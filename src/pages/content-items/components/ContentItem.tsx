@@ -114,40 +114,42 @@ export const ContentItem: React.FC<ContentItemProps> = ({
 
   if (isEditing) {
     return (
-      <Card className="p-6 border-2 border-primary mb-4">
-        {/* Render appropriate edit component based on type */}
-        {item.type === "company" && (
-          <CompanyEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "project" && (
-          <ProjectEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "skill-group" && (
-          <SkillGroupEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "education" && (
-          <EducationEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "profile-section" && (
-          <ProfileSectionEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "text-section" && (
-          <TextSectionEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "accomplishment" && (
-          <AccomplishmentEdit data={editData} onChange={setEditData} />
-        )}
-        {item.type === "timeline-event" && (
-          <TimelineEventEdit data={editData} onChange={setEditData} />
-        )}
+      <Card className="border-2 border-primary">
+        <div className="p-6 space-y-6">
+          {/* Render appropriate edit component based on type */}
+          {item.type === "company" && (
+            <CompanyEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "project" && (
+            <ProjectEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "skill-group" && (
+            <SkillGroupEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "education" && (
+            <EducationEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "profile-section" && (
+            <ProfileSectionEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "text-section" && (
+            <TextSectionEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "accomplishment" && (
+            <AccomplishmentEdit data={editData} onChange={setEditData} />
+          )}
+          {item.type === "timeline-event" && (
+            <TimelineEventEdit data={editData} onChange={setEditData} />
+          )}
 
-        <FormActions
-          onCancel={handleCancel}
-          onSave={() => void handleSave()}
-          onDelete={handleDeleteClick}
-          isSubmitting={isSaving}
-          isDeleting={isDeleting}
-        />
+          <FormActions
+            onCancel={handleCancel}
+            onSave={() => void handleSave()}
+            onDelete={handleDeleteClick}
+            isSubmitting={isSaving}
+            isDeleting={isDeleting}
+          />
+        </div>
 
         <ConfirmDialog
           isOpen={showDeleteDialog}
@@ -164,38 +166,40 @@ export const ContentItem: React.FC<ContentItemProps> = ({
   }
 
   return (
-    <Card className="p-6 mb-4 relative">
-      {/* Render appropriate view component based on type */}
-      {item.type === "company" && <CompanyView item={item} />}
-      {item.type === "project" && <ProjectView item={item} />}
-      {item.type === "skill-group" && <SkillGroupView item={item} />}
-      {item.type === "education" && <EducationView item={item} />}
-      {item.type === "profile-section" && <ProfileSectionView item={item} />}
-      {item.type === "text-section" && <TextSectionView item={item} />}
-      {item.type === "accomplishment" && <AccomplishmentView item={item} />}
-      {item.type === "timeline-event" && <TimelineEventView item={item} />}
+    <Card>
+      <div className="p-6 space-y-4">
+        {/* Render appropriate view component based on type */}
+        {item.type === "company" && <CompanyView item={item} />}
+        {item.type === "project" && <ProjectView item={item} />}
+        {item.type === "skill-group" && <SkillGroupView item={item} />}
+        {item.type === "education" && <EducationView item={item} />}
+        {item.type === "profile-section" && <ProfileSectionView item={item} />}
+        {item.type === "text-section" && <TextSectionView item={item} />}
+        {item.type === "accomplishment" && <AccomplishmentView item={item} />}
+        {item.type === "timeline-event" && <TimelineEventView item={item} />}
 
-      {/* Render children (nested items) */}
-      {children && <div className="mt-4 pl-4 border-l-2 border-muted">{children}</div>}
+        {/* Render children (nested items) */}
+        {children && <div className="mt-6 pl-4 border-l-2 border-muted space-y-4">{children}</div>}
 
-      {/* Editor Actions */}
-      {isEditor && (
-        <div className="mt-4 flex gap-2">
-          <Button type="button" onClick={() => setIsEditing(true)} variant="secondary" size="sm">
-            Edit
-          </Button>
-          {canHaveChildren(item.type) && onAddChild && (
-            <Button
-              type="button"
-              onClick={() => onAddChild(item.id, getChildType(item.type))}
-              variant="secondary"
-              size="sm"
-            >
-              + Add {getChildTypeName(item.type)}
+        {/* Editor Actions */}
+        {isEditor && (
+          <div className="flex gap-2 pt-4 border-t">
+            <Button type="button" onClick={() => setIsEditing(true)} variant="outline" size="sm">
+              Edit
             </Button>
-          )}
-        </div>
-      )}
+            {canHaveChildren(item.type) && onAddChild && (
+              <Button
+                type="button"
+                onClick={() => onAddChild(item.id, getChildType(item.type))}
+                variant="outline"
+                size="sm"
+              >
+                + Add {getChildTypeName(item.type)}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
     </Card>
   )
 }
