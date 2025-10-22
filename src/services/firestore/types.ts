@@ -1,6 +1,6 @@
 /**
  * Firestore Service Types
- * 
+ *
  * Type definitions for the Firestore service layer
  */
 
@@ -11,8 +11,10 @@ import type {
   ContentItemDocument,
   ContactSubmissionDocument,
   UserDocument,
-  ConfigDocument,
-  FirestoreCollectionName,
+  StopList,
+  QueueSettings,
+  AISettings,
+  PersonalInfo,
 } from "@jdubzw/job-finder-shared-types"
 
 /**
@@ -22,10 +24,10 @@ export type ClientSideDocument<T> = {
   [K in keyof T]: T[K] extends Timestamp
     ? Date
     : T[K] extends Timestamp | undefined
-    ? Date | undefined
-    : T[K] extends { [key: string]: any }
-    ? ClientSideDocument<T[K]>
-    : T[K]
+      ? Date | undefined
+      : T[K] extends Record<string, unknown>
+        ? ClientSideDocument<T[K]>
+        : T[K]
 }
 
 /**
@@ -39,16 +41,26 @@ export type DocumentWithId<T> = ClientSideDocument<T> & { id: string }
 export interface QueryConstraints {
   where?: Array<{
     field: string
-    operator: "<" | "<=" | "==" | "!=" | ">=" | ">" | "array-contains" | "in" | "array-contains-any" | "not-in"
-    value: any
+    operator:
+      | "<"
+      | "<="
+      | "=="
+      | "!="
+      | ">="
+      | ">"
+      | "array-contains"
+      | "in"
+      | "array-contains-any"
+      | "not-in"
+    value: unknown
   }>
   orderBy?: Array<{
     field: string
     direction?: "asc" | "desc"
   }>
   limit?: number
-  startAfter?: any
-  startAt?: any
+  startAfter?: unknown
+  startAt?: unknown
 }
 
 /**
@@ -72,19 +84,25 @@ export type ErrorCallback = (error: Error) => void
 export type UnsubscribeFn = () => void
 
 /**
+ * Job Finder Config document union type
+ * The job-finder-config collection can contain different document types based on document ID
+ */
+export type JobFinderConfigDocument = PersonalInfo | StopList | QueueSettings | AISettings
+
+/**
  * Collection map for type safety
  */
 export interface CollectionTypeMap {
   "job-queue": QueueItemDocument
-  "companies": CompanyDocument
+  companies: CompanyDocument
   "content-items": ContentItemDocument
   "contact-submissions": ContactSubmissionDocument
-  "users": UserDocument
-  "config": ConfigDocument
-  "generator-documents": any // Will be defined later
-  "job-matches": any // Will be defined later
-  "experiences": any // Will be defined later
-  "blurbs": any // Will be defined later
+  users: UserDocument
+  "job-finder-config": JobFinderConfigDocument
+  "generator-documents": Record<string, unknown> // Will be defined later
+  "job-matches": Record<string, unknown> // Will be defined later
+  experiences: Record<string, unknown> // Will be defined later
+  blurbs: Record<string, unknown> // Will be defined later
 }
 
 /**
@@ -104,4 +122,3 @@ export interface DocumentCacheEntry<T> {
   timestamp: number
   unsubscribe: UnsubscribeFn
 }
-

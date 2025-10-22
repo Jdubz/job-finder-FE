@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
+import { usePersonalInfo } from "@/hooks/usePersonalInfo"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Save, User, Shield, Bell } from "lucide-react"
-import { generatorClient, type UserDefaults } from "@/api"
+import type { PersonalInfo } from "@jsdubzw/job-finder-shared-types"
 import {
   Select,
   SelectContent,
@@ -19,39 +20,66 @@ import {
 
 export function SettingsPage() {
   const { user, isEditor } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
+  const {
+    personalInfo,
+    loading: isLoading,
+    error: loadError,
+    updatePersonalInfo,
+  } = usePersonalInfo()
+
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  // User defaults state
-  const [userDefaults, setUserDefaults] = useState<UserDefaults>({
+  // User defaults state (mapped from PersonalInfo)
+  const [userDefaults, setUserDefaults] = useState<Partial<PersonalInfo>>({
     name: "",
     email: "",
     phone: "",
     location: "",
     linkedin: "",
     github: "",
-    portfolio: "",
-    summary: "",
+    website: "",
+    accentColor: "#3b82f6",
   })
-  const [originalDefaults, setOriginalDefaults] = useState<UserDefaults>({
+  const [originalDefaults, setOriginalDefaults] = useState<Partial<PersonalInfo>>({
     name: "",
     email: "",
     phone: "",
     location: "",
     linkedin: "",
     github: "",
-    portfolio: "",
-    summary: "",
+    website: "",
+    accentColor: "#3b82f6",
   })
 
   // Theme preference (stored in localStorage)
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system")
 
+  // Load personal info into state when it changes
   useEffect(() => {
-    loadSettings()
-  }, [])
+    if (personalInfo) {
+      const defaults = {
+        name: personalInfo.name || "",
+        email: personalInfo.email || "",
+        phone: personalInfo.phone || "",
+        location: personalInfo.location || "",
+        linkedin: personalInfo.linkedin || "",
+        github: personalInfo.github || "",
+        website: personalInfo.website || "",
+        accentColor: personalInfo.accentColor || "#3b82f6",
+      }
+      setUserDefaults(defaults)
+      setOriginalDefaults(defaults)
+    }
+  }, [personalInfo])
+
+  // Set error from load error
+  useEffect(() => {
+    if (loadError) {
+      setError(loadError.message)
+    }
+  }, [loadError])
 
   useEffect(() => {
     // Load theme from localStorage
@@ -62,29 +90,13 @@ export function SettingsPage() {
     }
   }, [])
 
-  const loadSettings = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const defaults = await generatorClient.getUserDefaults()
-      setUserDefaults(defaults)
-      setOriginalDefaults(defaults)
-    } catch (err) {
-      console.error("Error loading settings:", err)
-      // It's OK if defaults don't exist yet
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleSaveDefaults = async () => {
     setIsSaving(true)
     setError(null)
     setSuccess(null)
 
     try {
-      await generatorClient.updateUserDefaults(userDefaults)
+      await updatePersonalInfo(userDefaults)
       setOriginalDefaults(userDefaults)
       setSuccess("Settings saved successfully!")
       setTimeout(() => setSuccess(null), 3000)
@@ -334,25 +346,41 @@ export function SettingsPage() {
             </div>
 
             <div className="space-y-2 col-span-2">
-              <Label htmlFor="portfolio">Portfolio Website</Label>
+              <Label htmlFor="website">Website</Label>
               <Input
-                id="portfolio"
-                value={userDefaults.portfolio || ""}
-                onChange={(e) =>
-                  setUserDefaults((prev) => ({ ...prev, portfolio: e.target.value }))
-                }
+                id="website"
+                value={userDefaults.website || ""}
+                onChange={(e) => setUserDefaults((prev) => ({ ...prev, website: e.target.value }))}
                 placeholder="https://johndoe.com"
               />
             </div>
 
             <div className="space-y-2 col-span-2">
-              <Label htmlFor="summary">Professional Summary</Label>
-              <Input
-                id="summary"
-                value={userDefaults.summary || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, summary: e.target.value }))}
-                placeholder="Experienced software engineer specializing in..."
-              />
+              <Label htmlFor="accentColor">Accent Color (for document styling)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="accentColor"
+                  type="color"
+                  value={userDefaults.accentColor || "#3b82f6"}
+                  onChange={(e) =>
+                    setUserDefaults((prev) => ({ ...prev, accentColor: e.target.value }))
+                  }
+                  className="h-10 w-20"
+                />
+                <Input
+                  type="text"
+                  value={userDefaults.accentColor || "#3b82f6"}
+                  onChange={(e) =>
+                    setUserDefaults((prev) => ({ ...prev, accentColor: e.target.value }))
+                  }
+                  placeholder="#3b82f6"
+                  pattern="^#[0-9A-Fa-f]{6}$"
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                Choose a color to personalize your resumes and cover letters
+              </p>
             </div>
           </div>
         </CardContent>
