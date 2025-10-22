@@ -36,7 +36,7 @@ interface NavLink {
 const publicLinks: NavLink[] = [
   { to: ROUTES.HOME, label: "Home", icon: Home },
   { to: ROUTES.HOW_IT_WORKS, label: "How It Works", icon: HelpCircle },
-  { to: ROUTES.CONTENT_ITEMS, label: "Content Items", icon: FolderOpen },
+  { to: ROUTES.CONTENT_ITEMS, label: "Experience", icon: FolderOpen },
   { to: ROUTES.DOCUMENT_BUILDER, label: "Document Builder", icon: FileText },
   { to: ROUTES.AI_PROMPTS, label: "AI Prompts", icon: Sparkles },
   { to: ROUTES.SETTINGS, label: "Settings", icon: Settings },

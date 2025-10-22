@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react"
-import { db } from "@/config/firebase"
-import { collection, query, where, orderBy, limit, onSnapshot, Timestamp } from "firebase/firestore"
 import type { QueueItem } from "@jsdubzw/job-finder-shared-types"
 import {
   Table,
@@ -12,6 +9,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Loader2 } from "lucide-react"
+import { useQueueItems } from "@/hooks/useQueueItems"
 
 interface QueueStatusTableProps {
   userId: string
@@ -19,46 +17,8 @@ interface QueueStatusTableProps {
 }
 
 export function QueueStatusTable({ userId, maxItems = 10 }: QueueStatusTableProps) {
-  const [items, setItems] = useState<QueueItem[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!userId) {
-      setLoading(false)
-      return
-    }
-
-    // Set up real-time listener
-    const q = query(
-      collection(db, "job-queue"),
-      where("submitted_by", "==", userId),
-      orderBy("created_at", "desc"),
-      limit(maxItems)
-    )
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const queueItems = snapshot.docs.map((doc) => {
-        const data = doc.data()
-        return {
-          id: doc.id,
-          ...data,
-          created_at:
-            data.created_at instanceof Timestamp ? data.created_at.toDate() : data.created_at,
-          updated_at:
-            data.updated_at instanceof Timestamp ? data.updated_at.toDate() : data.updated_at,
-          processed_at:
-            data.processed_at instanceof Timestamp ? data.processed_at.toDate() : data.processed_at,
-          completed_at:
-            data.completed_at instanceof Timestamp ? data.completed_at.toDate() : data.completed_at,
-        } as QueueItem
-      })
-
-      setItems(queueItems)
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
-  }, [userId, maxItems])
+  // Use the new Firestore hook
+  const { queueItems: items, loading } = useQueueItems({ limit: maxItems })
 
   const getStatusBadge = (status: string) => {
     switch (status) {

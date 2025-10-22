@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { contentItemsClient } from "@/api"
 import type {
   ContentItem,
   ContentItemType,
   ContentItemWithChildren,
   CreateContentItemData,
 } from "@/types/content-items"
+import { useContentItems } from "@/hooks/useContentItems"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -24,7 +24,13 @@ import {
   Upload,
   AlertCircle,
 } from "lucide-react"
-import { CompanyList } from "./components/CompanyList"
+import {
+  CompanyList,
+  ProjectList,
+  SkillGroupList,
+  EducationList,
+  ProfileSectionList,
+} from "./components"
 import { ContentItemDialog } from "./components/ContentItemDialog"
 
 interface ContentStats {
@@ -39,8 +45,11 @@ interface ContentStats {
 
 export function ContentItemsPage() {
   const { user, isEditor } = useAuth()
+  
+  // Use the new Firestore hook
+  const { contentItems, loading, error: firestoreError, createContentItem, updateContentItem, deleteContentItem } = useContentItems()
+  
   const [hierarchy, setHierarchy] = useState<ContentItemWithChildren[]>([])
-  const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<ContentStats>({
     companies: 0,
     projects: 0,
@@ -56,36 +65,54 @@ export function ContentItemsPage() {
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null)
   const [selectedTab, setSelectedTab] = useState("companies")
 
-  // Load content items hierarchy
+  // Build hierarchy and calculate stats when content items change
   useEffect(() => {
-    if (!user) {
-      setLoading(false)
+    if (firestoreError) {
+      setAlert({
+        type: "error",
+        message: "Failed to load experience. Please try again.",
+      })
       return
     }
 
-    loadContentItems()
-  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+    // Filter to only show published and draft items
+    const filteredItems = contentItems.filter((item: any) => 
+      item.visibility === "published" || item.visibility === "draft"
+    )
 
-  const loadContentItems = async () => {
-    try {
-      setLoading(true)
-      const data = await contentItemsClient.getHierarchy({
-        visibility: ["published", "draft"],
-      })
-      setHierarchy(data)
+    // Build hierarchy
+    const newHierarchy = buildHierarchy(filteredItems as any)
+    setHierarchy(newHierarchy)
 
-      // Calculate stats
-      const newStats = calculateStats(data)
-      setStats(newStats)
-    } catch (error) {
-      console.error("Failed to load content items:", error)
-      setAlert({
-        type: "error",
-        message: "Failed to load content items. Please try again.",
-      })
-    } finally {
-      setLoading(false)
-    }
+    // Calculate stats
+    const newStats = calculateStats(newHierarchy)
+    setStats(newStats)
+  }, [contentItems, firestoreError])
+
+  // Build hierarchy from flat list of content items
+  const buildHierarchy = (items: ContentItem[]): ContentItemWithChildren[] => {
+    const itemsMap = new Map<string, ContentItemWithChildren>()
+    const rootItems: ContentItemWithChildren[] = []
+
+    // First pass: create map of all items
+    items.forEach((item) => {
+      itemsMap.set(item.id, { ...item, children: [] })
+    })
+
+    // Second pass: build parent-child relationships
+    items.forEach((item) => {
+      const itemWithChildren = itemsMap.get(item.id)!
+      if (item.parentId && itemsMap.has(item.parentId)) {
+        // Add to parent's children
+        const parent = itemsMap.get(item.parentId)!
+        parent.children!.push(itemWithChildren)
+      } else {
+        // Root level item (no parent or parent doesn't exist)
+        rootItems.push(itemWithChildren)
+      }
+    })
+
+    return rootItems
   }
 
   const calculateStats = (items: ContentItemWithChildren[]): ContentStats => {
@@ -147,25 +174,31 @@ export function ContentItemsPage() {
 
   const handleDeleteItem = async (id: string) => {
     try {
-      await contentItemsClient.deleteItem(id, true) // Delete children too
+      // Delete the item using the hook
+      await deleteContentItem(id)
+
+      // Also delete children (items with this parentId)
+      const children = contentItems.filter((item: any) => item.parentId === id)
+      const deletePromises = children.map((child: any) => deleteContentItem(child.id))
+      await Promise.all(deletePromises)
+
       setAlert({
         type: "success",
-        message: "Content item deleted successfully",
+        message: "Experience deleted successfully",
       })
-      await loadContentItems()
     } catch (error) {
       console.error("Failed to delete content item:", error)
       setAlert({
         type: "error",
-        message: "Failed to delete content item. Please try again.",
+        message: "Failed to delete experience. Please try again.",
       })
     }
   }
 
   const handleExportItems = async () => {
     try {
-      const items = await contentItemsClient.exportItems()
-      const dataStr = JSON.stringify(items, null, 2)
+      // Export content items from the hook data
+      const dataStr = JSON.stringify(contentItems, null, 2)
       const dataBlob = new Blob([dataStr], { type: "application/json" })
       const url = URL.createObjectURL(dataBlob)
       const link = document.createElement("a")
@@ -176,13 +209,13 @@ export function ContentItemsPage() {
 
       setAlert({
         type: "success",
-        message: `Exported ${items.length} content items`,
+        message: `Exported ${contentItems.length} items`,
       })
     } catch (error) {
       console.error("Failed to export content items:", error)
       setAlert({
         type: "error",
-        message: "Failed to export content items. Please try again.",
+        message: "Failed to export experience. Please try again.",
       })
     }
   }
@@ -203,20 +236,24 @@ export function ContentItemsPage() {
           const items = JSON.parse(text) as CreateContentItemData[]
 
           if (!Array.isArray(items)) {
-            throw new Error("Invalid file format: expected array of content items")
+            throw new Error("Invalid file format: expected array of experience items")
           }
 
-          const imported = await contentItemsClient.importItems(items)
+          // Import items using the hook
+          const importPromises = items.map((item) =>
+            createContentItem(item as any)
+          )
+          await Promise.all(importPromises)
+
           setAlert({
             type: "success",
-            message: `Imported ${imported.length} content items successfully`,
+            message: `Imported ${items.length} items successfully`,
           })
-          await loadContentItems()
         } catch (error) {
           console.error("Failed to import content items:", error)
           setAlert({
             type: "error",
-            message: error instanceof Error ? error.message : "Failed to import content items",
+            message: error instanceof Error ? error.message : "Failed to import experience",
           })
         }
       }
@@ -233,7 +270,6 @@ export function ContentItemsPage() {
 
   const handleDialogSave = async () => {
     setDialogOpen(false)
-    await loadContentItems()
     setAlert({
       type: "success",
       message: editingItem
@@ -246,13 +282,13 @@ export function ContentItemsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Content Items</h1>
-          <p className="text-muted-foreground mt-2">Please sign in to manage your content items</p>
+          <h1 className="text-3xl font-bold tracking-tight">Experience</h1>
+          <p className="text-muted-foreground mt-2">Please sign in to manage your experience</p>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            You need to be signed in to access content management features.
+            You need to be signed in to access experience management features.
           </AlertDescription>
         </Alert>
       </div>
@@ -263,14 +299,14 @@ export function ContentItemsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Content Items</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Experience</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your experience entries and reusable content
+            Manage your work experience, projects, skills, and education
           </p>
         </div>
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>You need editor permissions to manage content items.</AlertDescription>
+          <AlertDescription>You need editor permissions to manage experience.</AlertDescription>
         </Alert>
       </div>
     )
@@ -280,9 +316,9 @@ export function ContentItemsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Content Items</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Experience</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your experience entries and reusable content
+            Manage your work experience, projects, skills, and education
           </p>
         </div>
         <div className="flex gap-2">
@@ -451,23 +487,13 @@ export function ContentItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.flatMap(
+            <ProjectList
+              items={hierarchy.flatMap(
                 (item) => item.children?.filter((child) => child.type === "project") || []
-              ).length === 0 ? (
-                <p>No projects found. Click "Add Project" to get started.</p>
-              ) : (
-                <p>
-                  Project list component coming soon... (
-                  {
-                    hierarchy.flatMap(
-                      (item) => item.children?.filter((child) => child.type === "project") || []
-                    ).length
-                  }{" "}
-                  items)
-                </p>
               )}
-            </div>
+              onEdit={handleEditItem}
+              onDelete={handleDeleteItem}
+            />
           )}
         </TabsContent>
 
@@ -486,16 +512,11 @@ export function ContentItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter((item) => item.type === "skill-group").length === 0 ? (
-                <p>No skill groups found. Click "Add Skill Group" to get started.</p>
-              ) : (
-                <p>
-                  Skill group list component coming soon... (
-                  {hierarchy.filter((item) => item.type === "skill-group").length} items)
-                </p>
-              )}
-            </div>
+            <SkillGroupList
+              items={hierarchy.filter((item) => item.type === "skill-group")}
+              onEdit={handleEditItem}
+              onDelete={handleDeleteItem}
+            />
           )}
         </TabsContent>
 
@@ -514,16 +535,11 @@ export function ContentItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter((item) => item.type === "education").length === 0 ? (
-                <p>No education items found. Click "Add Education" to get started.</p>
-              ) : (
-                <p>
-                  Education list component coming soon... (
-                  {hierarchy.filter((item) => item.type === "education").length} items)
-                </p>
-              )}
-            </div>
+            <EducationList
+              items={hierarchy.filter((item) => item.type === "education")}
+              onEdit={handleEditItem}
+              onDelete={handleDeleteItem}
+            />
           )}
         </TabsContent>
 
@@ -542,16 +558,11 @@ export function ContentItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="border rounded-lg p-6 text-center text-muted-foreground">
-              {hierarchy.filter((item) => item.type === "profile-section").length === 0 ? (
-                <p>No profile sections found. Click "Add Profile Section" to get started.</p>
-              ) : (
-                <p>
-                  Profile section list component coming soon... (
-                  {hierarchy.filter((item) => item.type === "profile-section").length} items)
-                </p>
-              )}
-            </div>
+            <ProfileSectionList
+              items={hierarchy.filter((item) => item.type === "profile-section")}
+              onEdit={handleEditItem}
+              onDelete={handleDeleteItem}
+            />
           )}
         </TabsContent>
 

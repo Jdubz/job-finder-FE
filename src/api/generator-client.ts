@@ -65,6 +65,48 @@ export interface UserDefaults {
   summary?: string
 }
 
+export interface GenerationStep {
+  id: string
+  name: string
+  description: string
+  status: "pending" | "in_progress" | "completed" | "failed" | "skipped"
+  startedAt?: Date
+  completedAt?: Date
+  duration?: number
+  result?: {
+    resumeUrl?: string
+    coverLetterUrl?: string
+    [key: string]: unknown
+  }
+  error?: {
+    message: string
+    code?: string
+  }
+}
+
+export interface StartGenerationResponse {
+  success: boolean
+  data: {
+    requestId: string
+    status: string
+    nextStep?: string
+  }
+  requestId: string
+}
+
+export interface ExecuteStepResponse {
+  success: boolean
+  data: {
+    stepCompleted: string
+    nextStep?: string
+    status: string
+    resumeUrl?: string
+    coverLetterUrl?: string
+    steps?: GenerationStep[]
+  }
+  requestId: string
+}
+
 export class GeneratorClient extends BaseApiClient {
   /**
    * Generate a resume or cover letter
@@ -100,6 +142,22 @@ export class GeneratorClient extends BaseApiClient {
    */
   async deleteDocument(documentId: string): Promise<{ success: boolean }> {
     return this.delete<{ success: boolean }>(`/manageGenerator/${documentId}`)
+  }
+
+  /**
+   * Start multi-step document generation
+   * Returns requestId to track progress through steps
+   */
+  async startGeneration(request: GenerateDocumentRequest): Promise<StartGenerationResponse> {
+    return this.post<StartGenerationResponse>("/generator/start", request)
+  }
+
+  /**
+   * Execute the next step in a multi-step generation
+   * Call repeatedly until nextStep is null
+   */
+  async executeStep(requestId: string): Promise<ExecuteStepResponse> {
+    return this.post<ExecuteStepResponse>(`/generator/step/${requestId}`, {})
   }
 }
 

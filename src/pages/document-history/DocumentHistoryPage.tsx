@@ -17,7 +17,6 @@ import {
   Filter,
   RefreshCw,
 } from "lucide-react"
-import { generatorClient, type DocumentHistoryItem } from "@/api"
 import {
   Dialog,
   DialogContent,
@@ -33,15 +32,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useGeneratorDocuments, type GeneratorDocument } from "@/hooks/useGeneratorDocuments"
 
 type SortField = "createdAt" | "jobTitle" | "companyName" | "type"
 type SortOrder = "asc" | "desc"
 
 export function DocumentHistoryPage() {
-  const { isEditor, user } = useAuth()
-  const [documents, setDocuments] = useState<DocumentHistoryItem[]>([])
-  const [filteredDocuments, setFilteredDocuments] = useState<DocumentHistoryItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { isEditor } = useAuth()
+  
+  // Use the new Firestore hook
+  const { documents, loading: isLoading, error: firestoreError, deleteDocument } = useGeneratorDocuments()
+  
+  const [filteredDocuments, setFilteredDocuments] = useState<GeneratorDocument[]>([])
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -53,43 +55,34 @@ export function DocumentHistoryPage() {
 
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [documentToDelete, setDocumentToDelete] = useState<DocumentHistoryItem | null>(null)
+  const [documentToDelete, setDocumentToDelete] = useState<GeneratorDocument | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Set error from Firestore hook
   useEffect(() => {
-    loadDocuments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+    if (firestoreError) {
+      setError("Failed to load document history")
+      console.error("Error loading documents:", firestoreError)
+    }
+  }, [firestoreError])
 
   useEffect(() => {
     applyFiltersAndSort()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documents, searchTerm, filterType, sortField, sortOrder])
 
-  const loadDocuments = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const history = await generatorClient.getHistory(user?.uid)
-      setDocuments(history)
-    } catch (err) {
-      setError("Failed to load document history")
-      console.error("Error loading documents:", err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const applyFiltersAndSort = () => {
-    let filtered = [...documents]
+    // Filter out documents with missing required fields
+    let filtered = documents.filter(
+      (doc) => doc && doc.jobTitle && doc.companyName && doc.type && doc.createdAt
+    )
 
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (doc) =>
-          doc.jobTitle.toLowerCase().includes(term) || doc.companyName.toLowerCase().includes(term)
+          doc.jobTitle?.toLowerCase().includes(term) || doc.companyName?.toLowerCase().includes(term)
       )
     }
 
@@ -104,16 +97,16 @@ export function DocumentHistoryPage() {
 
       switch (sortField) {
         case "createdAt":
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
           break
         case "jobTitle":
-          comparison = a.jobTitle.localeCompare(b.jobTitle)
+          comparison = (a.jobTitle || "").localeCompare(b.jobTitle || "")
           break
         case "companyName":
-          comparison = a.companyName.localeCompare(b.companyName)
+          comparison = (a.companyName || "").localeCompare(b.companyName || "")
           break
         case "type":
-          comparison = a.type.localeCompare(b.type)
+          comparison = (a.type || "").localeCompare(b.type || "")
           break
       }
 
@@ -123,8 +116,13 @@ export function DocumentHistoryPage() {
     setFilteredDocuments(filtered)
   }
 
-  const handleDownload = async (document: DocumentHistoryItem) => {
+  const handleDownload = async (document: GeneratorDocument) => {
     try {
+      if (!document.documentUrl) {
+        setError("Document URL is not available")
+        return
+      }
+
       // Open the document URL in a new tab
       window.open(document.documentUrl, "_blank")
 
@@ -136,7 +134,7 @@ export function DocumentHistoryPage() {
     }
   }
 
-  const handleDeleteClick = (document: DocumentHistoryItem) => {
+  const handleDeleteClick = (document: GeneratorDocument) => {
     setDocumentToDelete(document)
     setDeleteDialogOpen(true)
   }
@@ -148,10 +146,8 @@ export function DocumentHistoryPage() {
     setError(null)
 
     try {
-      await generatorClient.deleteDocument(documentToDelete.id)
-
-      // Remove from local state
-      setDocuments((prev) => prev.filter((doc) => doc.id !== documentToDelete.id))
+      // Delete using Firestore service
+      await deleteDocument(documentToDelete.id)
 
       setSuccess("Document deleted successfully")
       setTimeout(() => setSuccess(null), 3000)
@@ -360,15 +356,15 @@ export function DocumentHistoryPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg mb-1">{document.jobTitle}</h3>
+                        <h3 className="font-semibold text-lg mb-1">{document.jobTitle || "Untitled"}</h3>
                         <div className="flex items-center gap-3 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
                             <Building2 className="h-4 w-4" />
-                            {document.companyName}
+                            {document.companyName || "Unknown Company"}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            {getRelativeTime(document.createdAt)}
+                            {document.createdAt ? getRelativeTime(document.createdAt) : "Unknown date"}
                           </span>
                         </div>
                       </div>
@@ -415,8 +411,8 @@ export function DocumentHistoryPage() {
           </DialogHeader>
           {documentToDelete && (
             <div className="py-4">
-              <p className="font-semibold">{documentToDelete.jobTitle}</p>
-              <p className="text-sm text-gray-600">{documentToDelete.companyName}</p>
+              <p className="font-semibold">{documentToDelete.jobTitle || "Untitled"}</p>
+              <p className="text-sm text-gray-600">{documentToDelete.companyName || "Unknown Company"}</p>
               <Badge variant="secondary" className="mt-2">
                 {documentToDelete.type === "resume" ? "Resume" : "Cover Letter"}
               </Badge>
