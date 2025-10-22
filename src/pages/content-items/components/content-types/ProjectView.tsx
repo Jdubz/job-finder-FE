@@ -3,7 +3,6 @@ import type { ProjectItem } from "../../../../types/content-items"
 import { formatMonthYear } from "../../../../utils/dateFormat"
 import { Badge } from "../../../../components/ui/badge"
 import { Folder, Calendar, ExternalLink } from "lucide-react"
-import { Separator } from "../../../../components/ui/separator"
 
 interface ProjectViewProps {
   item: ProjectItem

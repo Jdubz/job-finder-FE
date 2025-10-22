@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import type {
-  ContentItem as ContentItemType,
+  ContentItem as ContentItemTypeUnion,
+  ContentItemType,
   ContentItemWithChildren,
   UpdateContentItemData,
   CreateContentItemData,
@@ -15,7 +16,7 @@ import { ContentItem } from "./components/ContentItem"
 import { ContentItemDialog } from "./components/ContentItemDialog"
 
 export function ContentItemsPage() {
-  const { user, isEditor } = useAuth()
+  const { isEditor } = useAuth()
 
   const {
     contentItems,
@@ -30,7 +31,7 @@ export function ContentItemsPage() {
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<ContentItemType>("company")
-  const [preselectedParentId, setPreselectedParentId] = useState<string | null>(null)
+  const [, setPreselectedParentId] = useState<string | null>(null)
 
   // Auto-dismiss success alerts after 3 seconds
   useEffect(() => {
@@ -59,7 +60,7 @@ export function ContentItemsPage() {
   }, [contentItems, firestoreError])
 
   // Build hierarchy from flat list
-  const buildHierarchy = (items: ContentItemType[]): ContentItemWithChildren[] => {
+  const buildHierarchy = (items: ContentItemTypeUnion[]): ContentItemWithChildren[] => {
     const itemsMap = new Map<string, ContentItemWithChildren>()
     const rootItems: ContentItemWithChildren[] = []
 
@@ -324,19 +325,21 @@ export function ContentItemsPage() {
       )}
 
       {/* Create Content Dialog */}
-      <ContentItemDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        type={dialogType}
-        onSave={() => {
-          setDialogOpen(false)
-          setPreselectedParentId(null)
-          setAlert({
-            type: "success",
-            message: "Item created successfully",
-          })
-        }}
-      />
+      {dialogOpen && (
+        <ContentItemDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          type={dialogType}
+          onSave={() => {
+            setDialogOpen(false)
+            setPreselectedParentId(null)
+            setAlert({
+              type: "success",
+              message: "Item created successfully",
+            })
+          }}
+        />
+      )}
     </div>
   )
 }
