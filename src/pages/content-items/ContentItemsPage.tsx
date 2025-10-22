@@ -29,7 +29,7 @@ export function ContentItemsPage() {
   const [hierarchy, setHierarchy] = useState<ContentItemWithChildren[]>([])
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [preselectedType, setPreselectedType] = useState<string | undefined>(undefined)
+  const [dialogType, setDialogType] = useState<ContentItemType>("company")
   const [preselectedParentId, setPreselectedParentId] = useState<string | null>(null)
 
   // Build hierarchy when content items change
@@ -115,13 +115,13 @@ export function ContentItemsPage() {
 
   const handleAddChild = (parentId: string, childType: string) => {
     setPreselectedParentId(parentId)
-    setPreselectedType(childType)
+    setDialogType(childType as ContentItemType)
     setDialogOpen(true)
   }
 
   const handleCreateNew = () => {
     setPreselectedParentId(null)
-    setPreselectedType(undefined)
+    setDialogType("company")
     setDialogOpen(true)
   }
 
@@ -287,35 +287,17 @@ export function ContentItemsPage() {
 
       {/* Create Content Dialog */}
       <ContentItemDialog
-        isOpen={dialogOpen}
-        onClose={() => {
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        type={dialogType}
+        onSave={() => {
           setDialogOpen(false)
-          setPreselectedType(undefined)
           setPreselectedParentId(null)
+          setAlert({
+            type: "success",
+            message: "Item created successfully",
+          })
         }}
-        onCreate={async (data) => {
-          try {
-            // Add parentId if creating a child
-            if (preselectedParentId) {
-              data.parentId = preselectedParentId
-            }
-            await createContentItem(data)
-            setDialogOpen(false)
-            setPreselectedType(undefined)
-            setPreselectedParentId(null)
-            setAlert({
-              type: "success",
-              message: "Item created successfully",
-            })
-          } catch (error) {
-            console.error("Failed to create content item:", error)
-            setAlert({
-              type: "error",
-              message: "Failed to create item. Please try again.",
-            })
-          }
-        }}
-        preselectedType={preselectedType}
       />
     </div>
   )

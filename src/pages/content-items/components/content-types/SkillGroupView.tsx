@@ -29,7 +29,7 @@ export const SkillGroupView: React.FC<SkillGroupViewProps> = ({ item }) => {
                 {subcategory.name}:
               </p>
               <p className="text-base">
-                {subcategory.skills.join(", ")}
+                {subcategory.skills?.join(", ") || ""}
               </p>
             </div>
           ))}
