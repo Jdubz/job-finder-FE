@@ -1,6 +1,9 @@
 import React from "react"
 import type { CompanyItem } from "../../../../types/content-items"
 import { formatMonthYear } from "../../../../utils/dateFormat"
+import { Badge } from "../../../../components/ui/badge"
+import { Building2, MapPin, Calendar, ExternalLink } from "lucide-react"
+import { Separator } from "../../../../components/ui/separator"
 
 interface CompanyViewProps {
   item: CompanyItem
@@ -8,78 +11,82 @@ interface CompanyViewProps {
 
 export const CompanyView: React.FC<CompanyViewProps> = ({ item }) => {
   return (
-    <div>
-      {/* Date Range */}
-      <p className="text-sm font-bold text-primary uppercase tracking-wide mb-2">
-        {formatMonthYear(item.startDate)} – {formatMonthYear(item.endDate)}
-      </p>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-5 w-5 text-primary" />
+          <h3 className="text-xl font-semibold">{item.company}</h3>
+          {item.website && (
+            <a
+              href={item.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/80 transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
 
-      {/* Company Name */}
-      <h2 className="text-2xl md:text-3xl font-bold mb-2">
-        {item.company}
-      </h2>
+        {item.role && <p className="text-base font-medium text-muted-foreground">{item.role}</p>}
 
-      {/* Location */}
-      {item.location && (
-        <p className="text-sm text-muted-foreground mb-2">
-          {item.location}
-        </p>
-      )}
-
-      {/* Role */}
-      {item.role && (
-        <p className="text-base text-muted-foreground italic mb-3">
-          {item.role}
-        </p>
-      )}
+        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Calendar className="h-4 w-4" />
+            <span>
+              {formatMonthYear(item.startDate)} – {item.endDate ? formatMonthYear(item.endDate) : "Present"}
+            </span>
+          </div>
+          {item.location && (
+            <div className="flex items-center gap-1">
+              <MapPin className="h-4 w-4" />
+              <span>{item.location}</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Summary */}
       {item.summary && (
-        <p className="text-base mb-3 leading-relaxed">
-          {item.summary}
-        </p>
+        <>
+          <Separator />
+          <p className="text-sm leading-relaxed text-muted-foreground">{item.summary}</p>
+        </>
       )}
 
       {/* Accomplishments */}
       {item.accomplishments && item.accomplishments.length > 0 && (
-        <div className="mb-4">
-          <ul className="pl-5 m-0 list-disc">
-            {item.accomplishments.map((accomplishment, idx) => (
-              <li
-                key={idx}
-                className="mb-3 leading-relaxed"
-              >
-                <span className="text-base">{accomplishment}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <>
+          <Separator />
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Key Accomplishments</h4>
+            <ul className="space-y-2 list-disc list-inside">
+              {item.accomplishments.map((accomplishment, idx) => (
+                <li key={idx} className="text-sm text-muted-foreground leading-relaxed">
+                  {accomplishment}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
 
       {/* Technologies */}
       {item.technologies && item.technologies.length > 0 && (
-        <div className="mb-4">
-          <span className="text-sm font-bold text-muted-foreground mr-2">
-            Skills:
-          </span>
-          <span className="text-sm text-muted-foreground">
-            {item.technologies.join(", ")}
-          </span>
-        </div>
-      )}
-
-      {/* Website */}
-      {item.website && (
-        <div className="mb-2">
-          <a
-            href={item.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-primary no-underline hover:underline"
-          >
-            {item.website}
-          </a>
-        </div>
+        <>
+          <Separator />
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Technologies</h4>
+            <div className="flex flex-wrap gap-1">
+              {item.technologies.map((tech) => (
+                <Badge key={tech} variant="secondary" className="text-xs">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   )

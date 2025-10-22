@@ -1,6 +1,9 @@
 import React from "react"
 import type { ProjectItem } from "../../../../types/content-items"
 import { formatMonthYear } from "../../../../utils/dateFormat"
+import { Badge } from "../../../../components/ui/badge"
+import { Folder, Calendar, ExternalLink } from "lucide-react"
+import { Separator } from "../../../../components/ui/separator"
 
 interface ProjectViewProps {
   item: ProjectItem
@@ -8,46 +11,42 @@ interface ProjectViewProps {
 
 export const ProjectView: React.FC<ProjectViewProps> = ({ item }) => {
   return (
-    <div>
-      {/* Date Range (if provided) */}
-      {item.startDate && (
-        <p className="text-sm font-bold text-primary uppercase tracking-wide mb-2">
-          {formatMonthYear(item.startDate)} – {formatMonthYear(item.endDate)}
-        </p>
-      )}
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <Folder className="h-4 w-4 text-primary" />
+          <h4 className="text-base font-semibold">{item.name}</h4>
+        </div>
 
-      {/* Project Name */}
-      <h3 className="text-xl md:text-2xl font-bold mb-2">
-        {item.name}
-      </h3>
+        {item.role && <p className="text-sm text-muted-foreground italic">{item.role}</p>}
 
-      {/* Role */}
-      {item.role && (
-        <p className="text-sm text-muted-foreground italic mb-3">
-          {item.role}
-        </p>
-      )}
+        {item.startDate && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
+            <span>
+              {formatMonthYear(item.startDate)} – {item.endDate ? formatMonthYear(item.endDate) : "Present"}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Description */}
-      <p className="text-base mb-3 leading-relaxed">
-        {item.description}
-      </p>
+      <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p>
 
       {/* Context */}
       {item.context && (
-        <p className="text-sm text-muted-foreground italic mb-3">
-          {item.context}
-        </p>
+        <p className="text-xs italic text-muted-foreground border-l-2 pl-2 border-muted">{item.context}</p>
       )}
 
       {/* Accomplishments */}
       {item.accomplishments && item.accomplishments.length > 0 && (
-        <div className="mb-4">
-          <p className="text-sm font-bold text-muted-foreground mb-1">Accomplishments:</p>
-          <ul className="pl-5 m-0 list-disc">
+        <div className="space-y-1">
+          <h5 className="text-xs font-medium">Accomplishments</h5>
+          <ul className="space-y-1 list-disc list-inside">
             {item.accomplishments.map((accomplishment, idx) => (
-              <li key={idx} className="mb-2 leading-relaxed">
-                <span className="text-base">{accomplishment}</span>
+              <li key={idx} className="text-xs text-muted-foreground leading-relaxed">
+                {accomplishment}
               </li>
             ))}
           </ul>
@@ -56,12 +55,12 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ item }) => {
 
       {/* Challenges */}
       {item.challenges && item.challenges.length > 0 && (
-        <div className="mb-4">
-          <p className="text-sm font-bold text-muted-foreground mb-1">Challenges:</p>
-          <ul className="pl-5 m-0 list-disc">
+        <div className="space-y-1">
+          <h5 className="text-xs font-medium">Challenges</h5>
+          <ul className="space-y-1 list-disc list-inside">
             {item.challenges.map((challenge, idx) => (
-              <li key={idx} className="mb-2 leading-relaxed">
-                <span className="text-base">{challenge}</span>
+              <li key={idx} className="text-xs text-muted-foreground leading-relaxed">
+                {challenge}
               </li>
             ))}
           </ul>
@@ -70,28 +69,28 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ item }) => {
 
       {/* Technologies */}
       {item.technologies && item.technologies.length > 0 && (
-        <div className="mb-4">
-          <span className="text-sm font-bold text-muted-foreground mr-2">
-            Technologies:
-          </span>
-          <span className="text-sm text-muted-foreground">
-            {item.technologies.join(", ")}
-          </span>
+        <div className="flex flex-wrap gap-1">
+          {item.technologies.map((tech) => (
+            <Badge key={tech} variant="outline" className="text-xs">
+              {tech}
+            </Badge>
+          ))}
         </div>
       )}
 
       {/* Links */}
       {item.links && item.links.length > 0 && (
-        <div className="mt-2">
+        <div className="flex flex-wrap gap-2">
           {item.links.map((link, idx) => (
             <a
               key={idx}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block text-sm text-primary mr-3 no-underline hover:underline"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
             >
               {link.label}
+              <ExternalLink className="h-3 w-3" />
             </a>
           ))}
         </div>
