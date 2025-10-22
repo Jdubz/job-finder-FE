@@ -29,11 +29,6 @@ const AIPromptsPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("@/pages/settings/SettingsPage").then((m) => ({ default: m.SettingsPage }))
 )
-const DocumentHistoryPage = lazy(() =>
-  import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
-    default: m.DocumentHistoryPage,
-  }))
-)
 const JobApplicationsPage = lazy(() =>
   import("@/pages/job-applications/JobApplicationsPage").then((m) => ({
     default: m.JobApplicationsPage,
@@ -123,14 +118,6 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <DocumentBuilderPage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.DOCUMENT_HISTORY,
-            element: (
-              <LazyPage>
-                <DocumentHistoryPage />
               </LazyPage>
             ),
           },
