@@ -2,7 +2,11 @@ import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { jobMatchesClient } from "@/api/job-matches-client"
-import { generatorClient, type GenerateDocumentRequest, type GenerationStep } from "@/api/generator-client"
+import {
+  generatorClient,
+  type GenerateDocumentRequest,
+  type GenerationStep,
+} from "@/api/generator-client"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +44,7 @@ export function DocumentBuilderPage() {
 
   // Multi-step generation state
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([])
-  const [generationRequestId, setGenerationRequestId] = useState<string | null>(null)
+  const [_generationRequestId, setGenerationRequestId] = useState<string | null>(null)
   const [resumeUrl, setResumeUrl] = useState<string | null>(null)
   const [coverLetterUrl, setCoverLetterUrl] = useState<string | null>(null)
 
@@ -300,7 +304,12 @@ export function DocumentBuilderPage() {
                       </div>
                     ) : jobMatches.length === 0 ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
-                        No job matches found. Add jobs in Job Finder first.
+                        <div className="space-y-2">
+                          <p>No job matches found.</p>
+                          <p className="text-xs">
+                            You can still generate documents by entering job details manually below.
+                          </p>
+                        </div>
                       </div>
                     ) : (
                       jobMatches.map((match) => (
@@ -321,6 +330,12 @@ export function DocumentBuilderPage() {
                   <p className="text-sm text-muted-foreground">
                     Match Score: {selectedMatch.matchScore}% • Analyzed{" "}
                     {new Date(selectedMatch.analyzedAt).toLocaleDateString()}
+                  </p>
+                )}
+                {jobMatches.length === 0 && !loadingMatches && (
+                  <p className="text-sm text-muted-foreground">
+                    💡 Tip: Use the Job Finder to analyze job postings and get AI-powered match
+                    scores.
                   </p>
                 )}
               </div>
