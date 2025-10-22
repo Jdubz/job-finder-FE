@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search, Download, Eye, Trash2, Calendar, FileText } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/contexts/AuthContext"
 import { useGeneratorDocuments, type DocumentHistoryItem } from "@/hooks/useGeneratorDocuments"
 
 export function DocumentHistoryPage() {
