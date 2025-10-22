@@ -42,16 +42,12 @@ export function JobApplicationsPage() {
       return
     }
 
-    // Editors see all matches, regular users see only their own
-    const userIdFilter = isEditor ? null : user.uid
+    console.log("JobApplicationsPage: Subscribing to job matches for all users")
+    console.log("  Current user:", user.uid)
 
-    console.log("JobApplicationsPage: Subscribing to job matches")
-    console.log("  User:", user.uid)
-    console.log("  Is Editor:", isEditor)
-    console.log("  Filter by user:", userIdFilter ? "Yes" : "No (showing all)")
-
+    // All authenticated users see all matches (no userId filtering)
     const unsubscribe = jobMatchesClient.subscribeToMatches(
-      userIdFilter,
+      null, // No user filtering - show all matches
       (updatedMatches) => {
         console.log("JobApplicationsPage: Received job matches:", updatedMatches.length, "matches")
         if (updatedMatches.length > 0) {
@@ -78,7 +74,7 @@ export function JobApplicationsPage() {
       console.log("JobApplicationsPage: Unsubscribing from job matches")
       unsubscribe()
     }
-  }, [user, isEditor])
+  }, [user])
 
   // Apply filters and sorting
   useEffect(() => {
