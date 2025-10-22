@@ -37,26 +37,33 @@ export function JobApplicationsPage() {
   // Subscribe to real-time job matches
   useEffect(() => {
     if (!user) {
+      console.log("JobApplicationsPage: No user, skipping subscription")
       setLoading(false)
       return
     }
 
+    console.log("JobApplicationsPage: Subscribing to job matches for user:", user.uid)
+
     const unsubscribe = jobMatchesClient.subscribeToMatches(
       user.uid,
       (updatedMatches) => {
+        console.log("JobApplicationsPage: Received job matches:", updatedMatches.length, "matches")
         setMatches(updatedMatches)
         setLoading(false)
         setError(null) // Clear any previous errors
       },
       undefined,
       (err) => {
+        console.error("JobApplicationsPage: Job matches subscription error:", err)
         setError("Failed to load job matches. Please refresh the page.")
         setLoading(false)
-        console.error("Job matches subscription error:", err)
       }
     )
 
-    return () => unsubscribe()
+    return () => {
+      console.log("JobApplicationsPage: Unsubscribing from job matches")
+      unsubscribe()
+    }
   }, [user])
 
   // Apply filters and sorting
