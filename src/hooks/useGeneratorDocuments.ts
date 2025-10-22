@@ -4,7 +4,7 @@
  * Hook for managing generated documents (resume/cover letter history)
  */
 
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useFirestore } from "@/contexts/FirestoreContext"
 import { useFirestoreCollection } from "./useFirestoreCollection"
@@ -95,8 +95,11 @@ export function useGeneratorDocuments(): UseGeneratorDocumentsResult {
     enabled: !!user?.uid,
   })
 
-  // Transform documents for UI display
-  const documents = transformDocuments(rawDocuments as GeneratorDocument[])
+  // Transform documents for UI display (memoized to prevent infinite loops)
+  const documents = useMemo(
+    () => transformDocuments(rawDocuments as GeneratorDocument[]),
+    [rawDocuments]
+  )
 
   /**
    * Delete a generator document
