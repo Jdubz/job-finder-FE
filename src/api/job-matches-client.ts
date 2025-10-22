@@ -98,15 +98,17 @@ export class JobMatchesClient {
    * Subscribe to real-time updates for job matches
    */
   subscribeToMatches(
-    userId: string,
+    userId: string | null,
     callback: (matches: JobMatch[]) => void,
     filters?: JobMatchFilters,
     onError?: (error: Error) => void
   ): Unsubscribe {
     let q: Query = collection(db, this.collectionName)
 
-    // Filter by user ID
-    q = query(q, where("submittedBy", "==", userId))
+    // Filter by user ID (if provided - omit for editors to see all)
+    if (userId) {
+      q = query(q, where("submittedBy", "==", userId))
+    }
 
     // Apply filters
     if (filters?.minScore !== undefined) {
