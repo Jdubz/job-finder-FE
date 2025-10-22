@@ -52,6 +52,11 @@ const SystemHealthPage = lazy(() =>
     default: m.SystemHealthPage,
   }))
 )
+const DocumentHistoryPage = lazy(() =>
+  import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
+    default: m.DocumentHistoryPage,
+  }))
+)
 const UnauthorizedPage = lazy(() =>
   import("@/pages/auth/UnauthorizedPage").then((m) => ({ default: m.UnauthorizedPage }))
 )
@@ -181,6 +186,14 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <SystemHealthPage />
+              </LazyPage>
+            ),
+          },
+          {
+            path: ROUTES.DOCUMENT_HISTORY,
+            element: (
+              <LazyPage>
+                <DocumentHistoryPage />
               </LazyPage>
             ),
           },
