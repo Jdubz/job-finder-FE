@@ -244,13 +244,6 @@ export class FirestoreService {
     const collectionRef = collection(this.db, collectionName)
     const queryConstraints = buildQueryConstraints(constraints)
     
-    // Debug logging
-    console.log("🔥 FirestoreService.subscribeToCollection:", {
-      collection: collectionName,
-      constraints,
-      queryConstraintsCount: queryConstraints.length,
-    })
-    
     const q = queryConstraints.length > 0 
       ? query(collectionRef, ...queryConstraints)
       : collectionRef
@@ -266,20 +259,9 @@ export class FirestoreService {
           } as DocumentWithId<CollectionTypeMap[K]>
         })
         
-        // Debug logging
-        console.log("🔥 FirestoreService.subscribeToCollection - received:", {
-          collection: collectionName,
-          docCount: documents.length,
-          sampleDoc: documents[0],
-        })
-        
         onData(documents)
       },
       (error) => {
-        console.error("🔥 FirestoreService.subscribeToCollection - error:", {
-          collection: collectionName,
-          error: error.message,
-        })
         onError(error as Error)
       }
     )

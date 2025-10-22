@@ -42,9 +42,6 @@ export function useGeneratorDocuments(): UseGeneratorDocumentsResult {
   const { user } = useAuth()
   const { service } = useFirestore()
 
-  // Debug logging
-  console.log("🔍 useGeneratorDocuments - user.uid:", user?.uid)
-
   // Subscribe to ALL generator documents (no userId filter - editors see everything)
   const { data: documents, loading, error, refetch } = useFirestoreCollection({
     collectionName: "generator-documents" as any,
@@ -54,14 +51,6 @@ export function useGeneratorDocuments(): UseGeneratorDocumentsResult {
         }
       : undefined,
     enabled: !!user?.uid,
-  })
-
-  // Debug logging
-  console.log("🔍 useGeneratorDocuments - results:", {
-    count: documents.length,
-    loading,
-    error: error?.message,
-    sampleDoc: documents[0],
   })
 
   /**

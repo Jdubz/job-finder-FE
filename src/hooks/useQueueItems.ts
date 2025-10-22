@@ -33,9 +33,6 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
   const { service } = useFirestore()
   const { limit: maxItems = 50, status } = options
 
-  // Debug logging
-  console.log("🔍 useQueueItems - user.uid:", user?.uid, "status filter:", status)
-
   // Build query constraints - NO userId filter, editors see all queue items
   const constraints = user?.uid
     ? {
@@ -50,14 +47,6 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
     collectionName: "job-queue",
     constraints,
     enabled: !!user?.uid,
-  })
-
-  // Debug logging
-  console.log("🔍 useQueueItems - results:", {
-    count: queueItems.length,
-    loading,
-    error: error?.message,
-    sampleDoc: queueItems[0],
   })
 
   /**

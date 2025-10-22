@@ -28,9 +28,6 @@ export function useContentItems(): UseContentItemsResult {
   const { user } = useAuth()
   const { service } = useFirestore()
 
-  // Debug logging
-  console.log("🔍 useContentItems - user.uid:", user?.uid)
-
   // Subscribe to ALL content items (no userId filter - editors see everything)
   const { data: contentItems, loading, error, refetch } = useFirestoreCollection({
     collectionName: "content-items",
@@ -40,14 +37,6 @@ export function useContentItems(): UseContentItemsResult {
         }
       : undefined,
     enabled: !!user?.uid,
-  })
-
-  // Debug logging
-  console.log("🔍 useContentItems - results:", {
-    count: contentItems.length,
-    loading,
-    error: error?.message,
-    sampleDoc: contentItems[0],
   })
 
   /**
