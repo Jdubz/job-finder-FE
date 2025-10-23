@@ -125,15 +125,21 @@ export function DocumentBuilderPage() {
     setGenerationRequestId(null)
 
     try {
+      // Map UI document type to backend generateType
+      const generateType = documentType === "resume" ? "resume" : "coverLetter"
+
       const request: GenerateDocumentRequest = {
-        type: documentType,
+        generateType,
+        job: {
+          role: customJobTitle,
+          company: customCompanyName,
+          jobDescriptionText: customJobDescription || undefined,
+        },
         jobMatchId: selectedJobMatchId || undefined,
-        jobTitle: customJobTitle,
-        companyName: customCompanyName,
-        jobDescription: customJobDescription || undefined,
-        customization: targetSummary
+        date: new Date().toLocaleDateString(), // Client's local date for cover letter
+        preferences: targetSummary
           ? {
-              targetSummary,
+              emphasize: [targetSummary], // Use targetSummary as emphasis preference
             }
           : undefined,
       }

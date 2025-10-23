@@ -1,12 +1,23 @@
 import path from "path"
 import { defineConfig } from "vitest/config"
 import react from "@vitejs/plugin-react"
+import { consoleLogger } from "./vite-plugin-console-logger"
+import { jsonLogger } from "./vite-plugin-json-logger"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    consoleLogger({
+      backendUrl: "http://localhost:5000",
+    }),
+    jsonLogger({
+      serviceName: "job-finder-frontend",
+      logFile: path.resolve(__dirname, "../dev-monitor/logs/job-finder-frontend.log"),
+    }),
+  ],
   server: {
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 5173,
   },
   resolve: {
@@ -20,9 +31,9 @@ export default defineConfig({
         // Add content hash to filenames for cache-busting
         entryFileNames: `assets/[name].[hash].js`,
         chunkFileNames: `assets/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`
-      }
-    }
+        assetFileNames: `assets/[name].[hash].[ext]`,
+      },
+    },
   },
   test: {
     globals: true,

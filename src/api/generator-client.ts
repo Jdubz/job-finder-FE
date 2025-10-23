@@ -7,32 +7,29 @@
 
 import { BaseApiClient } from "./base-client"
 
+/**
+ * Request payload for generating documents
+ * IMPORTANT: Must match the backend schema in generator.ts (generateRequestSchema)
+ *
+ * The backend fetches personal info, experiences, and blurbs from Firestore automatically.
+ * The frontend only needs to provide job details and preferences.
+ */
 export interface GenerateDocumentRequest {
-  type: "resume" | "cover_letter"
-  jobMatchId?: string
-  jobUrl?: string
-  jobTitle?: string
-  companyName?: string
-  jobDescription?: string
-  customization?: {
-    targetSummary?: string
-    skillsPriority?: string[]
-    experienceHighlights?: Array<{
-      company: string
-      title: string
-      pointsToEmphasize: string[]
-    }>
-    projectsToInclude?: Array<{
-      name: string
-      whyRelevant: string
-      pointsToHighlight: string[]
-    }>
+  generateType: "resume" | "coverLetter" | "both"
+  provider?: "openai" | "gemini"
+  job: {
+    role: string
+    company: string
+    companyWebsite?: string
+    jobDescriptionUrl?: string
+    jobDescriptionText?: string
   }
   preferences?: {
-    provider?: "openai" | "gemini"
-    tone?: string
-    includeProjects?: boolean
+    style?: "modern" | "traditional" | "technical" | "executive"
+    emphasize?: string[]
   }
+  date?: string // Client's local date string for cover letter
+  jobMatchId?: string // Reference to job-match document ID
 }
 
 export interface GenerateDocumentResponse {
@@ -163,4 +160,4 @@ export class GeneratorClient extends BaseApiClient {
 
 // Export singleton instance
 import { api } from "@/config/api"
-export const generatorClient = new GeneratorClient(api.baseUrl)
+export const generatorClient = new GeneratorClient(api.functions.manageGenerator)

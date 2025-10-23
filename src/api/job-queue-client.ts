@@ -77,4 +77,4 @@ export class JobQueueClient extends BaseApiClient {
 
 // Export singleton instance
 import { api } from "@/config/api"
-export const jobQueueClient = new JobQueueClient(api.baseUrl)
+export const jobQueueClient = new JobQueueClient(api.functions.manageJobQueue)
