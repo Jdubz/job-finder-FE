@@ -85,8 +85,21 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
   const canRetry = item.status === "failed" || item.status === "skipped"
   const canCancel = item.status === "pending" || item.status === "processing"
 
+  const getStatusBorderClass = () => {
+    switch (item.status) {
+      case "processing":
+        return "border-l-4 border-l-blue-500"
+      case "success":
+        return "border-l-4 border-l-green-500 bg-green-50/30 dark:bg-green-950/10"
+      case "failed":
+        return "border-l-4 border-l-red-500"
+      default:
+        return ""
+    }
+  }
+
   return (
-    <Card className={`transition-colors ${selected ? "ring-2 ring-primary" : ""}`}>
+    <Card className={`transition-all duration-300 ease-in-out hover:shadow-md ${selected ? "ring-2 ring-primary shadow-lg" : ""} ${getStatusBorderClass()}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <input

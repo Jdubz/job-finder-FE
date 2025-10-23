@@ -2,7 +2,11 @@ import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { jobMatchesClient } from "@/api/job-matches-client"
-import { generatorClient, type GenerateDocumentRequest } from "@/api/generator-client"
+import {
+  generatorClient,
+  type GenerateDocumentRequest,
+  type GenerationStep,
+} from "@/api/generator-client"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,8 +23,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, FileText, Sparkles } from "lucide-react"
+import { Loader2, FileText, Sparkles, Download } from "lucide-react"
 import { DocumentHistoryList } from "./components/DocumentHistoryList"
+import { GenerationProgress } from "@/components/GenerationProgress"
 
 export function DocumentBuilderPage() {
   const { user } = useAuth()
@@ -36,6 +41,12 @@ export function DocumentBuilderPage() {
   const [loadingMatches, setLoadingMatches] = useState(true)
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [refreshHistory, setRefreshHistory] = useState(0)
+
+  // Multi-step generation state
+  const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([])
+  const [_generationRequestId, setGenerationRequestId] = useState<string | null>(null)
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null)
+  const [coverLetterUrl, setCoverLetterUrl] = useState<string | null>(null)
 
   // Load job matches
   useEffect(() => {
@@ -108,42 +119,90 @@ export function DocumentBuilderPage() {
 
     setLoading(true)
     setAlert(null)
+    setGenerationSteps([])
+    setResumeUrl(null)
+    setCoverLetterUrl(null)
+    setGenerationRequestId(null)
 
     try {
+      // Map UI document type to backend generateType
+      const generateType = documentType === "resume" ? "resume" : "coverLetter"
+
       const request: GenerateDocumentRequest = {
-        type: documentType,
+        generateType,
+        job: {
+          role: customJobTitle,
+          company: customCompanyName,
+          jobDescriptionText: customJobDescription || undefined,
+        },
         jobMatchId: selectedJobMatchId || undefined,
-        jobTitle: customJobTitle,
-        companyName: customCompanyName,
-        jobDescription: customJobDescription || undefined,
-        customization: targetSummary
+        date: new Date().toLocaleDateString(), // Client's local date for cover letter
+        preferences: targetSummary
           ? {
-              targetSummary,
+              emphasize: [targetSummary], // Use targetSummary as emphasis preference
             }
           : undefined,
       }
 
-      const response = await generatorClient.generateDocument(request)
+      // Step 1: Start generation
+      const startResponse = await generatorClient.startGeneration(request)
 
-      if (response.success) {
-        setAlert({
-          type: "success",
-          message: `${documentType === "resume" ? "Resume" : "Cover letter"} generated successfully!`,
-        })
-        // Refresh history
-        setRefreshHistory((prev) => prev + 1)
-        // Reset form
-        setSelectedJobMatchId("")
-        setCustomJobTitle("")
-        setCustomCompanyName("")
-        setCustomJobDescription("")
-        setTargetSummary("")
-      } else {
+      if (!startResponse.success) {
         setAlert({
           type: "error",
-          message: response.error || "Failed to generate document",
+          message: "Failed to start generation",
         })
+        return
       }
+
+      setGenerationRequestId(startResponse.data.requestId)
+
+      // Step 2: Execute steps until complete
+      let nextStep = startResponse.data.nextStep
+      while (nextStep) {
+        const stepResponse = await generatorClient.executeStep(startResponse.data.requestId)
+
+        // Update steps if provided
+        if (stepResponse.data.steps) {
+          setGenerationSteps(stepResponse.data.steps)
+        }
+
+        // Update URLs as they become available
+        if (stepResponse.data.resumeUrl) {
+          setResumeUrl(stepResponse.data.resumeUrl)
+        }
+        if (stepResponse.data.coverLetterUrl) {
+          setCoverLetterUrl(stepResponse.data.coverLetterUrl)
+        }
+
+        // Check for next step
+        nextStep = stepResponse.data.nextStep
+
+        // If generation failed, show error
+        if (!stepResponse.success) {
+          setAlert({
+            type: "error",
+            message: "Generation failed during step execution",
+          })
+          return
+        }
+      }
+
+      // Step 3: Mark complete
+      setAlert({
+        type: "success",
+        message: `${documentType === "resume" ? "Resume" : "Cover letter"} generated successfully!`,
+      })
+
+      // Refresh history
+      setRefreshHistory((prev) => prev + 1)
+
+      // Reset form
+      setSelectedJobMatchId("")
+      setCustomJobTitle("")
+      setCustomCompanyName("")
+      setCustomJobDescription("")
+      setTargetSummary("")
     } catch (error) {
       console.error("Generation error:", error)
       setAlert({
@@ -191,6 +250,35 @@ export function DocumentBuilderPage() {
                 </Alert>
               )}
 
+              {/* Generation Progress */}
+              {generationSteps.length > 0 && (
+                <div className="space-y-4">
+                  <GenerationProgress steps={generationSteps} />
+
+                  {/* Download Buttons */}
+                  {(resumeUrl || coverLetterUrl) && (
+                    <div className="flex gap-3 justify-center">
+                      {resumeUrl && (
+                        <Button asChild variant="outline" size="sm">
+                          <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Resume
+                          </a>
+                        </Button>
+                      )}
+                      {coverLetterUrl && (
+                        <Button asChild variant="outline" size="sm">
+                          <a href={coverLetterUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Cover Letter
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Document Type Selection */}
               <div className="space-y-2">
                 <Label>Document Type</Label>
@@ -222,7 +310,12 @@ export function DocumentBuilderPage() {
                       </div>
                     ) : jobMatches.length === 0 ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
-                        No job matches found. Add jobs in Job Finder first.
+                        <div className="space-y-2">
+                          <p>No job matches found.</p>
+                          <p className="text-xs">
+                            You can still generate documents by entering job details manually below.
+                          </p>
+                        </div>
                       </div>
                     ) : (
                       jobMatches.map((match) => (
@@ -243,6 +336,12 @@ export function DocumentBuilderPage() {
                   <p className="text-sm text-muted-foreground">
                     Match Score: {selectedMatch.matchScore}% • Analyzed{" "}
                     {new Date(selectedMatch.analyzedAt).toLocaleDateString()}
+                  </p>
+                )}
+                {jobMatches.length === 0 && !loadingMatches && (
+                  <p className="text-sm text-muted-foreground">
+                    💡 Tip: Use the Job Finder to analyze job postings and get AI-powered match
+                    scores.
                   </p>
                 )}
               </div>

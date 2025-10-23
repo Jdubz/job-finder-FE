@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobQueueClient } from "@/api"
-import type { QueueItem, QueueStats } from "@jsdubzw/job-finder-shared-types"
+import type { QueueItem, QueueStats } from "@jdubzw/job-finder-shared-types"
+import { useQueueItems } from "@/hooks/useQueueItems"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RefreshCw, Search, Filter, RotateCcw, Trash2, AlertCircle, Activity } from "lucide-react"
 import { QueueItemCard } from "./components/QueueItemCard"
@@ -30,10 +31,12 @@ interface QueueFiltersType {
 
 export function QueueManagementPage() {
   const { user, isEditor } = useAuth()
-  const [queueItems, setQueueItems] = useState<QueueItem[]>([])
+  
+  // Use the queue items hook (will show all items since editors can see all)
+  const { queueItems, loading, error, updateQueueItem } = useQueueItems({ limit: 1000 })
+  
   const [filteredItems, setFilteredItems] = useState<QueueItem[]>([])
   const [queueStats, setQueueStats] = useState<QueueStats | null>(null)
-  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
@@ -43,19 +46,33 @@ export function QueueManagementPage() {
   const [sortBy, setSortBy] = useState<string>("created_at")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
-  // Load initial data
+  // Calculate stats when queue items change
   useEffect(() => {
-    if (!user || !isEditor) {
-      setLoading(false)
+    if (error) {
+      setAlert({
+        type: "error",
+        message: "Failed to load queue data. Please try again.",
+      })
+      setRefreshing(false)
       return
     }
 
-    loadQueueData()
-
-    // Set up auto-refresh every 30 seconds
-    const interval = setInterval(loadQueueData, 30000)
-    return () => clearInterval(interval)
-  }, [user, isEditor])
+    // Calculate stats locally
+    const stats: QueueStats = {
+      total: queueItems.length,
+      pending: queueItems.filter((i: any) => i.status === "pending").length,
+      processing: queueItems.filter((i: any) => i.status === "processing").length,
+      success: queueItems.filter((i: any) => i.status === "success").length,
+      failed: queueItems.filter((i: any) => i.status === "failed").length,
+      skipped: queueItems.filter((i: any) => i.status === "skipped").length,
+      filtered: queueItems.filter((i: any) => i.status === "filtered").length,
+    }
+    setQueueStats(stats)
+    setRefreshing(false)
+    if (queueItems.length > 0) {
+      setAlert(null)
+    }
+  }, [queueItems, error])
 
   // Apply filters when items or filters change
   useEffect(() => {
@@ -63,31 +80,11 @@ export function QueueManagementPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queueItems, filters, sortBy, sortOrder])
 
-  const loadQueueData = async () => {
-    try {
-      const [items, stats] = await Promise.all([
-        jobQueueClient.getQueueItems(),
-        jobQueueClient.getQueueStats(),
-      ])
-
-      setQueueItems(items)
-      setQueueStats(stats)
-      setAlert(null)
-    } catch (error) {
-      console.error("Failed to load queue data:", error)
-      setAlert({
-        type: "error",
-        message: "Failed to load queue data. Please try again.",
-      })
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }
-
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setRefreshing(true)
-    await loadQueueData()
+    // Real-time listener will handle the refresh
+    // Just show visual feedback that we're "refreshing"
+    setTimeout(() => setRefreshing(false), 500)
   }
 
   const applyFilters = () => {
@@ -148,12 +145,18 @@ export function QueueManagementPage() {
 
   const handleRetryItem = async (id: string) => {
     try {
-      await jobQueueClient.retryQueueItem(id)
+      // Update the queue item to pending status for retry
+      await updateQueueItem(id, {
+        status: "pending",
+        result_message: "Queued for retry",
+        processed_at: null as any,
+        completed_at: null as any,
+      })
+
       setAlert({
         type: "success",
         message: "Queue item queued for retry",
       })
-      await loadQueueData()
     } catch (error) {
       console.error("Failed to retry item:", error)
       setAlert({
@@ -165,12 +168,17 @@ export function QueueManagementPage() {
 
   const handleCancelItem = async (id: string) => {
     try {
-      await jobQueueClient.cancelQueueItem(id)
+      // Update the queue item to cancelled status
+      await updateQueueItem(id, {
+        status: "skipped",
+        result_message: "Cancelled by user",
+        completed_at: new Date() as any,
+      })
+
       setAlert({
         type: "success",
         message: "Queue item cancelled",
       })
-      await loadQueueData()
     } catch (error) {
       console.error("Failed to cancel item:", error)
       setAlert({
@@ -184,9 +192,22 @@ export function QueueManagementPage() {
     if (selectedItems.size === 0) return
 
     try {
-      const promises = Array.from(selectedItems).map((id) =>
-        action === "retry" ? jobQueueClient.retryQueueItem(id) : jobQueueClient.cancelQueueItem(id)
-      )
+      const promises = Array.from(selectedItems).map((id) => {
+        if (action === "retry") {
+          return updateQueueItem(id, {
+            status: "pending",
+            result_message: "Queued for retry",
+            processed_at: null as any,
+            completed_at: null as any,
+          })
+        } else {
+          return updateQueueItem(id, {
+            status: "skipped",
+            result_message: "Cancelled by user",
+            completed_at: new Date() as any,
+          })
+        }
+      })
 
       await Promise.all(promises)
       setAlert({
@@ -194,7 +215,6 @@ export function QueueManagementPage() {
         message: `${action === "retry" ? "Retried" : "Cancelled"} ${selectedItems.size} items`,
       })
       setSelectedItems(new Set())
-      await loadQueueData()
     } catch {
       setAlert({
         type: "error",
@@ -241,8 +261,17 @@ export function QueueManagementPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-          <p className="text-muted-foreground mt-2">Monitor and manage the job processing queue</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
+            <Badge variant="outline" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Live
+            </Badge>
+          </div>
+          <p className="text-muted-foreground mt-2">Monitor and manage the job processing queue in real-time</p>
         </div>
 
         <div className="flex items-center gap-2">

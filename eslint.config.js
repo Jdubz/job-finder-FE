@@ -7,12 +7,22 @@ import { defineConfig, globalIgnores } from "eslint/config"
 import prettierConfig from "eslint-config-prettier"
 
 export default defineConfig([
-  globalIgnores(["dist", "node_modules", "build", ".vite"]),
+  globalIgnores([
+    "dist",
+    "node_modules",
+    "build",
+    ".vite",
+    "*.config.js",
+    "*.config.ts",
+    "tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+  ]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      ...tseslint.configs.recommended,
       reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
       prettierConfig,
@@ -22,8 +32,29 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      // TypeScript strict rules
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+
+      // React rules
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
+      // General code quality
+      "no-console": ["warn", { allow: ["warn", "error", "log"] }],
+      "prefer-const": "error",
+      "no-var": "error",
     },
   },
 ])

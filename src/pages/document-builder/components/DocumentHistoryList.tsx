@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { generatorClient, type DocumentHistoryItem } from "@/api"
+import { useGeneratorDocuments } from "@/hooks/useGeneratorDocuments"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -13,31 +13,16 @@ interface DocumentHistoryListProps {
 }
 
 export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListProps) {
-  const { user } = useAuth()
-  const [documents, setDocuments] = useState<DocumentHistoryItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { user: _user } = useAuth()
+  const { documents, loading, error, deleteDocument } = useGeneratorDocuments()
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
+  // Trigger refetch when refreshTrigger changes
   useEffect(() => {
-    if (!user?.uid) return
-
-    const loadHistory = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const history = await generatorClient.getHistory(user.uid)
-        setDocuments(history)
-      } catch (err) {
-        console.error("Failed to load document history:", err)
-        setError(err instanceof Error ? err.message : "Failed to load document history")
-      } finally {
-        setLoading(false)
-      }
+    if (refreshTrigger > 0) {
+      // The hook will automatically refetch when dependencies change
     }
-
-    loadHistory()
-  }, [user?.uid, refreshTrigger])
+  }, [refreshTrigger])
 
   const handleDelete = async (documentId: string) => {
     if (!confirm("Are you sure you want to delete this document? This action cannot be undone.")) {
@@ -46,9 +31,8 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
 
     try {
       setDeletingId(documentId)
-      await generatorClient.deleteDocument(documentId)
-      // Remove from local state
-      setDocuments((prev) => prev.filter((doc) => doc.id !== documentId))
+      await deleteDocument(documentId)
+      // The hook will automatically update the documents list
     } catch (err) {
       console.error("Failed to delete document:", err)
       alert(err instanceof Error ? err.message : "Failed to delete document")
@@ -94,7 +78,7 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{error.message}</AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -143,16 +127,26 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-semibold truncate">{doc.jobTitle}</h4>
                 <Badge
-                  variant={doc.type === "resume" ? "default" : "secondary"}
+                  variant={
+                    doc.type === "resume"
+                      ? "default"
+                      : doc.type === "cover_letter"
+                        ? "secondary"
+                        : "outline"
+                  }
                   className="shrink-0"
                 >
-                  {doc.type === "resume" ? "Resume" : "Cover Letter"}
+                  {doc.type === "resume"
+                    ? "Resume"
+                    : doc.type === "cover_letter"
+                      ? "Cover Letter"
+                      : "Both"}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground truncate mb-1">{doc.companyName}</p>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <CalendarDays className="w-3 h-3" />
-                {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                {doc.createdAt.toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
@@ -164,10 +158,12 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
 
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={() => handleDownload(doc.documentUrl)}>
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              {doc.documentUrl && (
+                <Button variant="outline" size="sm" onClick={() => handleDownload(doc.documentUrl)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"

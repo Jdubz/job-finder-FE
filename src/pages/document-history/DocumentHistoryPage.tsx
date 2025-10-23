@@ -1,31 +1,8 @@
 import { useState, useEffect } from "react"
-import { useAuth } from "@/contexts/AuthContext"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Loader2,
-  FileText,
-  Download,
-  Trash2,
-  Search,
-  Calendar,
-  Building2,
-  Filter,
-  RefreshCw,
-} from "lucide-react"
-import { generatorClient, type DocumentHistoryItem } from "@/api"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -33,416 +10,243 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-type SortField = "createdAt" | "jobTitle" | "companyName" | "type"
-type SortOrder = "asc" | "desc"
+import { Search, Download, Eye, Trash2, Calendar, FileText } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useGeneratorDocuments, type DocumentHistoryItem } from "@/hooks/useGeneratorDocuments"
 
 export function DocumentHistoryPage() {
-  const { isEditor, user } = useAuth()
-  const [documents, setDocuments] = useState<DocumentHistoryItem[]>([])
+  const { user: _user } = useAuth()
+  const { documents: allDocuments, loading, error, deleteDocument } = useGeneratorDocuments()
   const [filteredDocuments, setFilteredDocuments] = useState<DocumentHistoryItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-
-  // Filter and search state
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState<"all" | "resume" | "cover_letter">("all")
-  const [sortField, setSortField] = useState<SortField>("createdAt")
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+  const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Delete confirmation dialog
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [documentToDelete, setDocumentToDelete] = useState<DocumentHistoryItem | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-
+  // Filter documents based on search and filters
   useEffect(() => {
-    loadDocuments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
+    let filtered = allDocuments
 
-  useEffect(() => {
-    applyFiltersAndSort()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documents, searchTerm, filterType, sortField, sortOrder])
-
-  const loadDocuments = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const history = await generatorClient.getHistory(user?.uid)
-      setDocuments(history)
-    } catch (err) {
-      setError("Failed to load document history")
-      console.error("Error loading documents:", err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const applyFiltersAndSort = () => {
-    let filtered = [...documents]
-
-    // Apply search filter
+    // Search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (doc) =>
-          doc.jobTitle.toLowerCase().includes(term) || doc.companyName.toLowerCase().includes(term)
+          doc.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          doc.companyName.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
-    // Apply type filter
-    if (filterType !== "all") {
-      filtered = filtered.filter((doc) => doc.type === filterType)
+    // Type filter
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((doc) => doc.type === typeFilter)
     }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let comparison = 0
-
-      switch (sortField) {
-        case "createdAt":
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          break
-        case "jobTitle":
-          comparison = a.jobTitle.localeCompare(b.jobTitle)
-          break
-        case "companyName":
-          comparison = a.companyName.localeCompare(b.companyName)
-          break
-        case "type":
-          comparison = a.type.localeCompare(b.type)
-          break
-      }
-
-      return sortOrder === "asc" ? comparison : -comparison
-    })
 
     setFilteredDocuments(filtered)
-  }
+  }, [allDocuments, searchTerm, typeFilter])
 
-  const handleDownload = async (document: DocumentHistoryItem) => {
-    try {
-      // Open the document URL in a new tab
-      window.open(document.documentUrl, "_blank")
-
-      setSuccess(`Downloading ${document.type === "resume" ? "resume" : "cover letter"}...`)
-      setTimeout(() => setSuccess(null), 3000)
-    } catch (err) {
-      setError("Failed to download document")
-      console.error("Error downloading document:", err)
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "cover-letter":
+        return "📝"
+      case "resume":
+        return "📄"
+      case "application":
+        return "📋"
+      default:
+        return "📄"
     }
   }
 
-  const handleDeleteClick = (document: DocumentHistoryItem) => {
-    setDocumentToDelete(document)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleDeleteConfirm = async () => {
-    if (!documentToDelete) return
-
-    setIsDeleting(true)
-    setError(null)
-
-    try {
-      await generatorClient.deleteDocument(documentToDelete.id)
-
-      // Remove from local state
-      setDocuments((prev) => prev.filter((doc) => doc.id !== documentToDelete.id))
-
-      setSuccess("Document deleted successfully")
-      setTimeout(() => setSuccess(null), 3000)
-      setDeleteDialogOpen(false)
-      setDocumentToDelete(null)
-    } catch (err) {
-      setError("Failed to delete document")
-      console.error("Error deleting document:", err)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    }).format(new Date(date))
+    })
   }
 
-  const getRelativeTime = (date: Date) => {
-    const now = new Date()
-    const diffMs = now.getTime() - new Date(date).getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 60) return `${diffMins}m ago`
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffDays < 30) return `${diffDays}d ago`
-    return formatDate(date)
+  const handleDownload = (documentUrl: string) => {
+    // Open in new tab for download
+    window.open(documentUrl, "_blank")
   }
 
-  const handleRefresh = () => {
-    loadDocuments()
+  const handleView = (documentUrl: string) => {
+    // Open in new tab for viewing
+    window.open(documentUrl, "_blank")
   }
 
-  if (!isEditor) {
+  const handleDelete = async (documentId: string) => {
+    if (!confirm("Are you sure you want to delete this document? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      setDeletingId(documentId)
+      await deleteDocument(documentId)
+    } catch (err) {
+      console.error("Failed to delete document:", err)
+      alert(err instanceof Error ? err.message : "Failed to delete document")
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertDescription>
-            You do not have permission to access document history. Editor role required.
-          </AlertDescription>
-        </Alert>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-muted-foreground">Loading document history...</div>
       </div>
     )
   }
 
-  if (isLoading) {
+  if (error) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Document History</h1>
-          <p className="text-gray-600 mt-2">View and manage your generated documents</p>
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-12 w-12 rounded" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-1/3" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                  <Skeleton className="h-9 w-24" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="container mx-auto py-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center text-destructive">
+              <h3 className="text-lg font-semibold mb-2">Error loading documents</h3>
+              <p>{error.message}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Document History</h1>
-            <p className="text-gray-600 mt-2">
-              View and manage your generated resumes and cover letters
-            </p>
-          </div>
-          <Button onClick={handleRefresh} variant="outline">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Document History</h1>
+          <p className="text-muted-foreground">View and manage your generated documents</p>
         </div>
       </div>
 
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert className="mb-4 bg-green-50 border-green-200">
-          <AlertDescription className="text-green-800">{success}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Filters and Search */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+          <CardDescription>Filter your documents by search term, status, or type</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search by job title or company..."
+                  placeholder="Search documents..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
             </div>
-
-            {/* Type Filter */}
-            <Select
-              value={filterType}
-              onValueChange={(value: "all" | "resume" | "cover_letter") => setFilterType(value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="resume">Resumes</SelectItem>
-                <SelectItem value="cover_letter">Cover Letters</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Sort */}
-            <Select
-              value={`${sortField}-${sortOrder}`}
-              onValueChange={(value) => {
-                const [field, order] = value.split("-")
-                setSortField(field as SortField)
-                setSortOrder(order as SortOrder)
-              }}
-            >
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt-desc">Newest First</SelectItem>
-                <SelectItem value="createdAt-asc">Oldest First</SelectItem>
-                <SelectItem value="jobTitle-asc">Job Title (A-Z)</SelectItem>
-                <SelectItem value="jobTitle-desc">Job Title (Z-A)</SelectItem>
-                <SelectItem value="companyName-asc">Company (A-Z)</SelectItem>
-                <SelectItem value="companyName-desc">Company (Z-A)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Type</label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="cover_letter">Cover Letter</SelectItem>
+                  <SelectItem value="resume">Resume</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Results Summary */}
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          Showing {filteredDocuments.length} of {documents.length} document
-          {documents.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-
-      {/* Document List */}
-      {filteredDocuments.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No documents found</h3>
-            <p className="text-gray-600">
-              {searchTerm || filterType !== "all"
-                ? "Try adjusting your filters or search terms"
-                : "Generate your first document to get started"}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {filteredDocuments.map((document) => (
+      {/* Documents List */}
+      <div className="space-y-4">
+        {filteredDocuments.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No documents found</h3>
+              <p className="text-muted-foreground text-center">
+                {searchTerm || typeFilter !== "all"
+                  ? "Try adjusting your filters to see more results."
+                  : "Start by creating your first document in the Document Builder."}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          filteredDocuments.map((document) => (
             <Card key={document.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Icon */}
-                  <div
-                    className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
-                      document.type === "resume"
-                        ? "bg-blue-100 text-blue-600"
-                        : "bg-purple-100 text-purple-600"
-                    }`}
-                  >
-                    <FileText className="h-6 w-6" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{getTypeIcon(document.type)}</span>
                       <div>
-                        <h3 className="font-semibold text-lg mb-1">{document.jobTitle}</h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <Building2 className="h-4 w-4" />
-                            {document.companyName}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {getRelativeTime(document.createdAt)}
-                          </span>
-                        </div>
+                        <h3 className="text-lg font-semibold">{document.jobTitle}</h3>
+                        <p className="text-sm text-muted-foreground">{document.companyName}</p>
                       </div>
-                      <Badge
-                        variant={document.type === "resume" ? "default" : "secondary"}
-                        className="ml-2"
-                      >
-                        {document.type === "resume" ? "Resume" : "Cover Letter"}
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(document.createdAt.toISOString())}
+                      </div>
+                      <Badge variant={document.status === "completed" ? "default" : "secondary"}>
+                        {document.status}
                       </Badge>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-2 mt-4">
-                      <Button onClick={() => handleDownload(document)} size="sm" variant="outline">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                      <Button
-                        onClick={() => handleDeleteClick(document)}
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
-                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {document.documentUrl && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleView(document.documentUrl)}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(document.documentUrl)}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(document.id)}
+                      disabled={deletingId === document.id}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Document</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this document? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          {documentToDelete && (
-            <div className="py-4">
-              <p className="font-semibold">{documentToDelete.jobTitle}</p>
-              <p className="text-sm text-gray-600">{documentToDelete.companyName}</p>
-              <Badge variant="secondary" className="mt-2">
-                {documentToDelete.type === "resume" ? "Resume" : "Cover Letter"}
-              </Badge>
-            </div>
-          )}
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={isDeleting}>
-              {isDeleting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Summary */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              Showing {filteredDocuments.length} of {allDocuments.length} documents
+            </span>
+            <span>Last updated: {new Date().toLocaleString()}</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

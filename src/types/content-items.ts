@@ -62,6 +62,7 @@ export interface CompanyItem extends BaseContentItem {
   accomplishments?: string[]
   technologies?: string[]
   notes?: string
+  relatedBlurbIds?: string[] // References to text-section items (portfolio migration compatibility)
 }
 
 /**

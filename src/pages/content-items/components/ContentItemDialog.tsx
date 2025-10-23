@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
-import { contentItemsClient } from "@/api"
+import { useAuth } from "@/contexts/AuthContext"
+import { db } from "@/config/firebase"
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore"
 import type {
   ContentItem,
   ContentItemType,
@@ -44,6 +46,7 @@ export function ContentItemDialog({
   item,
   onSave,
 }: ContentItemDialogProps) {
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
@@ -336,9 +339,19 @@ export function ContentItemDialog({
       }
 
       if (item) {
-        await contentItemsClient.updateItem(item.id, data as UpdateContentItemData)
+        // Update existing item in Firestore
+        await updateDoc(doc(db, "content-items", item.id), {
+          ...data,
+          updatedAt: serverTimestamp(),
+        })
       } else {
-        await contentItemsClient.createItem(data as CreateContentItemData)
+        // Create new item in Firestore
+        await addDoc(collection(db, "content-items"), {
+          ...data,
+          userId: user?.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        })
       }
 
       onSave()

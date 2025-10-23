@@ -294,4 +294,4 @@ export class ContentItemsClient extends BaseApiClient {
 
 // Create singleton instance
 import { api } from "@/config/api"
-export const contentItemsClient = new ContentItemsClient(api.baseUrl)
+export const contentItemsClient = new ContentItemsClient(api.functions.manageContentItems)

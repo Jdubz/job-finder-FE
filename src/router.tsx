@@ -29,11 +29,6 @@ const AIPromptsPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("@/pages/settings/SettingsPage").then((m) => ({ default: m.SettingsPage }))
 )
-const DocumentHistoryPage = lazy(() =>
-  import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
-    default: m.DocumentHistoryPage,
-  }))
-)
 const JobApplicationsPage = lazy(() =>
   import("@/pages/job-applications/JobApplicationsPage").then((m) => ({
     default: m.JobApplicationsPage,
@@ -55,6 +50,11 @@ const JobFinderConfigPage = lazy(() =>
 const SystemHealthPage = lazy(() =>
   import("@/pages/system-health/SystemHealthPage").then((m) => ({
     default: m.SystemHealthPage,
+  }))
+)
+const DocumentHistoryPage = lazy(() =>
+  import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
+    default: m.DocumentHistoryPage,
   }))
 )
 const UnauthorizedPage = lazy(() =>
@@ -127,14 +127,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: ROUTES.DOCUMENT_HISTORY,
-            element: (
-              <LazyPage>
-                <DocumentHistoryPage />
-              </LazyPage>
-            ),
-          },
-          {
             path: ROUTES.SETTINGS,
             element: (
               <LazyPage>
@@ -194,6 +186,14 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <SystemHealthPage />
+              </LazyPage>
+            ),
+          },
+          {
+            path: ROUTES.DOCUMENT_HISTORY,
+            element: (
+              <LazyPage>
+                <DocumentHistoryPage />
               </LazyPage>
             ),
           },
