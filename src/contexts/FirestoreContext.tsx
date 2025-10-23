@@ -74,7 +74,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       const cached = collectionCache.current.get(key)
       if (cached) {
         // Return cached data immediately
-        onData(cached.data)
+        onData(cached.data as DocumentWithId<CollectionTypeMap[K]>[])
 
         // Return a no-op unsubscribe since we're sharing the subscription
         return () => {
@@ -137,7 +137,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       const cached = documentCache.current.get(key)
       if (cached) {
         // Return cached data immediately
-        onData(cached.data)
+        onData(cached.data as DocumentWithId<CollectionTypeMap[K]> | null)
 
         // Return a no-op unsubscribe since we're sharing the subscription
         return () => {
@@ -217,7 +217,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       cacheKey: string
     ): DocumentWithId<CollectionTypeMap[K]>[] | null => {
       const entry = collectionCache.current.get(cacheKey)
-      return entry ? entry.data : null
+      return entry ? (entry.data as DocumentWithId<CollectionTypeMap[K]>[]) : null
     },
     []
   )

@@ -60,12 +60,13 @@ export function QueueManagementPage() {
     // Calculate stats locally
     const stats: QueueStats = {
       total: queueItems.length,
-      pending: queueItems.filter((i: QueueItem) => i.status === "pending").length,
-      processing: queueItems.filter((i: QueueItem) => i.status === "processing").length,
-      success: queueItems.filter((i: QueueItem) => i.status === "success").length,
-      failed: queueItems.filter((i: QueueItem) => i.status === "failed").length,
-      skipped: queueItems.filter((i: QueueItem) => i.status === "skipped").length,
-      filtered: queueItems.filter((i: QueueItem) => i.status === "filtered").length,
+      pending: queueItems.filter((i) => i.status === "pending").length,
+      processing: queueItems.filter((i) => i.status === "processing").length,
+      success: queueItems.filter((i) => i.status === "success").length,
+      failed: queueItems.filter((i) => i.status === "failed").length,
+      skipped: queueItems.filter((i) => i.status === "skipped").length,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filtered: queueItems.filter((i) => (i as any).status === "filtered").length,
     }
     setQueueStats(stats)
     setRefreshing(false)
@@ -116,9 +117,9 @@ export function QueueManagementPage() {
     // Apply sorting
     filtered.sort((a, b) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let aValue: any = a[sortBy as keyof QueueItem]
+      let aValue: any = (a as any)[sortBy]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let bValue: any = b[sortBy as keyof QueueItem]
+      let bValue: any = (b as any)[sortBy]
 
       // Handle dates
       if (aValue instanceof Date) {
@@ -140,7 +141,7 @@ export function QueueManagementPage() {
       }
     })
 
-    setFilteredItems(filtered)
+    setFilteredItems(filtered as QueueItem[])
   }
 
   const handleRetryItem = async (id: string) => {

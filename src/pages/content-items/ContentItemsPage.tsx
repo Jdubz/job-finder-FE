@@ -55,7 +55,7 @@ export function ContentItemsPage() {
       (item) => item.visibility === "published" || item.visibility === "draft"
     )
 
-    const newHierarchy = buildHierarchy(filteredItems)
+    const newHierarchy = buildHierarchy(filteredItems as unknown as ContentItemTypeUnion[])
     setHierarchy(newHierarchy)
   }, [contentItems, firestoreError])
 
@@ -183,7 +183,16 @@ export function ContentItemsPage() {
             throw new Error("Invalid file format")
           }
 
-          await Promise.all(items.map((item) => createContentItem(item)))
+          await Promise.all(
+            items.map((item) =>
+              createContentItem({
+                ...item,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                visibility: (item.visibility || "draft") as any,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any)
+            )
+          )
 
           setAlert({
             type: "success",
