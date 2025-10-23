@@ -105,7 +105,12 @@ export const ProjectEdit: React.FC<ProjectEditProps> = ({ data, onChange }) => {
         onChange={(value) =>
           onChange({
             ...projectData,
-            technologies: value ? value.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            technologies: value
+              ? value
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter(Boolean)
+              : [],
           })
         }
         placeholder="React, Node.js, MongoDB"

@@ -2,28 +2,22 @@ import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { ROUTES } from "@/types/routes"
 import { cn } from "@/lib/utils"
-import { 
-  Menu, 
-  Home, 
-  HelpCircle, 
-  FileText, 
-  Settings, 
+import {
+  Menu,
+  Home,
+  HelpCircle,
+  FileText,
+  Settings,
   Briefcase,
   ListChecks,
   Activity,
   Sparkles,
-  FolderOpen
+  FolderOpen,
 } from "lucide-react"
 import { useState } from "react"
 import { AuthIcon } from "@/components/auth/AuthIcon"
 import { AuthModalDebug as AuthModal } from "@/components/auth/AuthModalDebug"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
@@ -71,9 +65,7 @@ export function Navigation() {
         className={cn(
           "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
           "hover:bg-accent hover:text-accent-foreground",
-          isActive(link.to)
-            ? "bg-primary/10 text-primary font-semibold"
-            : "text-muted-foreground"
+          isActive(link.to) ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground"
         )}
       >
         <Icon className="h-4 w-4" />
@@ -112,11 +104,7 @@ export function Navigation() {
                         Main
                       </h4>
                       {publicLinks.map((link) => (
-                        <NavLink
-                          key={link.to}
-                          link={link}
-                          onClick={() => setDrawerOpen(false)}
-                        />
+                        <NavLink key={link.to} link={link} onClick={() => setDrawerOpen(false)} />
                       ))}
                     </div>
 
@@ -124,7 +112,7 @@ export function Navigation() {
                     {isEditor && (
                       <>
                         <Separator />
-                        
+
                         <div className="space-y-1">
                           <h4 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Job Finder Tools

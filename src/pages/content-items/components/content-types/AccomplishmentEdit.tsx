@@ -1,5 +1,8 @@
 import React from "react"
-import type { UpdateContentItemData, UpdateAccomplishmentData } from "../../../../types/content-items"
+import type {
+  UpdateContentItemData,
+  UpdateAccomplishmentData,
+} from "../../../../types/content-items"
 import { FormField } from "../FormField"
 
 interface AccomplishmentEditProps {
@@ -53,7 +56,12 @@ export const AccomplishmentEdit: React.FC<AccomplishmentEditProps> = ({ data, on
         onChange={(value) =>
           onChange({
             ...accomplishmentData,
-            technologies: value ? value.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            technologies: value
+              ? value
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter(Boolean)
+              : [],
           })
         }
       />

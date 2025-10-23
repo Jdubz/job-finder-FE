@@ -38,9 +38,7 @@ export function ProfileSectionList({ items, onEdit, onDelete }: ProfileSectionLi
     return (
       <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
         <User className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground mb-2">
-          No Profile Sections Yet
-        </h3>
+        <h3 className="text-lg font-medium text-muted-foreground mb-2">No Profile Sections Yet</h3>
         <p className="text-sm text-muted-foreground">
           Add profile sections to build your professional narrative.
         </p>
@@ -53,7 +51,8 @@ export function ProfileSectionList({ items, onEdit, onDelete }: ProfileSectionLi
       {items.map((item) => {
         const section = item as ProfileSectionItem & { children?: ContentItemWithChildren[] }
         const isExpanded = expandedSections.has(section.id)
-        const hasStructuredData = section.structuredData && Object.keys(section.structuredData).length > 0
+        const hasStructuredData =
+          section.structuredData && Object.keys(section.structuredData).length > 0
 
         return (
           <Card key={section.id} className="relative">

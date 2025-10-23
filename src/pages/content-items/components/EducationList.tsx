@@ -208,11 +208,7 @@ export function EducationList({ items, onEdit, onDelete }: EducationListProps) {
                     )}
                     {education.credentialUrl && (
                       <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={education.credentialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <a href={education.credentialUrl} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3 w-3 mr-1" />
                           View Credential
                         </a>

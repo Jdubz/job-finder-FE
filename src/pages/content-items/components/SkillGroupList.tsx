@@ -81,8 +81,7 @@ export function SkillGroupList({ items, onEdit, onDelete }: SkillGroupListProps)
       {items.map((item) => {
         const skillGroup = item as SkillGroupItem & { children?: ContentItemWithChildren[] }
         const isExpanded = expandedGroups.has(skillGroup.id)
-        const hasSubcategories =
-          skillGroup.subcategories && skillGroup.subcategories.length > 0
+        const hasSubcategories = skillGroup.subcategories && skillGroup.subcategories.length > 0
 
         return (
           <Card key={skillGroup.id} className="relative">
@@ -138,9 +137,7 @@ export function SkillGroupList({ items, onEdit, onDelete }: SkillGroupListProps)
                           <ProficiencyIcon level={proficiency} />
                           {skill}
                           {proficiency && (
-                            <span className="ml-1 text-[10px] opacity-70">
-                              ({proficiency})
-                            </span>
+                            <span className="ml-1 text-[10px] opacity-70">({proficiency})</span>
                           )}
                         </Badge>
                       )

@@ -35,7 +35,8 @@ export const CompanyView: React.FC<CompanyViewProps> = ({ item }) => {
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <span>
-              {formatMonthYear(item.startDate)} – {item.endDate ? formatMonthYear(item.endDate) : "Present"}
+              {formatMonthYear(item.startDate)} –{" "}
+              {item.endDate ? formatMonthYear(item.endDate) : "Present"}
             </span>
           </div>
           {item.location && (

@@ -38,11 +38,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <DialogDescription>{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
+          <Button type="button" variant="outline" onClick={onCancel}>
             {cancelLabel}
           </Button>
           <Button

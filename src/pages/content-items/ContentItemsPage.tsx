@@ -24,7 +24,7 @@ export function ContentItemsPage() {
     error: firestoreError,
     createContentItem,
     updateContentItem,
-    deleteContentItem
+    deleteContentItem,
   } = useContentItems()
 
   const [hierarchy, setHierarchy] = useState<ContentItemWithChildren[]>([])
@@ -51,8 +51,8 @@ export function ContentItemsPage() {
       return
     }
 
-    const filteredItems = contentItems.filter((item) =>
-      item.visibility === "published" || item.visibility === "draft"
+    const filteredItems = contentItems.filter(
+      (item) => item.visibility === "published" || item.visibility === "draft"
     )
 
     const newHierarchy = buildHierarchy(filteredItems)
@@ -221,9 +221,7 @@ export function ContentItemsPage() {
       >
         {/* Render children if they exist */}
         {item.children && item.children.length > 0 && (
-          <div className="mt-4">
-            {item.children.map((child) => renderItemWithChildren(child))}
-          </div>
+          <div className="mt-4">{item.children.map((child) => renderItemWithChildren(child))}</div>
         )}
       </ContentItem>
     )
@@ -253,7 +251,9 @@ export function ContentItemsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold tracking-tight">Experience</h1>
-            <p className="text-muted-foreground mt-2">Manage your professional experience and portfolio</p>
+            <p className="text-muted-foreground mt-2">
+              Manage your professional experience and portfolio
+            </p>
           </div>
           {isEditor && (
             <Button onClick={handleCreateNew}>
@@ -319,9 +319,7 @@ export function ContentItemsPage() {
 
       {/* Other Content (Skills, Education, etc.) */}
       {otherItems.length > 0 && (
-        <div className="space-y-4">
-          {otherItems.map((item) => renderItemWithChildren(item))}
-        </div>
+        <div className="space-y-4">{otherItems.map((item) => renderItemWithChildren(item))}</div>
       )}
 
       {/* Create Content Dialog */}

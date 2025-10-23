@@ -16,22 +16,14 @@ export const TimelineEventView: React.FC<TimelineEventViewProps> = ({ item }) =>
       )}
 
       {/* Title */}
-      <h3 className="text-lg md:text-xl font-bold mb-2">
-        {item.title}
-      </h3>
+      <h3 className="text-lg md:text-xl font-bold mb-2">{item.title}</h3>
 
       {/* Description */}
-      {item.description && (
-        <p className="text-base mb-2 leading-relaxed">
-          {item.description}
-        </p>
-      )}
+      {item.description && <p className="text-base mb-2 leading-relaxed">{item.description}</p>}
 
       {/* Details */}
       {item.details && (
-        <p className="text-sm mb-2 text-muted-foreground leading-relaxed">
-          {item.details}
-        </p>
+        <p className="text-sm mb-2 text-muted-foreground leading-relaxed">{item.details}</p>
       )}
 
       {/* Links */}

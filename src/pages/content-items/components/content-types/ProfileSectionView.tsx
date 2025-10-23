@@ -9,9 +9,7 @@ export const ProfileSectionView: React.FC<ProfileSectionViewProps> = ({ item }) 
   return (
     <div>
       {/* Heading */}
-      <h2 className="text-2xl md:text-3xl font-bold mb-3">
-        {item.heading}
-      </h2>
+      <h2 className="text-2xl md:text-3xl font-bold mb-3">{item.heading}</h2>
 
       {/* Structured Data (if available) */}
       {item.structuredData && (
@@ -22,9 +20,7 @@ export const ProfileSectionView: React.FC<ProfileSectionViewProps> = ({ item }) 
           {item.structuredData.tagline && (
             <p className="text-base text-muted-foreground italic">{item.structuredData.tagline}</p>
           )}
-          {item.structuredData.role && (
-            <p className="text-base">{item.structuredData.role}</p>
-          )}
+          {item.structuredData.role && <p className="text-base">{item.structuredData.role}</p>}
           {item.structuredData.summary && (
             <p className="text-base leading-relaxed">{item.structuredData.summary}</p>
           )}
@@ -56,9 +52,7 @@ export const ProfileSectionView: React.FC<ProfileSectionViewProps> = ({ item }) 
 
       {/* Content (fallback or additional content) */}
       {item.content && (
-        <div className="text-base leading-relaxed whitespace-pre-wrap">
-          {item.content}
-        </div>
+        <div className="text-base leading-relaxed whitespace-pre-wrap">{item.content}</div>
       )}
     </div>
   )

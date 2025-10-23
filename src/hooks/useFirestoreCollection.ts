@@ -1,12 +1,16 @@
 /**
  * Firestore Collection Hook
- * 
+ *
  * Generic hook for subscribing to Firestore collections with automatic cleanup
  */
 
 import { useState, useEffect, useCallback } from "react"
 import { useFirestore } from "@/contexts/FirestoreContext"
-import type { CollectionTypeMap, DocumentWithId, QueryConstraints } from "@/services/firestore/types"
+import type {
+  CollectionTypeMap,
+  DocumentWithId,
+  QueryConstraints,
+} from "@/services/firestore/types"
 
 interface UseFirestoreCollectionOptions<K extends keyof CollectionTypeMap> {
   collectionName: K
@@ -85,4 +89,3 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
     refetch,
   }
 }
-

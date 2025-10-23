@@ -101,7 +101,12 @@ export const CompanyEdit: React.FC<CompanyEditProps> = ({ data, onChange }) => {
         onChange={(value) =>
           onChange({
             ...companyData,
-            technologies: value ? value.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            technologies: value
+              ? value
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter(Boolean)
+              : [],
           })
         }
         placeholder="React, TypeScript, Node.js, PostgreSQL"

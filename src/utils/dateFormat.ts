@@ -15,7 +15,20 @@ export function formatMonthYear(dateStr: string | null | undefined): string {
 
   try {
     const [year, month] = dateStr.split("-")
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ]
     const monthNum = parseInt(month, 10)
 
     if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {

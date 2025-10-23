@@ -99,7 +99,9 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
   }
 
   return (
-    <Card className={`transition-all duration-300 ease-in-out hover:shadow-md ${selected ? "ring-2 ring-primary shadow-lg" : ""} ${getStatusBorderClass()}`}>
+    <Card
+      className={`transition-all duration-300 ease-in-out hover:shadow-md ${selected ? "ring-2 ring-primary shadow-lg" : ""} ${getStatusBorderClass()}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <input
