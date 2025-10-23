@@ -10,22 +10,25 @@ import type {
 } from "@/api/generator-client"
 
 export const mockCoverLetterRequest: GenerateDocumentRequest = {
-  type: "cover_letter",
-  jobTitle: "Senior Frontend Engineer",
-  companyName: "Acme Corporation",
-  jobDescription:
-    "We are seeking a talented frontend developer with expertise in React and TypeScript to join our growing team. The ideal candidate will have 5+ years of experience building modern web applications.",
-  customization: {
-    targetSummary:
-      "Emphasize my React and TypeScript expertise, as well as my experience leading frontend teams.",
+  generateType: "coverLetter",
+  job: {
+    role: "Senior Frontend Engineer",
+    company: "Acme Corporation",
+    jobDescriptionText:
+      "We are seeking a talented frontend developer with expertise in React and TypeScript to join our growing team. The ideal candidate will have 5+ years of experience building modern web applications.",
+  },
+  preferences: {
+    emphasize: ["React and TypeScript expertise", "experience leading frontend teams"],
   },
 }
 
 export const mockResumeRequest: GenerateDocumentRequest = {
-  type: "resume",
-  jobTitle: "Full Stack Developer",
-  companyName: "Tech Startup Inc",
-  jobDescription: "Looking for a full stack developer proficient in React, Node.js, and AWS.",
+  generateType: "resume",
+  job: {
+    role: "Full Stack Developer",
+    company: "Tech Startup Inc",
+    jobDescriptionText: "Looking for a full stack developer proficient in React, Node.js, and AWS.",
+  },
 }
 
 export const mockSuccessResponse: GenerateDocumentResponse = {

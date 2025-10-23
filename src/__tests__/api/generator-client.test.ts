@@ -18,25 +18,26 @@ describe("GeneratorClient", () => {
       const request = mockCoverLetterRequest
 
       // Validate request structure
-      expect(request).toHaveProperty("type", "cover_letter")
-      expect(request).toHaveProperty("jobTitle")
-      expect(request).toHaveProperty("companyName")
-      expect(request.jobTitle).toBeTruthy()
-      expect(request.companyName).toBeTruthy()
+      expect(request).toHaveProperty("generateType", "coverLetter")
+      expect(request).toHaveProperty("job")
+      expect(request.job).toHaveProperty("role")
+      expect(request.job).toHaveProperty("company")
+      expect(request.job.role).toBeTruthy()
+      expect(request.job.company).toBeTruthy()
     })
 
     it("should validate required fields are present", () => {
       const request = mockCoverLetterRequest
 
       // Required fields
-      expect(request.type).toBe("cover_letter")
-      expect(request.jobTitle).toBe("Senior Frontend Engineer")
-      expect(request.companyName).toBe("Acme Corporation")
+      expect(request.generateType).toBe("coverLetter")
+      expect(request.job.role).toBe("Senior Frontend Engineer")
+      expect(request.job.company).toBe("Acme Corporation")
 
       // Optional fields
-      expect(request.jobDescription).toBeDefined()
-      expect(request.customization).toBeDefined()
-      expect(request.customization?.targetSummary).toBeDefined()
+      expect(request.job.jobDescriptionText).toBeDefined()
+      expect(request.preferences).toBeDefined()
+      expect(request.preferences?.emphasize).toBeDefined()
     })
 
     it("should handle successful response structure", () => {
@@ -59,30 +60,30 @@ describe("GeneratorClient", () => {
   })
 
   describe("request validation", () => {
-    it("should require type field", () => {
+    it("should require generateType field", () => {
       const request = mockCoverLetterRequest
-      expect(request.type).toBeDefined()
-      expect(["resume", "cover_letter"]).toContain(request.type)
+      expect(request.generateType).toBeDefined()
+      expect(["resume", "coverLetter", "both"]).toContain(request.generateType)
     })
 
-    it("should require jobTitle field", () => {
+    it("should require job.role field", () => {
       const request = mockCoverLetterRequest
-      expect(request.jobTitle).toBeDefined()
-      expect(request.jobTitle).not.toBe("")
+      expect(request.job.role).toBeDefined()
+      expect(request.job.role).not.toBe("")
     })
 
-    it("should require companyName field", () => {
+    it("should require job.company field", () => {
       const request = mockCoverLetterRequest
-      expect(request.companyName).toBeDefined()
-      expect(request.companyName).not.toBe("")
+      expect(request.job.company).toBeDefined()
+      expect(request.job.company).not.toBe("")
     })
 
-    it("should allow optional customization", () => {
+    it("should allow optional preferences", () => {
       const request = mockCoverLetterRequest
-      if (request.customization) {
-        expect(request.customization).toHaveProperty("targetSummary")
+      if (request.preferences) {
+        expect(request.preferences).toHaveProperty("emphasize")
       }
-      // Test passes whether customization is present or not
+      // Test passes whether preferences is present or not
       expect(true).toBe(true)
     })
   })

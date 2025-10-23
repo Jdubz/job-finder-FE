@@ -8,7 +8,7 @@ import { useCallback } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useFirestore } from "@/contexts/FirestoreContext"
 import { useFirestoreCollection } from "./useFirestoreCollection"
-import type { ContentItemDocument } from "@jdubzw/job-finder-shared-types"
+import type { ContentItemDocument } from "@jsdubzw/job-finder-shared-types"
 import type { DocumentWithId } from "@/services/firestore/types"
 
 interface UseContentItemsResult {

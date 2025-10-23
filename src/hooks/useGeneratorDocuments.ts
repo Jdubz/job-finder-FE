@@ -8,7 +8,7 @@ import { useCallback, useMemo } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useFirestore } from "@/contexts/FirestoreContext"
 import { useFirestoreCollection } from "./useFirestoreCollection"
-import type { GeneratorRequest, GeneratorResponse } from "@jdubzw/job-finder-shared-types"
+import type { GeneratorRequest, GeneratorResponse } from "@jsdubzw/job-finder-shared-types"
 
 // Union type for generator documents
 export type GeneratorDocument = GeneratorRequest | GeneratorResponse
