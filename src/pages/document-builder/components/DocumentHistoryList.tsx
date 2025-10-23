@@ -159,7 +159,11 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
               {doc.documentUrl && (
-                <Button variant="outline" size="sm" onClick={() => handleDownload(doc.documentUrl)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDownload(doc.documentUrl!)}
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Download
                 </Button>

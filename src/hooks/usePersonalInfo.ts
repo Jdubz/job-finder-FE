@@ -78,8 +78,6 @@ export function usePersonalInfo(): UsePersonalInfoResult {
         // If document doesn't exist, create it
         if (!personalInfo) {
           await service.setDocument("job-finder-config", PERSONAL_INFO_DOC_ID, {
-            id: PERSONAL_INFO_DOC_ID,
-            type: "personal-info",
             name: updates.name || "",
             email: updates.email || user.email,
             phone: updates.phone,
@@ -90,7 +88,7 @@ export function usePersonalInfo(): UsePersonalInfoResult {
             avatar: updates.avatar,
             logo: updates.logo,
             accentColor: updates.accentColor || "#3b82f6", // Default blue
-          })
+          } as any) // eslint-disable-line @typescript-eslint/no-explicit-any
         } else {
           // Update existing document
           await service.updateDocument("job-finder-config", PERSONAL_INFO_DOC_ID, updates)

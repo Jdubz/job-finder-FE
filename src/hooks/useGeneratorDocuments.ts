@@ -65,7 +65,12 @@ function transformDocuments(rawDocuments: GeneratorDocument[]): DocumentHistoryI
         jobTitle,
         companyName,
         documentUrl,
-        createdAt: doc.createdAt instanceof Date ? doc.createdAt : new Date(doc.createdAt),
+        createdAt:
+          doc.createdAt instanceof Date
+            ? doc.createdAt
+            : typeof doc.createdAt === "object" && "seconds" in doc.createdAt
+              ? new Date(doc.createdAt.seconds * 1000)
+              : new Date(doc.createdAt as string | number),
         status: doc.status,
         jobMatchId: doc.jobMatchId,
       }
@@ -97,7 +102,7 @@ export function useGeneratorDocuments(): UseGeneratorDocumentsResult {
 
   // Transform documents for UI display (memoized to prevent infinite loops)
   const documents = useMemo(
-    () => transformDocuments(rawDocuments as GeneratorDocument[]),
+    () => transformDocuments(rawDocuments as unknown as GeneratorDocument[]),
     [rawDocuments]
   )
 
