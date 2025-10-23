@@ -1,8 +1,20 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run type check before push
-npm run type-check
+echo "🔍 Running pre-push checks..."
+
+# Run TypeScript type check with project references (catches all errors)
+echo "📝 Type checking..."
+npm run type-check || {
+  echo "❌ TypeScript errors found! Fix them before pushing."
+  exit 1
+}
 
 # Run tests before push
-npm run test:ci
+echo "🧪 Running tests..."
+npm run test:ci || {
+  echo "❌ Tests failed! Fix tests before pushing."
+  exit 1
+}
+
+echo "✅ All pre-push checks passed!"

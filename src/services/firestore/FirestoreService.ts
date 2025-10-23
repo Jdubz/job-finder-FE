@@ -1,6 +1,6 @@
 /**
  * Firestore Service
- * 
+ *
  * Type-safe service layer for Firestore operations with caching and real-time subscriptions
  */
 
@@ -43,18 +43,18 @@ import type {
  * Convert Firestore Timestamp to Date
  */
 function convertTimestamps<T extends DocumentData>(data: T): ClientSideDocument<T> {
-  const result: any = { ...data }
+  const result: Record<string, unknown> = { ...data }
 
   for (const key in result) {
     const value = result[key]
-    
+
     if (value instanceof Timestamp) {
       result[key] = value.toDate()
     } else if (value && typeof value === "object" && !Array.isArray(value)) {
-      result[key] = convertTimestamps(value)
+      result[key] = convertTimestamps(value as DocumentData)
     } else if (Array.isArray(value)) {
       result[key] = value.map((item) =>
-        item && typeof item === "object" ? convertTimestamps(item) : item
+        item && typeof item === "object" ? convertTimestamps(item as DocumentData) : item
       )
     }
   }
@@ -97,7 +97,7 @@ function buildQueryConstraints(constraints?: QueryConstraints): QueryConstraint[
 
 /**
  * Firestore Service Class
- * 
+ *
  * Provides type-safe CRUD operations for all Firestore collections
  */
 export class FirestoreService {
@@ -137,13 +137,12 @@ export class FirestoreService {
   ): Promise<DocumentWithId<CollectionTypeMap[K]>[]> {
     const collectionRef = collection(this.db, collectionName)
     const queryConstraints = buildQueryConstraints(constraints)
-    
-    const q = queryConstraints.length > 0 
-      ? query(collectionRef, ...queryConstraints)
-      : collectionRef
+
+    const q =
+      queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
     const querySnapshot = await getDocs(q)
-    
+
     return querySnapshot.docs.map((doc) => {
       const data = convertTimestamps(doc.data())
       return {
@@ -159,13 +158,13 @@ export class FirestoreService {
   async createDocument<K extends keyof CollectionTypeMap>(
     collectionName: K,
     data: Omit<CollectionTypeMap[K], "createdAt" | "updatedAt"> & {
-      createdAt?: any
-      updatedAt?: any
+      createdAt?: Timestamp | Date
+      updatedAt?: Timestamp | Date
     }
   ): Promise<string> {
     const collectionRef = collection(this.db, collectionName)
     const now = Timestamp.now()
-    
+
     const docData = {
       ...data,
       createdAt: data.createdAt || now,
@@ -183,22 +182,22 @@ export class FirestoreService {
     collectionName: K,
     documentId: string,
     data: Omit<CollectionTypeMap[K], "createdAt" | "updatedAt"> & {
-      createdAt?: any
-      updatedAt?: any
+      createdAt?: Timestamp | Date
+      updatedAt?: Timestamp | Date
     },
     merge = true
   ): Promise<void> {
     const docRef = doc(this.db, collectionName, documentId)
     const now = Timestamp.now()
-    
-    const docData = {
+
+    const docData: Record<string, unknown> = {
       ...data,
       updatedAt: now,
     }
 
     // Only set createdAt if it's a new document (not merging)
     if (!merge) {
-      (docData as any).createdAt = data.createdAt || now
+      docData.createdAt = data.createdAt || now
     }
 
     await setDoc(docRef, docData, { merge })
@@ -214,7 +213,7 @@ export class FirestoreService {
   ): Promise<void> {
     const docRef = doc(this.db, collectionName, documentId)
     const now = Timestamp.now()
-    
+
     await updateDoc(docRef, {
       ...data,
       updatedAt: now,
@@ -243,10 +242,9 @@ export class FirestoreService {
   ): UnsubscribeFn {
     const collectionRef = collection(this.db, collectionName)
     const queryConstraints = buildQueryConstraints(constraints)
-    
-    const q = queryConstraints.length > 0 
-      ? query(collectionRef, ...queryConstraints)
-      : collectionRef
+
+    const q =
+      queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
     return onSnapshot(
       q,
@@ -258,7 +256,7 @@ export class FirestoreService {
             ...data,
           } as DocumentWithId<CollectionTypeMap[K]>
         })
-        
+
         onData(documents)
       },
       (error) => {
@@ -301,4 +299,3 @@ export class FirestoreService {
 
 // Export singleton instance
 export const firestoreService = new FirestoreService()
-

@@ -24,7 +24,7 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   const [debugInfo, setDebugInfo] = useState<string[]>([])
 
   // Show debug mode in development and staging, but NOT in production
-  const isDebugMode = import.meta.env.VITE_ENVIRONMENT !== 'production'
+  const isDebugMode = import.meta.env.VITE_ENVIRONMENT !== "production"
 
   const addDebugLog = (message: string) => {
     const timestamp = new Date().toISOString().split("T")[1].split(".")[0]

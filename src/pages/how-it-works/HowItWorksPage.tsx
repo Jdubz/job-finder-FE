@@ -1,11 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { 
-  Briefcase, 
-  Sparkles, 
-  FileText, 
-  Target, 
+import {
+  Briefcase,
+  Sparkles,
+  FileText,
+  Target,
   Zap,
   Database,
   GitBranch,
@@ -13,7 +13,7 @@ import {
   ArrowRight,
   TrendingUp,
   Shield,
-  Clock
+  Clock,
 } from "lucide-react"
 
 export function HowItWorksPage() {
@@ -25,11 +25,9 @@ export function HowItWorksPage() {
           <Sparkles className="h-3 w-3 mr-1" />
           AI-Powered Job Search
         </Badge>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          How Job Finder Works
-        </h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">How Job Finder Works</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          An intelligent, end-to-end platform that transforms your job search from manual drudgery 
+          An intelligent, end-to-end platform that transforms your job search from manual drudgery
           into a streamlined, AI-assisted process
         </p>
       </div>
@@ -89,8 +87,8 @@ export function HowItWorksPage() {
               </div>
             </div>
             <p className="text-muted-foreground">
-              Start your job search by submitting job postings you're interested in. Our system supports 
-              multiple intake methods to fit your workflow.
+              Start your job search by submitting job postings you're interested in. Our system
+              supports multiple intake methods to fit your workflow.
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -98,7 +96,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Manual URL Submission</p>
                   <p className="text-sm text-muted-foreground">
-                    Paste job posting URLs directly - supports Greenhouse, Workday, Lever, and most ATS platforms
+                    Paste job posting URLs directly - supports Greenhouse, Workday, Lever, and most
+                    ATS platforms
                   </p>
                 </div>
               </div>
@@ -107,7 +106,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Automated Company Scraping</p>
                   <p className="text-sm text-muted-foreground">
-                    Add target companies to your watchlist - our scraper automatically finds new postings
+                    Add target companies to your watchlist - our scraper automatically finds new
+                    postings
                   </p>
                 </div>
               </div>
@@ -146,7 +146,8 @@ export function HowItWorksPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground pt-2 border-t">
-                Each job moves through our pipeline automatically, with retry logic and error handling built in
+                Each job moves through our pipeline automatically, with retry logic and error
+                handling built in
               </p>
             </CardContent>
           </Card>
@@ -194,8 +195,9 @@ export function HowItWorksPage() {
               </div>
             </div>
             <p className="text-muted-foreground">
-              Once a job is queued, our Python-based scraper extracts all relevant information from the 
-              job posting. We handle different ATS platforms, parse structured data, and clean up messy formatting.
+              Once a job is queued, our Python-based scraper extracts all relevant information from
+              the job posting. We handle different ATS platforms, parse structured data, and clean
+              up messy formatting.
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -203,8 +205,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Platform Detection</p>
                   <p className="text-sm text-muted-foreground">
-                    Automatically identifies the job board platform (Greenhouse, Workday, etc.) and uses 
-                    optimized scraping strategies for each
+                    Automatically identifies the job board platform (Greenhouse, Workday, etc.) and
+                    uses optimized scraping strategies for each
                   </p>
                 </div>
               </div>
@@ -213,8 +215,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Data Normalization</p>
                   <p className="text-sm text-muted-foreground">
-                    Standardizes job data into a consistent format, removing HTML tags, normalizing dates, 
-                    and extracting key details
+                    Standardizes job data into a consistent format, removing HTML tags, normalizing
+                    dates, and extracting key details
                   </p>
                 </div>
               </div>
@@ -223,8 +225,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Company Enrichment</p>
                   <p className="text-sm text-muted-foreground">
-                    Fetches additional company information (culture, tech stack, size) to help you make 
-                    informed decisions
+                    Fetches additional company information (culture, tech stack, size) to help you
+                    make informed decisions
                   </p>
                 </div>
               </div>
@@ -245,8 +247,8 @@ export function HowItWorksPage() {
               </div>
             </div>
             <p className="text-muted-foreground">
-              Our AI analyzes the job description against your profile, experience, and preferences to 
-              generate a detailed match report with actionable insights.
+              Our AI analyzes the job description against your profile, experience, and preferences
+              to generate a detailed match report with actionable insights.
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -254,8 +256,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Match Score (0-100)</p>
                   <p className="text-sm text-muted-foreground">
-                    Comprehensive score considering skills overlap, experience level, location preferences, 
-                    and role alignment
+                    Comprehensive score considering skills overlap, experience level, location
+                    preferences, and role alignment
                   </p>
                 </div>
               </div>
@@ -264,8 +266,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Skills Analysis</p>
                   <p className="text-sm text-muted-foreground">
-                    Lists matched skills you have, missing skills to highlight, and transferable skills 
-                    from your background
+                    Lists matched skills you have, missing skills to highlight, and transferable
+                    skills from your background
                   </p>
                 </div>
               </div>
@@ -274,7 +276,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Application Priority</p>
                   <p className="text-sm text-muted-foreground">
-                    Categorizes as High, Medium, or Low priority based on match quality and your preferences
+                    Categorizes as High, Medium, or Low priority based on match quality and your
+                    preferences
                   </p>
                 </div>
               </div>
@@ -283,8 +286,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Resume Intake Data</p>
                   <p className="text-sm text-muted-foreground">
-                    Generates specific recommendations: which experiences to emphasize, projects to highlight, 
-                    skills to feature, and ATS keywords to include
+                    Generates specific recommendations: which experiences to emphasize, projects to
+                    highlight, skills to feature, and ATS keywords to include
                   </p>
                 </div>
               </div>
@@ -302,7 +305,7 @@ export function HowItWorksPage() {
                   <Badge className="bg-green-600">85/100</Badge>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }} />
+                  <div className="bg-green-600 h-2 rounded-full" style={{ width: "85%" }} />
                 </div>
               </div>
               <Separator />
@@ -342,8 +345,8 @@ export function HowItWorksPage() {
               <div>
                 <p className="text-sm font-medium mb-2">Professional Summary</p>
                 <p className="text-xs text-muted-foreground italic">
-                  "Full-stack engineer with 5+ years building scalable distributed systems. 
-                  Expert in TypeScript, React, and microservices architecture..."
+                  "Full-stack engineer with 5+ years building scalable distributed systems. Expert
+                  in TypeScript, React, and microservices architecture..."
                 </p>
               </div>
               <Separator />
@@ -365,7 +368,8 @@ export function HowItWorksPage() {
               <div>
                 <p className="text-sm font-medium mb-2">ATS Keywords</p>
                 <p className="text-xs text-muted-foreground">
-                  distributed systems, microservices, Kubernetes, CI/CD, system design, REST APIs, GraphQL...
+                  distributed systems, microservices, Kubernetes, CI/CD, system design, REST APIs,
+                  GraphQL...
                 </p>
               </div>
             </CardContent>
@@ -381,8 +385,9 @@ export function HowItWorksPage() {
               </div>
             </div>
             <p className="text-muted-foreground">
-              Using the match analysis and resume intake data, generate perfectly tailored application 
-              materials for each position. Our AI provides specific, actionable guidance - not generic templates.
+              Using the match analysis and resume intake data, generate perfectly tailored
+              application materials for each position. Our AI provides specific, actionable guidance
+              - not generic templates.
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
@@ -390,8 +395,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Resume Builder</p>
                   <p className="text-sm text-muted-foreground">
-                    Pull content from your profile library, reorder based on relevance, emphasize key achievements, 
-                    and optimize for ATS scanning
+                    Pull content from your profile library, reorder based on relevance, emphasize
+                    key achievements, and optimize for ATS scanning
                   </p>
                 </div>
               </div>
@@ -400,8 +405,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Cover Letter Generation</p>
                   <p className="text-sm text-muted-foreground">
-                    AI drafts a compelling cover letter highlighting your most relevant experience and 
-                    explaining your motivation for the role
+                    AI drafts a compelling cover letter highlighting your most relevant experience
+                    and explaining your motivation for the role
                   </p>
                 </div>
               </div>
@@ -410,7 +415,7 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Gap Mitigation Strategies</p>
                   <p className="text-sm text-muted-foreground">
-                    For missing requirements, AI suggests how to frame your transferable skills and 
+                    For missing requirements, AI suggests how to frame your transferable skills and
                     learning capacity
                   </p>
                 </div>
@@ -432,7 +437,7 @@ export function HowItWorksPage() {
               </div>
             </div>
             <p className="text-muted-foreground">
-              Monitor all your applications in a Kanban-style board. Track status changes, schedule 
+              Monitor all your applications in a Kanban-style board. Track status changes, schedule
               interviews, set reminders, and never lose track of an opportunity.
             </p>
             <div className="space-y-3">
@@ -441,7 +446,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Status Tracking</p>
                   <p className="text-sm text-muted-foreground">
-                    Applied → Screening → Interview → Offer → Rejected (track every application stage)
+                    Applied → Screening → Interview → Offer → Rejected (track every application
+                    stage)
                   </p>
                 </div>
               </div>
@@ -450,7 +456,8 @@ export function HowItWorksPage() {
                 <div>
                   <p className="font-medium">Interview Scheduling</p>
                   <p className="text-sm text-muted-foreground">
-                    Track interview dates, types (phone, technical, behavioral), and add preparation notes
+                    Track interview dates, types (phone, technical, behavioral), and add preparation
+                    notes
                   </p>
                 </div>
               </div>
@@ -484,14 +491,18 @@ export function HowItWorksPage() {
                     <p className="font-medium">Platform Engineer</p>
                     <Badge className="bg-blue-600">Interview</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">Company ABC • Tech interview tomorrow</p>
+                  <p className="text-xs text-muted-foreground">
+                    Company ABC • Tech interview tomorrow
+                  </p>
                 </div>
                 <div className="p-3 border rounded-lg">
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-medium">Full Stack Developer</p>
                     <Badge variant="outline">Screening</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">Company 123 • Recruiter call scheduled</p>
+                  <p className="text-xs text-muted-foreground">
+                    Company 123 • Recruiter call scheduled
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -516,19 +527,19 @@ export function HowItWorksPage() {
               <Shield className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Firebase Backend</CardTitle>
               <CardDescription>
-                Cloud Functions for serverless API, Firestore for data persistence, 
-                and Firebase Auth for secure authentication
+                Cloud Functions for serverless API, Firestore for data persistence, and Firebase
+                Auth for secure authentication
               </CardDescription>
             </CardHeader>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <Sparkles className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Advanced AI</CardTitle>
               <CardDescription>
-                Powered by Claude and GPT-4 for intelligent matching, content generation, 
-                and personalized recommendations
+                Powered by Claude and GPT-4 for intelligent matching, content generation, and
+                personalized recommendations
               </CardDescription>
             </CardHeader>
           </Card>
@@ -538,8 +549,8 @@ export function HowItWorksPage() {
               <Database className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Python Worker</CardTitle>
               <CardDescription>
-                Dedicated Python microservice for web scraping, data extraction, 
-                and queue processing
+                Dedicated Python microservice for web scraping, data extraction, and queue
+                processing
               </CardDescription>
             </CardHeader>
           </Card>
@@ -549,8 +560,8 @@ export function HowItWorksPage() {
               <FileText className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>React Frontend</CardTitle>
               <CardDescription>
-                Modern TypeScript + React app with Tailwind CSS, shadcn/ui components, 
-                and responsive design
+                Modern TypeScript + React app with Tailwind CSS, shadcn/ui components, and
+                responsive design
               </CardDescription>
             </CardHeader>
           </Card>
@@ -560,8 +571,8 @@ export function HowItWorksPage() {
               <Clock className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Real-time Updates</CardTitle>
               <CardDescription>
-                Live status updates, real-time queue monitoring, and instant notifications 
-                when jobs are processed
+                Live status updates, real-time queue monitoring, and instant notifications when jobs
+                are processed
               </CardDescription>
             </CardHeader>
           </Card>
@@ -571,8 +582,8 @@ export function HowItWorksPage() {
               <Shield className="h-8 w-8 mb-2 text-primary" />
               <CardTitle>Secure & Private</CardTitle>
               <CardDescription>
-                Your data is encrypted, stored securely in Firebase, and never shared. 
-                Role-based access control protects sensitive features
+                Your data is encrypted, stored securely in Firebase, and never shared. Role-based
+                access control protects sensitive features
               </CardDescription>
             </CardHeader>
           </Card>
@@ -596,8 +607,8 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Smart Content Library</h4>
                 <p className="text-sm text-muted-foreground">
-                  Build a reusable library of your experiences, projects, skills, and accomplishments. 
-                  The AI pulls relevant content for each application automatically.
+                  Build a reusable library of your experiences, projects, skills, and
+                  accomplishments. The AI pulls relevant content for each application automatically.
                 </p>
               </div>
             </div>
@@ -609,7 +620,7 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Batch Processing</h4>
                 <p className="text-sm text-muted-foreground">
-                  Submit multiple job URLs at once. Our queue system processes them in parallel, 
+                  Submit multiple job URLs at once. Our queue system processes them in parallel,
                   with intelligent retry logic and error handling.
                 </p>
               </div>
@@ -622,8 +633,8 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Filter & Strike System</h4>
                 <p className="text-sm text-muted-foreground">
-                  Set up exclusion lists (companies, keywords, domains) to automatically skip 
-                  jobs that don't match your criteria.
+                  Set up exclusion lists (companies, keywords, domains) to automatically skip jobs
+                  that don't match your criteria.
                 </p>
               </div>
             </div>
@@ -637,8 +648,8 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Multi-format Export</h4>
                 <p className="text-sm text-muted-foreground">
-                  Export resumes and cover letters in PDF, DOCX, or Markdown. Customize styling 
-                  and formatting to match your personal brand.
+                  Export resumes and cover letters in PDF, DOCX, or Markdown. Customize styling and
+                  formatting to match your personal brand.
                 </p>
               </div>
             </div>
@@ -650,7 +661,7 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Company Intelligence</h4>
                 <p className="text-sm text-muted-foreground">
-                  Automatically enriches company data with tech stack, culture info, size category, 
+                  Automatically enriches company data with tech stack, culture info, size category,
                   and priority scoring to help you prioritize applications.
                 </p>
               </div>
@@ -663,8 +674,8 @@ export function HowItWorksPage() {
               <div>
                 <h4 className="font-semibold mb-1">Analytics & Insights</h4>
                 <p className="text-sm text-muted-foreground">
-                  Track success rates, average time-to-interview, most successful application strategies, 
-                  and identify patterns in your job search.
+                  Track success rates, average time-to-interview, most successful application
+                  strategies, and identify patterns in your job search.
                 </p>
               </div>
             </div>
@@ -678,9 +689,7 @@ export function HowItWorksPage() {
       <div className="space-y-6">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-bold">Technical Architecture</h2>
-          <p className="text-muted-foreground">
-            How the system works under the hood
-          </p>
+          <p className="text-muted-foreground">How the system works under the hood</p>
         </div>
 
         <Card>
@@ -728,16 +737,18 @@ export function HowItWorksPage() {
               <CardTitle className="text-base">Resilient Queue</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
-              Automatic retry logic, dead-letter queue, and exponential backoff ensure no jobs are lost
+              Automatic retry logic, dead-letter queue, and exponential backoff ensure no jobs are
+              lost
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Structured Logging</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
-              Cloud Logging integration with request tracing, error tracking, and performance monitoring
+              Cloud Logging integration with request tracing, error tracking, and performance
+              monitoring
             </CardContent>
           </Card>
 
@@ -756,8 +767,8 @@ export function HowItWorksPage() {
       <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-lg p-8 text-center space-y-4">
         <h2 className="text-2xl font-bold">Ready to Transform Your Job Search?</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Stop manually tailoring resumes and tracking applications in spreadsheets. 
-          Let AI handle the busy work while you focus on interview prep and networking.
+          Stop manually tailoring resumes and tracking applications in spreadsheets. Let AI handle
+          the busy work while you focus on interview prep and networking.
         </p>
         <div className="flex gap-4 justify-center pt-4">
           <a

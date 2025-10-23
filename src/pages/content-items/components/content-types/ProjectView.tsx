@@ -24,7 +24,8 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ item }) => {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
             <span>
-              {formatMonthYear(item.startDate)} – {item.endDate ? formatMonthYear(item.endDate) : "Present"}
+              {formatMonthYear(item.startDate)} –{" "}
+              {item.endDate ? formatMonthYear(item.endDate) : "Present"}
             </span>
           </div>
         )}
@@ -35,7 +36,9 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ item }) => {
 
       {/* Context */}
       {item.context && (
-        <p className="text-xs italic text-muted-foreground border-l-2 pl-2 border-muted">{item.context}</p>
+        <p className="text-xs italic text-muted-foreground border-l-2 pl-2 border-muted">
+          {item.context}
+        </p>
       )}
 
       {/* Accomplishments */}

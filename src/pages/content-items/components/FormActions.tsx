@@ -26,11 +26,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
       >
         Cancel
       </Button>
-      <Button
-        type="button"
-        onClick={onSave}
-        disabled={isSubmitting || isDeleting}
-      >
+      <Button type="button" onClick={onSave} disabled={isSubmitting || isDeleting}>
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
       <Button

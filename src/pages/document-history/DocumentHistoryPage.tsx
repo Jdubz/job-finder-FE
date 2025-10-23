@@ -204,7 +204,7 @@ export function DocumentHistoryPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleView(document.documentUrl)}
+                          onClick={() => handleView(document.documentUrl!)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           View
@@ -212,7 +212,7 @@ export function DocumentHistoryPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDownload(document.documentUrl)}
+                          onClick={() => handleDownload(document.documentUrl!)}
                         >
                           <Download className="h-4 w-4 mr-2" />
                           Download

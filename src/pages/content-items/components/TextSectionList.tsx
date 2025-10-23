@@ -72,7 +72,7 @@ export function TextSectionList({ items, onEdit, onDelete }: TextSectionListProp
                 <div>
                   <div
                     className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none"
-                    style={{ whiteSpace: 'pre-wrap' }}
+                    style={{ whiteSpace: "pre-wrap" }}
                   >
                     {section.format === "markdown" ? (
                       // For now, display as plain text. Can add markdown parser later

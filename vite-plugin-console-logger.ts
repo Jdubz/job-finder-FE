@@ -11,7 +11,7 @@
  * - Only active in development mode
  */
 
-import type { Plugin } from "vite"
+import type { Plugin, ResolvedConfig } from "vite"
 
 export interface ConsoleLoggerOptions {
   /**
@@ -30,7 +30,7 @@ export interface ConsoleLoggerOptions {
 export function consoleLogger(options: ConsoleLoggerOptions = {}): Plugin {
   const { backendUrl = "http://localhost:5000", enabled = true } = options
 
-  let config: unknown
+  let config: ResolvedConfig
 
   return {
     name: "vite-plugin-console-logger",

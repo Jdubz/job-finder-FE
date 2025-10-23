@@ -34,7 +34,9 @@ export const TextSectionEdit: React.FC<TextSectionEditProps> = ({ data, onChange
         </Label>
         <Select
           value={textSectionData.format ?? "plain"}
-          onValueChange={(value) => onChange({ ...textSectionData, format: value as "markdown" | "plain" | "html" })}
+          onValueChange={(value) =>
+            onChange({ ...textSectionData, format: value as "markdown" | "plain" | "html" })
+          }
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select format" />

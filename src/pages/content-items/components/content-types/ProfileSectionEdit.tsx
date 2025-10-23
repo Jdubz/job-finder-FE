@@ -1,5 +1,8 @@
 import React from "react"
-import type { UpdateContentItemData, UpdateProfileSectionData } from "../../../../types/content-items"
+import type {
+  UpdateContentItemData,
+  UpdateProfileSectionData,
+} from "../../../../types/content-items"
 import { FormField } from "../FormField"
 
 interface ProfileSectionEditProps {

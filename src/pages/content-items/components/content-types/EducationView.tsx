@@ -32,7 +32,8 @@ export const EducationView: React.FC<EducationViewProps> = ({ item }) => {
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               <span>
-                {formatMonthYear(item.startDate)} – {item.endDate ? formatMonthYear(item.endDate) : "Present"}
+                {formatMonthYear(item.startDate)} –{" "}
+                {item.endDate ? formatMonthYear(item.endDate) : "Present"}
               </span>
             </div>
           )}
@@ -88,7 +89,9 @@ export const EducationView: React.FC<EducationViewProps> = ({ item }) => {
             className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
           >
             View Credential
-            {item.credentialId && <span className="text-muted-foreground">({item.credentialId})</span>}
+            {item.credentialId && (
+              <span className="text-muted-foreground">({item.credentialId})</span>
+            )}
             <ExternalLink className="h-3 w-3" />
           </a>
         </>

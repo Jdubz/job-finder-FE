@@ -15,7 +15,7 @@ import type {
   QueueSettings,
   AISettings,
   PersonalInfo,
-} from "@jdubzw/job-finder-shared-types"
+} from "@jsdubzw/job-finder-shared-types"
 
 /**
  * Convert Firestore Timestamps to Dates for client-side usage

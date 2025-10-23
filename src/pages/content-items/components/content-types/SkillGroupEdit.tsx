@@ -29,7 +29,12 @@ export const SkillGroupEdit: React.FC<SkillGroupEditProps> = ({ data, onChange }
         onChange={(value) =>
           onChange({
             ...skillGroupData,
-            skills: value ? value.split(",").map((s) => s.trim()).filter(Boolean) : [],
+            skills: value
+              ? value
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : [],
           })
         }
         rows={3}

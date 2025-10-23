@@ -48,7 +48,10 @@ export function usePersonalInfo(): UsePersonalInfoResult {
       setLoading(true)
       setError(null)
 
-      const doc = await service.getDocument<PersonalInfo>("job-finder-config", PERSONAL_INFO_DOC_ID)
+      const doc = (await service.getDocument(
+        "job-finder-config",
+        PERSONAL_INFO_DOC_ID
+      )) as DocumentWithId<PersonalInfo> | null
 
       setPersonalInfo(doc)
     } catch (err) {
@@ -74,9 +77,7 @@ export function usePersonalInfo(): UsePersonalInfoResult {
 
         // If document doesn't exist, create it
         if (!personalInfo) {
-          await service.setDocument<PersonalInfo>("job-finder-config", PERSONAL_INFO_DOC_ID, {
-            id: PERSONAL_INFO_DOC_ID,
-            type: "personal-info",
+          await service.setDocument("job-finder-config", PERSONAL_INFO_DOC_ID, {
             name: updates.name || "",
             email: updates.email || user.email,
             phone: updates.phone,
@@ -87,14 +88,10 @@ export function usePersonalInfo(): UsePersonalInfoResult {
             avatar: updates.avatar,
             logo: updates.logo,
             accentColor: updates.accentColor || "#3b82f6", // Default blue
-          } as PersonalInfo)
+          } as any) // eslint-disable-line @typescript-eslint/no-explicit-any
         } else {
           // Update existing document
-          await service.updateDocument<PersonalInfo>(
-            "job-finder-config",
-            PERSONAL_INFO_DOC_ID,
-            updates as Partial<PersonalInfo>
-          )
+          await service.updateDocument("job-finder-config", PERSONAL_INFO_DOC_ID, updates)
         }
 
         // Reload to get fresh data

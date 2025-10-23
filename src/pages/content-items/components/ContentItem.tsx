@@ -1,5 +1,8 @@
 import React, { useState } from "react"
-import type { ContentItem as ContentItemType, UpdateContentItemData } from "../../../types/content-items"
+import type {
+  ContentItem as ContentItemType,
+  UpdateContentItemData,
+} from "../../../types/content-items"
 import { ConfirmDialog } from "./ConfirmDialog"
 import { FormActions } from "./FormActions"
 import { Button } from "../../../components/ui/button"
@@ -117,18 +120,10 @@ export const ContentItem: React.FC<ContentItemProps> = ({
       <Card className="border-2 border-primary">
         <div className="p-6 space-y-6">
           {/* Render appropriate edit component based on type */}
-          {item.type === "company" && (
-            <CompanyEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "project" && (
-            <ProjectEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "skill-group" && (
-            <SkillGroupEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "education" && (
-            <EducationEdit data={editData} onChange={setEditData} />
-          )}
+          {item.type === "company" && <CompanyEdit data={editData} onChange={setEditData} />}
+          {item.type === "project" && <ProjectEdit data={editData} onChange={setEditData} />}
+          {item.type === "skill-group" && <SkillGroupEdit data={editData} onChange={setEditData} />}
+          {item.type === "education" && <EducationEdit data={editData} onChange={setEditData} />}
           {item.type === "profile-section" && (
             <ProfileSectionEdit data={editData} onChange={setEditData} />
           )}

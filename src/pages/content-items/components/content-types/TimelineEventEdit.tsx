@@ -1,5 +1,8 @@
 import React from "react"
-import type { UpdateContentItemData, UpdateTimelineEventData } from "../../../../types/content-items"
+import type {
+  UpdateContentItemData,
+  UpdateTimelineEventData,
+} from "../../../../types/content-items"
 import { FormField } from "../FormField"
 
 interface TimelineEventEditProps {

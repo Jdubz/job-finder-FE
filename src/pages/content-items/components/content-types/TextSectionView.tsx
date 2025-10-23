@@ -21,16 +21,10 @@ export const TextSectionView: React.FC<TextSectionViewProps> = ({ item }) => {
   return (
     <div>
       {/* Heading */}
-      {item.heading && (
-        <h3 className="text-xl md:text-2xl font-bold mb-3">
-          {item.heading}
-        </h3>
-      )}
+      {item.heading && <h3 className="text-xl md:text-2xl font-bold mb-3">{item.heading}</h3>}
 
       {/* Content */}
-      <div className="text-base leading-relaxed">
-        {renderContent()}
-      </div>
+      <div className="text-base leading-relaxed">{renderContent()}</div>
     </div>
   )
 }

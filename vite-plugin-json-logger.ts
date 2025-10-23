@@ -11,7 +11,15 @@
  * - Preserves console output for developer visibility
  */
 
-import type { Plugin, Logger, LogLevel, LogType, LogOptions, LogErrorOptions } from "vite"
+import type {
+  Plugin,
+  Logger,
+  LogLevel,
+  LogType,
+  LogOptions,
+  LogErrorOptions,
+  ResolvedConfig,
+} from "vite"
 import { createLogger } from "vite"
 import * as fs from "fs"
 import * as path from "path"
@@ -56,7 +64,7 @@ export function jsonLogger(options: JsonLoggerOptions = {}): Plugin {
     enableConsole = true,
   } = options
 
-  let config: unknown
+  let config: ResolvedConfig
   let defaultLogger: Logger
   let writeStream: fs.WriteStream
 
@@ -201,7 +209,8 @@ export function jsonLogger(options: JsonLoggerOptions = {}): Plugin {
 
         // Create and assign custom logger
         defaultLogger = createCustomLogger()
-        config.logger = defaultLogger
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(config as any).logger = defaultLogger
       }
     },
 

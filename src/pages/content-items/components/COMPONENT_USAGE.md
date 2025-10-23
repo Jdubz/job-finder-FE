@@ -5,10 +5,12 @@ This directory contains list components for displaying different content item ty
 ## Components
 
 ### 1. CompanyList
+
 **File:** `CompanyList.tsx`
 **Purpose:** Display company/employer work experience items
 **Icon:** Building2 (blue)
 **Features:**
+
 - Company name with website link
 - Role and date range display
 - Location information
@@ -18,10 +20,12 @@ This directory contains list components for displaying different content item ty
 - Edit/delete actions
 
 ### 2. ProjectList
+
 **File:** `ProjectList.tsx`
 **Purpose:** Display project items with detailed information
 **Icon:** Folder (purple)
 **Features:**
+
 - Project name and role
 - Date range display
 - Description and context
@@ -32,10 +36,12 @@ This directory contains list components for displaying different content item ty
 - Edit/delete actions
 
 ### 3. SkillGroupList
+
 **File:** `SkillGroupList.tsx`
 **Purpose:** Display skill groups with proficiency levels
 **Icon:** GraduationCap (green)
 **Features:**
+
 - Category-based organization
 - Skills with proficiency badges (expert, advanced, intermediate, beginner)
 - Visual proficiency indicators (star icons)
@@ -45,16 +51,19 @@ This directory contains list components for displaying different content item ty
 - Edit/delete actions
 
 **Proficiency Levels:**
+
 - Expert: Yellow star (filled)
 - Advanced: Blue star (filled)
 - Intermediate: Blue half-star
 - Beginner: Gray circle
 
 ### 4. EducationList
+
 **File:** `EducationList.tsx`
 **Purpose:** Display education and certification items
 **Icon:** GraduationCap (indigo)
 **Features:**
+
 - Institution name
 - Degree and field of study
 - Date range and location
@@ -66,10 +75,12 @@ This directory contains list components for displaying different content item ty
 - Edit/delete actions
 
 ### 5. ProfileSectionList
+
 **File:** `ProfileSectionList.tsx`
 **Purpose:** Display profile sections with structured data
 **Icon:** User (teal)
 **Features:**
+
 - Section heading
 - Content display (supports whitespace formatting)
 - Expandable structured data view
@@ -106,38 +117,22 @@ function MyContentPage() {
     <div className="space-y-8">
       <section>
         <h2>Work Experience</h2>
-        <CompanyList
-          items={companyItems}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <CompanyList items={companyItems} onEdit={handleEdit} onDelete={handleDelete} />
       </section>
 
       <section>
         <h2>Projects</h2>
-        <ProjectList
-          items={projectItems}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <ProjectList items={projectItems} onEdit={handleEdit} onDelete={handleDelete} />
       </section>
 
       <section>
         <h2>Skills</h2>
-        <SkillGroupList
-          items={skillGroupItems}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <SkillGroupList items={skillGroupItems} onEdit={handleEdit} onDelete={handleDelete} />
       </section>
 
       <section>
         <h2>Education</h2>
-        <EducationList
-          items={educationItems}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <EducationList items={educationItems} onEdit={handleEdit} onDelete={handleDelete} />
       </section>
 
       <section>
@@ -159,15 +154,16 @@ All list components share the same props interface:
 
 ```typescript
 interface ListComponentProps {
-  items: ContentItemWithChildren[]  // Array of items to display
-  onEdit: (item: ContentItemWithChildren) => void  // Edit callback
-  onDelete: (id: string) => void  // Delete callback
+  items: ContentItemWithChildren[] // Array of items to display
+  onEdit: (item: ContentItemWithChildren) => void // Edit callback
+  onDelete: (id: string) => void // Delete callback
 }
 ```
 
 ## Empty States
 
 Each component includes a custom empty state with:
+
 - Relevant icon (12x12)
 - Descriptive heading
 - Helpful message
@@ -188,6 +184,7 @@ All components follow these consistent patterns:
 ## Dependencies
 
 Required packages:
+
 - `@/components/ui/button`
 - `@/components/ui/card`
 - `@/components/ui/badge`
@@ -213,6 +210,7 @@ Required packages:
 ## Accessibility
 
 All components include:
+
 - Semantic HTML structure
 - ARIA-friendly button labels
 - Keyboard navigation support
@@ -223,6 +221,7 @@ All components include:
 ## Type Safety
 
 All components are fully typed with TypeScript:
+
 - Props interfaces defined
 - Type guards for specific content item types
 - Type-safe callbacks
