@@ -2,6 +2,9 @@ import "@testing-library/jest-dom"
 import { cleanup } from "@testing-library/react"
 import { afterEach, beforeAll, vi } from "vitest"
 
+// Skip integration tests when Firebase is mocked
+process.env.FIREBASE_MOCKED = "true"
+
 // Mock environment variables for tests
 beforeAll(() => {
   // Set test environment variables using Vitest's vi.stubEnv
@@ -25,17 +28,20 @@ vi.mock("firebase/auth", () => ({
   getAuth: vi.fn(() => ({
     currentUser: null,
   })),
+  connectAuthEmulator: vi.fn(),
   onAuthStateChanged: vi.fn(() => {
     // Return unsubscribe function
     return () => {}
   }),
   signInWithPopup: vi.fn(),
+  signInWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
   GoogleAuthProvider: vi.fn(),
 }))
 
 vi.mock("firebase/firestore", () => ({
   getFirestore: vi.fn(() => ({})),
+  connectFirestoreEmulator: vi.fn(),
   collection: vi.fn(),
   doc: vi.fn(),
   getDoc: vi.fn(),

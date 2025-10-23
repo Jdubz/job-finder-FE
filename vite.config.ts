@@ -1,13 +1,21 @@
 import path from "path"
+import { fileURLToPath } from "url"
 import { defineConfig } from "vitest/config"
 import react from "@vitejs/plugin-react"
+import tsconfigPaths from "vite-tsconfig-paths"
 import { consoleLogger } from "./vite-plugin-console-logger"
 import { jsonLogger } from "./vite-plugin-json-logger"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    tsconfigPaths({
+      projects: ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.vitest.json"],
+    }),
     consoleLogger({
       backendUrl: "http://localhost:5000",
     }),
