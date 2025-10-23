@@ -1,6 +1,6 @@
 /**
  * Firestore Context Provider
- * 
+ *
  * Provides centralized Firestore access with caching and state management
  */
 
@@ -51,10 +51,10 @@ interface FirestoreProviderProps {
 
 export function FirestoreProvider({ children }: FirestoreProviderProps) {
   // Cache for collection subscriptions
-  const collectionCache = useRef<Map<string, CacheEntry<any>>>(new Map())
-  
+  const collectionCache = useRef<Map<string, CacheEntry<unknown>>>(new Map())
+
   // Cache for document subscriptions
-  const documentCache = useRef<Map<string, DocumentCacheEntry<any>>>(new Map())
+  const documentCache = useRef<Map<string, DocumentCacheEntry<unknown>>>(new Map())
 
   /**
    * Subscribe to a collection with caching
@@ -75,7 +75,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       if (cached) {
         // Return cached data immediately
         onData(cached.data)
-        
+
         // Return a no-op unsubscribe since we're sharing the subscription
         return () => {
           // Don't actually unsubscribe - let the cache manage it
@@ -92,7 +92,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
             entry.data = data
             entry.timestamp = Date.now()
           }
-          
+
           // Call callback
           onData(data)
         },
@@ -138,7 +138,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       if (cached) {
         // Return cached data immediately
         onData(cached.data)
-        
+
         // Return a no-op unsubscribe since we're sharing the subscription
         return () => {
           // Don't actually unsubscribe - let the cache manage it
@@ -156,7 +156,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
             entry.data = data
             entry.timestamp = Date.now()
           }
-          
+
           // Call callback
           onData(data)
         },
@@ -243,4 +243,3 @@ export function useFirestore() {
   }
   return context
 }
-

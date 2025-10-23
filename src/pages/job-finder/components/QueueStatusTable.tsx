@@ -1,4 +1,3 @@
-import type { QueueItem } from "@jsdubzw/job-finder-shared-types"
 import {
   Table,
   TableBody,
@@ -16,7 +15,7 @@ interface QueueStatusTableProps {
   maxItems?: number
 }
 
-export function QueueStatusTable({ userId, maxItems = 10 }: QueueStatusTableProps) {
+export function QueueStatusTable({ userId: _userId, maxItems = 10 }: QueueStatusTableProps) {
   // Use the new Firestore hook
   const { queueItems: items, loading } = useQueueItems({ limit: maxItems })
 

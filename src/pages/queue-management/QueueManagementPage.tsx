@@ -31,10 +31,10 @@ interface QueueFiltersType {
 
 export function QueueManagementPage() {
   const { user, isEditor } = useAuth()
-  
+
   // Use the queue items hook (will show all items since editors can see all)
   const { queueItems, loading, error, updateQueueItem } = useQueueItems({ limit: 1000 })
-  
+
   const [filteredItems, setFilteredItems] = useState<QueueItem[]>([])
   const [queueStats, setQueueStats] = useState<QueueStats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -60,12 +60,12 @@ export function QueueManagementPage() {
     // Calculate stats locally
     const stats: QueueStats = {
       total: queueItems.length,
-      pending: queueItems.filter((i: any) => i.status === "pending").length,
-      processing: queueItems.filter((i: any) => i.status === "processing").length,
-      success: queueItems.filter((i: any) => i.status === "success").length,
-      failed: queueItems.filter((i: any) => i.status === "failed").length,
-      skipped: queueItems.filter((i: any) => i.status === "skipped").length,
-      filtered: queueItems.filter((i: any) => i.status === "filtered").length,
+      pending: queueItems.filter((i: QueueItem) => i.status === "pending").length,
+      processing: queueItems.filter((i: QueueItem) => i.status === "processing").length,
+      success: queueItems.filter((i: QueueItem) => i.status === "success").length,
+      failed: queueItems.filter((i: QueueItem) => i.status === "failed").length,
+      skipped: queueItems.filter((i: QueueItem) => i.status === "skipped").length,
+      filtered: queueItems.filter((i: QueueItem) => i.status === "filtered").length,
     }
     setQueueStats(stats)
     setRefreshing(false)
@@ -149,8 +149,8 @@ export function QueueManagementPage() {
       await updateQueueItem(id, {
         status: "pending",
         result_message: "Queued for retry",
-        processed_at: null as any,
-        completed_at: null as any,
+        processed_at: undefined,
+        completed_at: undefined,
       })
 
       setAlert({
@@ -172,7 +172,7 @@ export function QueueManagementPage() {
       await updateQueueItem(id, {
         status: "skipped",
         result_message: "Cancelled by user",
-        completed_at: new Date() as any,
+        completed_at: new Date(),
       })
 
       setAlert({
@@ -197,14 +197,14 @@ export function QueueManagementPage() {
           return updateQueueItem(id, {
             status: "pending",
             result_message: "Queued for retry",
-            processed_at: null as any,
-            completed_at: null as any,
+            processed_at: undefined,
+            completed_at: undefined,
           })
         } else {
           return updateQueueItem(id, {
             status: "skipped",
             result_message: "Cancelled by user",
-            completed_at: new Date() as any,
+            completed_at: new Date(),
           })
         }
       })
@@ -263,7 +263,10 @@ export function QueueManagementPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-            <Badge variant="outline" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200">
+            <Badge
+              variant="outline"
+              className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200"
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -271,7 +274,9 @@ export function QueueManagementPage() {
               Live
             </Badge>
           </div>
-          <p className="text-muted-foreground mt-2">Monitor and manage the job processing queue in real-time</p>
+          <p className="text-muted-foreground mt-2">
+            Monitor and manage the job processing queue in real-time
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

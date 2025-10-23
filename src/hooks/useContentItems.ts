@@ -1,6 +1,6 @@
 /**
  * Content Items Hook
- * 
+ *
  * Hook for managing content items with type safety
  */
 
@@ -15,7 +15,9 @@ interface UseContentItemsResult {
   contentItems: DocumentWithId<ContentItemDocument>[]
   loading: boolean
   error: Error | null
-  createContentItem: (data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">) => Promise<string>
+  createContentItem: (
+    data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+  ) => Promise<string>
   updateContentItem: (id: string, data: Partial<ContentItemDocument>) => Promise<void>
   deleteContentItem: (id: string) => Promise<void>
   refetch: () => Promise<void>
@@ -29,7 +31,12 @@ export function useContentItems(): UseContentItemsResult {
   const { service } = useFirestore()
 
   // Subscribe to ALL content items (no userId filter - editors see everything)
-  const { data: contentItems, loading, error, refetch } = useFirestoreCollection({
+  const {
+    data: contentItems,
+    loading,
+    error,
+    refetch,
+  } = useFirestoreCollection({
     collectionName: "content-items",
     constraints: user?.uid
       ? {
@@ -43,17 +50,19 @@ export function useContentItems(): UseContentItemsResult {
    * Create a new content item
    */
   const createContentItem = useCallback(
-    async (data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">) => {
+    async (
+      data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+    ) => {
       if (!user?.uid) {
         throw new Error("User must be authenticated to create content items")
       }
 
-      const itemData = {
+      const itemData: Omit<ContentItemDocument, "createdAt" | "updatedAt"> & { userId: string } = {
         ...data,
         userId: user.uid, // For querying/filtering (matches existing indexes)
         createdBy: user.uid, // For audit trail
         updatedBy: user.uid,
-      } as any
+      }
 
       return service.createDocument("content-items", itemData)
     },
@@ -99,4 +108,3 @@ export function useContentItems(): UseContentItemsResult {
     refetch,
   }
 }
-

@@ -1,6 +1,6 @@
 /**
  * Queue Items Hook
- * 
+ *
  * Hook for managing job queue items with type safety
  */
 
@@ -36,14 +36,19 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
   // Build query constraints - NO userId filter, editors see all queue items
   const constraints = user?.uid
     ? {
-        where: status ? [{ field: "status", operator: "==", value: status }] as any : [],
-        orderBy: [{ field: "created_at", direction: "desc" }] as any,
+        where: status ? [{ field: "status", operator: "==" as const, value: status }] : [],
+        orderBy: [{ field: "created_at", direction: "desc" as const }],
         limit: maxItems,
       }
     : undefined
 
   // Subscribe to ALL queue items (no submitted_by filter - editors see everything)
-  const { data: queueItems, loading, error, refetch } = useFirestoreCollection({
+  const {
+    data: queueItems,
+    loading,
+    error,
+    refetch,
+  } = useFirestoreCollection({
     collectionName: "job-queue",
     constraints,
     enabled: !!user?.uid,
@@ -78,4 +83,3 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
     refetch,
   }
 }
-
