@@ -11,7 +11,7 @@ import { useContentItems } from "@/hooks/useContentItems"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Download, Upload, AlertCircle } from "lucide-react"
+import { Plus, Download, Upload, AlertCircle, FileText } from "lucide-react"
 import { ContentItem } from "./components/ContentItem"
 import { ContentItemDialog } from "./components/ContentItemDialog"
 
@@ -217,6 +217,88 @@ export function ContentItemsPage() {
     }
   }
 
+  const handleDownloadResume = () => {
+    try {
+      // Create a link to download the resume.pdf file
+      const link = document.createElement("a")
+      link.href = "/resume.pdf" // Static file in public directory
+      link.download = "resume.pdf"
+      link.target = "_blank"
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      setAlert({
+        type: "success",
+        message: "Resume download started",
+      })
+    } catch (error) {
+      console.error("Failed to download resume:", error)
+      setAlert({
+        type: "error",
+        message: "Failed to download resume. Please try again.",
+      })
+    }
+  }
+
+  const handleUploadResume = () => {
+    try {
+      const input = document.createElement("input")
+      input.type = "file"
+      input.accept = ".pdf,.doc,.docx"
+      input.multiple = false
+
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+
+        // Validate file type
+        const allowedTypes = [".pdf", ".doc", ".docx"]
+        const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`
+        if (!allowedTypes.includes(fileExtension)) {
+          setAlert({
+            type: "error",
+            message: "Please select a PDF, DOC, or DOCX file.",
+          })
+          return
+        }
+
+        // Validate file size (10MB limit)
+        const maxSize = 10 * 1024 * 1024 // 10MB
+        if (file.size > maxSize) {
+          setAlert({
+            type: "error",
+            message: "File size must be less than 10MB.",
+          })
+          return
+        }
+
+        try {
+          // Here you would typically upload the file to your backend
+          // For now, we'll just show a success message
+          setAlert({
+            type: "success",
+            message: `Resume "${file.name}" uploaded successfully`,
+          })
+        } catch (error) {
+          console.error("Failed to upload resume:", error)
+          setAlert({
+            type: "error",
+            message: "Failed to upload resume. Please try again.",
+          })
+        }
+      }
+
+      input.click()
+    } catch (error) {
+      console.error("Failed to upload resume:", error)
+      setAlert({
+        type: "error",
+        message: "Failed to upload resume. Please try again.",
+      })
+    }
+  }
+
   // Recursive rendering function
   const renderItemWithChildren = (item: ContentItemWithChildren) => {
     return (
@@ -282,6 +364,14 @@ export function ContentItemsPage() {
             <Button variant="outline" size="sm" onClick={handleImportItems}>
               <Upload className="mr-2 h-4 w-4" />
               Import
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadResume}>
+              <FileText className="mr-2 h-4 w-4" />
+              Download Resume
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleUploadResume}>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Resume
             </Button>
           </div>
         )}

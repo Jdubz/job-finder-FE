@@ -82,6 +82,9 @@ export const api = {
 
     // Experience management
     manageExperience: `${BASE_URL}/manageExperience${FUNCTION_SUFFIX}`,
+
+    // File management
+    manageFiles: `${BASE_URL}/manageFiles${FUNCTION_SUFFIX}`,
   },
 
   // Firestore collections (accessed via Firebase SDK, not REST)
