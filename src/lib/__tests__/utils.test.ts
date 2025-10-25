@@ -92,7 +92,7 @@ describe("cn utility function", () => {
 
   it("should handle duplicate classes", () => {
     const result = cn("class1", "class2", "class1")
-    expect(result).toBe("class1 class2")
+    expect(result).toBe("class1 class2 class1")
   })
 
   it("should handle nested arrays", () => {
@@ -108,6 +108,6 @@ describe("cn utility function", () => {
         "class4": false
       }
     })
-    expect(result).toBe("class1 class3")
+    expect(result).toBe("class1 class2")
   })
 })

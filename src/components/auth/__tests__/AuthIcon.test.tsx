@@ -212,15 +212,13 @@ describe("AuthIcon", () => {
 
   describe("state transitions", () => {
     it("should handle transition from loading to not signed in", () => {
-      const { rerender } = render(<AuthIcon {...defaultProps} />)
-
       // Start with loading
       mockUseAuth.mockReturnValue({
         user: null,
         isEditor: false,
         loading: true,
       })
-      rerender()
+      const { rerender } = render(<AuthIcon {...defaultProps} />)
 
       expect(screen.getByRole("button", { name: "Loading authentication status" })).toBeInTheDocument()
 
@@ -236,15 +234,13 @@ describe("AuthIcon", () => {
     })
 
     it("should handle transition from not signed in to signed in", () => {
-      const { rerender } = render(<AuthIcon {...defaultProps} />)
-
       // Start not signed in
       mockUseAuth.mockReturnValue({
         user: null,
         isEditor: false,
         loading: false,
       })
-      rerender()
+      const { rerender } = render(<AuthIcon {...defaultProps} />)
 
       expect(screen.getByRole("button", { name: /not signed in/i })).toBeInTheDocument()
 
@@ -260,15 +256,13 @@ describe("AuthIcon", () => {
     })
 
     it("should handle transition from viewer to editor", () => {
-      const { rerender } = render(<AuthIcon {...defaultProps} />)
-
       // Start as viewer
       mockUseAuth.mockReturnValue({
         user: mockUser,
         isEditor: false,
         loading: false,
       })
-      rerender()
+      const { rerender } = render(<AuthIcon {...defaultProps} />)
 
       expect(screen.getByRole("button", { name: /signed in as viewer/i })).toBeInTheDocument()
 
