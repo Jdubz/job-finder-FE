@@ -71,17 +71,8 @@ export const api = {
     // Content management
     manageContentItems: `${BASE_URL}/manageContentItems${FUNCTION_SUFFIX}`,
 
-    // Contact form
-    handleContactForm: `${BASE_URL}/contact-form${FUNCTION_SUFFIX}`,
-
     // Job queue management
     manageJobQueue: `${BASE_URL}/manageJobQueue${FUNCTION_SUFFIX}`,
-
-    // Settings management (if exists)
-    manageSettings: `${BASE_URL}/manageSettings${FUNCTION_SUFFIX}`,
-
-    // Experience management
-    manageExperience: `${BASE_URL}/manageExperience${FUNCTION_SUFFIX}`,
   },
 
   // Firestore collections (accessed via Firebase SDK, not REST)
