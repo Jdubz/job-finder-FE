@@ -220,7 +220,7 @@ export function ContentItemsPage() {
           await Promise.all(
             items.map((item) => {
               // Remove timestamp fields - let the service create them
-              const { createdAt: _createdAt, updatedAt: _updatedAt, createdBy: _createdBy, updatedBy: _updatedBy, ...itemData } = item
+              const itemData = item
               return createContentItem({
                 ...itemData,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -275,11 +275,11 @@ export function ContentItemsPage() {
           const existingIds = new Set(contentItems.map(item => item.id))
           
           // Filter out items that already exist
-          const newItems = items.filter(item => !existingIds.has(item.id))
+          const newItems = items.filter(item => !existingIds.has((item as Record<string, unknown>).id as string))
           
           if (newItems.length === 0) {
             setAlert({
-              type: "info",
+              type: "success",
               message: "No new items to import - all items already exist",
             })
             return
@@ -298,7 +298,7 @@ export function ContentItemsPage() {
           await Promise.all(
             newItems.map((item) => {
               // Remove timestamp fields - let the service create them
-              const { createdAt: _createdAt, updatedAt: _updatedAt, createdBy: _createdBy, updatedBy: _updatedBy, ...itemData } = item
+              const itemData = item
               return createContentItem({
                 ...itemData,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

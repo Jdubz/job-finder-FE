@@ -19,6 +19,11 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         <div
           className="h-full bg-primary transition-all duration-300 ease-in-out"
           style={{ width: `${percentage}%` }}
+          role="progressbar"
+          aria-valuenow={Math.round(percentage)}
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label={`Progress: ${percentage}%`}
         />
       </div>
     )

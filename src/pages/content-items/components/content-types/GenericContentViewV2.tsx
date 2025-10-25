@@ -62,7 +62,7 @@ export const GenericContentViewV2: React.FC<GenericContentViewProps> = ({ item }
               <IconComponent className="h-5 w-5 text-primary" />
               <h3 className="text-xl font-semibold">{getProperty("company") || "Company"}</h3>
               {getProperty("website") && (
-                <a href={getProperty("website")} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+                <a href={getProperty("website")} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline" aria-label="Visit company website">
                   <ExternalLink className="h-4 w-4" />
                 </a>
               )}

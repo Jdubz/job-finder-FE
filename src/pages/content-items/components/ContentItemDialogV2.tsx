@@ -56,7 +56,7 @@ export function ContentItemDialogV2({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<UpdateContentItemData>({})
-  const [visibility, setVisibility] = useState<ContentItemVisibility>("public")
+  const [visibility, setVisibility] = useState<ContentItemVisibility>("published")
 
   // Initialize form data when dialog opens or item changes
   useEffect(() => {
@@ -64,14 +64,14 @@ export function ContentItemDialogV2({
       if (item) {
         // Edit mode - populate with existing data
         setFormData(item as UpdateContentItemData)
-        setVisibility(item.visibility || "public")
+        setVisibility(item.visibility || "published")
         logger.debug("database", "processing", `Edit content item: ${item.id}`, {
           details: { itemType: item.type, itemId: item.id }
         })
       } else {
         // Create mode - initialize with empty data
-        setFormData({ type })
-        setVisibility("public")
+        setFormData({})
+        setVisibility("published")
         logger.debug("database", "processing", `Create content item: ${type}`)
       }
       setError(null)
@@ -109,12 +109,12 @@ export function ContentItemDialogV2({
         })
       } else {
         // Create new item
-        const createData: CreateContentItemData = {
+        const createData = {
           ...baseData,
           ...formData,
           createdAt: serverTimestamp(),
           createdBy: user.uid,
-        }
+        } as any
 
         await addDoc(collection(db, "content-items"), createData)
         
@@ -171,7 +171,7 @@ export function ContentItemDialogV2({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
                 <SelectItem value="private">Private</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
               </SelectContent>
