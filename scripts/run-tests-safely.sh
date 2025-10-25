@@ -13,23 +13,17 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}🧪 Running tests safely to prevent memory issues...${NC}"
 
-# Test file groups (smaller batches)
+# Test file groups (smaller batches) - Only include existing test files
 UNIT_TESTS=(
   "src/lib/__tests__/utils.test.ts"
   "src/components/ui/__tests__/button.test.ts"
   "src/components/auth/__tests__/AuthIcon.test.ts"
-  "src/components/auth/__tests__/AuthModal.test.ts"
   "src/components/layout/__tests__/MainLayout.test.ts"
-  "src/components/layout/__tests__/Navigation.test.ts"
-  "src/hooks/__tests__/usePersonalInfo.test.ts"
-  "src/__tests__/App.test.ts"
-  "src/__tests__/components/GenerationProgress.test.ts"
   "src/__tests__/components/DocumentHistoryList.test.ts"
 )
 
 INTEGRATION_TESTS=(
-  "src/__tests__/pages/DocumentBuilderPage.test.ts"
-  "src/__tests__/integration/document-generation-flow.test.ts"
+  # Integration tests will be added when they exist
 )
 
 # Function to run a single test file
@@ -72,6 +66,13 @@ run_unit_tests() {
 # Function to run integration tests
 run_integration_tests() {
   echo -e "${YELLOW}🔗 Running integration tests...${NC}"
+  
+  if [ ${#INTEGRATION_TESTS[@]} -eq 0 ]; then
+    echo -e "${YELLOW}⚠️  No integration tests configured yet${NC}"
+    echo -e "${GREEN}✅ Integration tests skipped (none configured)${NC}"
+    return 0
+  fi
+  
   local failed_tests=()
   
   for test_file in "${INTEGRATION_TESTS[@]}"; do
