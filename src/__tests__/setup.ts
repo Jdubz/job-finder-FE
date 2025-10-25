@@ -4,7 +4,7 @@
  * Global test setup and configuration for unit tests
  */
 
-import { vi } from "vitest"
+import { vi, beforeEach, afterEach } from "vitest"
 import "@testing-library/jest-dom"
 import { setupTestCleanup, logMemoryUsage } from "./test-cleanup"
 
@@ -139,8 +139,8 @@ vi.mock("react", async () => {
   const actual = await vi.importActual("react")
   return {
     ...actual,
-    useCallback: (fn: any) => fn,
-    useMemo: (fn: any) => fn(),
+    useCallback: (fn: unknown) => (fn as () => unknown),
+    useMemo: (fn: unknown) => (fn as () => unknown)(),
   }
 })
 
@@ -148,7 +148,7 @@ vi.mock("react", async () => {
 vi.mock("@/utils/date", () => ({
   formatDate: vi.fn((date: Date) => date.toLocaleDateString()),
   formatDateTime: vi.fn((date: Date) => date.toLocaleString()),
-  formatRelativeTime: vi.fn((date: Date) => "2 hours ago"),
+  formatRelativeTime: vi.fn((_date: Date) => "2 hours ago"),
 }))
 
 // Mock file download utilities
@@ -179,7 +179,7 @@ vi.mock("@/utils/storage", () => ({
 // Mock validation utilities
 vi.mock("@/utils/validation", () => ({
   validateEmail: vi.fn((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)),
-  validateRequired: vi.fn((value: any) => value != null && value !== ""),
+  validateRequired: vi.fn((value: unknown) => value != null && value !== ""),
   validateUrl: vi.fn((url: string) => {
     try {
       new URL(url)
@@ -246,16 +246,7 @@ setupTestCleanup()
 logMemoryUsage("Test Setup Complete")
 
 // Setup global test utilities
-declare global {
-  namespace Vi {
-    interface Assertion<T> {
-      toBeInTheDocument(): T
-      toHaveClass(className: string): T
-      toHaveAttribute(attr: string, value?: string): T
-      toHaveTextContent(text: string): T
-    }
-  }
-}
+// Note: Global type declarations are handled by @testing-library/jest-dom
 
 // Export test utilities
 export const mockUser = {

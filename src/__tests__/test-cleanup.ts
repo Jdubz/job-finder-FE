@@ -29,7 +29,7 @@ export function setupTestCleanup() {
     if (typeof window !== 'undefined') {
       // Clear timers
       const highestTimeoutId = setTimeout(() => {}, 0)
-      for (let i = 0; i < highestTimeoutId; i++) {
+      for (let i = 0; i < Number(highestTimeoutId); i++) {
         clearTimeout(i)
         clearInterval(i)
       }

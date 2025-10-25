@@ -4,7 +4,7 @@
  * Comprehensive tests for the DocumentHistoryList component functionality
  */
 
-import { describe, it, expect, beforeEach, vi, Mock } from "vitest"
+import { describe, it, expect, beforeEach, vi, type Mock } from "vitest"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { DocumentHistoryList } from "@/pages/document-builder/components/DocumentHistoryList"
 import { useAuth } from "@/contexts/AuthContext"
