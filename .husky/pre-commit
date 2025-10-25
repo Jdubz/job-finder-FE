@@ -1,5 +1,5 @@
-#!/bin/sh
-. "$(dirname "$0")/_/h"
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
 # Pre-commit hook: Blocking lint and typecheck
 echo "🔍 Running pre-commit checks..."
