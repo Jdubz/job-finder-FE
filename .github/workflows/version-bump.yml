@@ -53,6 +53,9 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "Bumped to version: $NEW_VERSION"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Update package-lock.json
         run: npm install --package-lock-only
 
