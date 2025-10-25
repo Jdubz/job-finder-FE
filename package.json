@@ -28,7 +28,9 @@
     "preview": "vite preview",
     "type-check": "tsc -b --noEmit",
     "check:env": "bash scripts/check-env.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prevent-no-verify": "./scripts/setup-no-verify-prevention.sh",
+    "activate-git-prevention": "source scripts/activate-git-prevention.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

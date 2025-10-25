@@ -37,3 +37,7 @@ coverage
 test-results
 playwright-report
 .playwright
+
+# Prevent --no-verify bypass scripts
+git-bypass-*
+no-verify-*
