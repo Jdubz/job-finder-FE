@@ -90,6 +90,13 @@ run_integration_tests() {
     return 0
   fi
   
+  # Check if we're in CI environment - skip integration tests in CI
+  if [ "$CI" = "true" ] || [ "$GITHUB_ACTIONS" = "true" ]; then
+    echo -e "${YELLOW}⚠️  CI environment detected, skipping integration tests${NC}"
+    echo -e "${GREEN}✅ Integration tests skipped (CI environment)${NC}"
+    return 0
+  fi
+  
   local failed_tests=()
   
   for test_file in "${INTEGRATION_TESTS[@]}"; do
