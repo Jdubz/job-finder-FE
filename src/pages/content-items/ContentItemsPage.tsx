@@ -220,7 +220,7 @@ export function ContentItemsPage() {
           await Promise.all(
             items.map((item) => {
               // Remove timestamp fields - let the service create them
-              const { createdAt, updatedAt, createdBy, updatedBy, ...itemData } = item
+              const { createdAt: _createdAt, updatedAt: _updatedAt, createdBy: _createdBy, updatedBy: _updatedBy, ...itemData } = item
               return createContentItem({
                 ...itemData,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,7 +298,7 @@ export function ContentItemsPage() {
           await Promise.all(
             newItems.map((item) => {
               // Remove timestamp fields - let the service create them
-              const { createdAt, updatedAt, createdBy, updatedBy, ...itemData } = item
+              const { createdAt: _createdAt, updatedAt: _updatedAt, createdBy: _createdBy, updatedBy: _updatedBy, ...itemData } = item
               return createContentItem({
                 ...itemData,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

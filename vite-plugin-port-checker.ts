@@ -17,7 +17,7 @@ export function portChecker(options: PortCheckerOptions): Plugin {
   return {
     name: 'port-checker',
     configureServer(server) {
-      const { port, projectName } = options
+      const { port } = options
       
       server.middlewares.use('/__port-check', (req, res, next) => {
         if (req.method === 'GET') {
@@ -39,7 +39,7 @@ export function portChecker(options: PortCheckerOptions): Plugin {
               res.writeHead(200, { 'Content-Type': 'application/json' })
               res.end(JSON.stringify({ portInUse: false }))
             }
-          } catch (error) {
+          } catch (_error) {
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ portInUse: false }))
           }
@@ -69,7 +69,7 @@ export function portChecker(options: PortCheckerOptions): Plugin {
           
           process.exit(1)
         }
-      } catch (error) {
+      } catch (_error) {
         // Port is free, continue
       }
     }

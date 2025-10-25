@@ -12,7 +12,7 @@ import type {
   LogLevel,
   LogAction,
   PipelineStage,
-  CloudLogEntry
+  // CloudLogEntry
 } from "@jsdubzw/job-finder-shared-types"
 
 /**
@@ -175,7 +175,7 @@ export class CloudLogger {
    */
   async logUserAction(
     action: string,
-    details: Record<string, any>,
+    details: Record<string, unknown>,
     options?: {
       queueItemId?: string
     }
@@ -198,7 +198,7 @@ export class CloudLogger {
   async logComponentLifecycle(
     componentName: string,
     action: "mounted" | "unmounted" | "updated" | "error",
-    details?: Record<string, any>
+    details?: Record<string, unknown>
   ): Promise<void> {
     await this.log(
       action === "error" ? "error" : "info",

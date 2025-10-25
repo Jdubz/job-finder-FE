@@ -104,7 +104,7 @@ export const GenericContentEdit: React.FC<GenericContentEditProps> = ({ data, on
     onChange(newData)
   }
 
-  const renderField = (field: any) => {
+  const renderField = (field: { name: string; type: string; label: string; required?: boolean }) => {
     const fieldValue = data[field.name as keyof UpdateContentItemData]
     
     // Handle special field types

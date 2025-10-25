@@ -6,7 +6,7 @@
  */
 
 import React from "react"
-import { Calendar, MapPin, ExternalLink, Building, GraduationCap, Code, FileText, Clock } from "lucide-react"
+import { Calendar, ExternalLink, Building, GraduationCap, Code, FileText, Clock } from "lucide-react"
 import type { ContentItem } from "@/types/content-items"
 
 interface GenericContentViewProps {
@@ -36,7 +36,7 @@ export const GenericContentViewV2: React.FC<GenericContentViewProps> = ({ item }
 
   // Helper function to safely get property values
   const getProperty = (key: string) => {
-    return (item as any)[key]
+    return (item as Record<string, unknown>)[key]
   }
 
   // Helper function to format dates

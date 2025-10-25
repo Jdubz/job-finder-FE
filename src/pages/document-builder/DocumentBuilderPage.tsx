@@ -28,7 +28,7 @@ import { DocumentHistoryList } from "./components/DocumentHistoryList"
 import { GenerationProgress } from "@/components/GenerationProgress"
 
 // Helper function to normalize job match data from different sources
-function normalizeJobMatch(match: any): {
+function normalizeJobMatch(match: Record<string, unknown>): {
   id: string
   jobTitle: string
   companyName: string

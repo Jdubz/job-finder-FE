@@ -20,10 +20,20 @@ UNIT_TESTS=(
   "src/components/auth/__tests__/AuthIcon.test.ts"
   "src/components/layout/__tests__/MainLayout.test.ts"
   "src/__tests__/components/DocumentHistoryList.test.ts"
+  "src/services/logging/__tests__/CloudLogger.test.ts"
+  "src/pages/content-items/__tests__/buildHierarchy.test.ts"
+  "src/utils/__tests__/dateFormat.test.ts"
+  "src/types/__tests__/routes.test.ts"
+  "src/api/__tests__/job-matches-client.test.ts"
 )
 
 INTEGRATION_TESTS=(
-  # Integration tests will be added when they exist
+  "tests/integration/jobQueue.test.ts"
+  "tests/integration/contentItems.test.ts"
+  "tests/integration/generator.test.ts"
+  "tests/integration/jobMatches.test.ts"
+  "tests/integration/errorHandling.test.ts"
+  "tests/integration/authentication.test.ts"
 )
 
 # Function to run a single test file
