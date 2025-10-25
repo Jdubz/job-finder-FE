@@ -83,6 +83,13 @@ run_integration_tests() {
     return 0
   fi
   
+  # Check if Firebase emulators are running
+  if ! curl -f -m 1 http://localhost:9099 2>/dev/null; then
+    echo -e "${YELLOW}⚠️  Firebase emulators not running, skipping integration tests${NC}"
+    echo -e "${GREEN}✅ Integration tests skipped (emulators not available)${NC}"
+    return 0
+  fi
+  
   local failed_tests=()
   
   for test_file in "${INTEGRATION_TESTS[@]}"; do
