@@ -107,14 +107,14 @@ function MyContentPage() {
   const handleEdit = (item: ContentItemWithChildren) => {
     // Open edit dialog
     logger.info("database", "processing", `Edit content item: ${item.id}`, {
-      details: { itemType: item.type, itemId: item.id }
+      details: { itemType: item.type, itemId: item.id },
     })
   }
 
   const handleDelete = (id: string) => {
     // Delete item
     logger.info("database", "processing", `Delete content item: ${id}`, {
-      details: { itemId: id }
+      details: { itemId: id },
     })
   }
 

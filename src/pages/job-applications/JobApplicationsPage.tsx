@@ -43,17 +43,27 @@ export function JobApplicationsPage() {
       return
     }
 
-    logger.info("database", "started", "JobApplicationsPage: Subscribing to job matches for all users", {
-      details: { userId: user.uid }
-    })
+    logger.info(
+      "database",
+      "started",
+      "JobApplicationsPage: Subscribing to job matches for all users",
+      {
+        details: { userId: user.uid },
+      }
+    )
 
     // All authenticated users see all matches (no userId filtering)
     const unsubscribe = jobMatchesClient.subscribeToMatches(
       null, // No user filtering - show all matches
       (updatedMatches) => {
-        logger.info("database", "completed", `JobApplicationsPage: Received ${updatedMatches.length} job matches`, {
-          details: { matchCount: updatedMatches.length }
-        })
+        logger.info(
+          "database",
+          "completed",
+          `JobApplicationsPage: Received ${updatedMatches.length} job matches`,
+          {
+            details: { matchCount: updatedMatches.length },
+          }
+        )
         if (updatedMatches.length > 0) {
           logger.debug("database", "processing", "JobApplicationsPage: First match sample", {
             details: {
@@ -61,7 +71,7 @@ export function JobApplicationsPage() {
               companyName: updatedMatches[0].companyName,
               jobTitle: updatedMatches[0].jobTitle,
               submittedBy: updatedMatches[0].submittedBy,
-            }
+            },
           })
         }
         setMatches(updatedMatches)
@@ -74,8 +84,8 @@ export function JobApplicationsPage() {
           error: {
             type: err.constructor.name,
             message: err.message,
-            stack: err.stack
-          }
+            stack: err.stack,
+          },
         })
         setError("Failed to load job matches. Please refresh the page.")
         setLoading(false)

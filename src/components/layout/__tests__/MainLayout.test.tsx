@@ -1,10 +1,10 @@
 /**
  * MainLayout Component Tests
- * 
+ *
  * Tests for the MainLayout component functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { MainLayout } from "../MainLayout"
@@ -66,9 +66,11 @@ describe("MainLayout", () => {
 
       const navigation = screen.getByTestId("navigation")
       const main = screen.getByRole("main")
-      
+
       // Navigation should come before main in the DOM
-      expect(navigation.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(
+        navigation.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy()
     })
 
     it("should have main content below navigation", () => {
@@ -108,7 +110,7 @@ describe("MainLayout", () => {
   describe("content rendering", () => {
     it("should render different content based on route", () => {
       const AnotherPage = () => <div data-testid="another-page">Another Page</div>
-      
+
       render(
         <BrowserRouter>
           <Routes>

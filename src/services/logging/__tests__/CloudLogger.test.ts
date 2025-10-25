@@ -1,6 +1,6 @@
 /**
  * CloudLogger Tests
- * 
+ *
  * Tests for the Google Cloud Logging service integration
  */
 
@@ -20,7 +20,7 @@ describe("CloudLogger", () => {
       logName: "test-logs",
       environment: "development",
       service: "test-service",
-      version: "1.0.0"
+      version: "1.0.0",
     })
   })
 
@@ -30,9 +30,9 @@ describe("CloudLogger", () => {
 
   it("should log info messages", async () => {
     const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    
+
     await logger.info("database", "started", "Test message", {
-      details: { test: "value" }
+      details: { test: "value" },
     })
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -40,7 +40,7 @@ describe("CloudLogger", () => {
       "Test message",
       expect.objectContaining({
         action: "started",
-        details: { test: "value" }
+        details: { test: "value" },
       })
     )
 
@@ -49,13 +49,13 @@ describe("CloudLogger", () => {
 
   it("should log error messages", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-    
+
     await logger.error("database", "failed", "Test error", {
       error: {
         type: "TestError",
         message: "Test error message",
-        stack: "Test stack trace"
-      }
+        stack: "Test stack trace",
+      },
     })
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -66,8 +66,8 @@ describe("CloudLogger", () => {
         error: {
           type: "TestError",
           message: "Test error message",
-          stack: "Test stack trace"
-        }
+          stack: "Test stack trace",
+        },
       })
     )
 
@@ -76,9 +76,9 @@ describe("CloudLogger", () => {
 
   it("should log API requests", async () => {
     const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    
+
     await logger.logApiRequest("GET", "/api/test", 200, 150, {
-      queueItemId: "test-123"
+      queueItemId: "test-123",
     })
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -90,8 +90,8 @@ describe("CloudLogger", () => {
           method: "GET",
           url: "/api/test",
           statusCode: 200,
-          duration: 150
-        })
+          duration: 150,
+        }),
       })
     )
 
@@ -101,9 +101,9 @@ describe("CloudLogger", () => {
   it("should handle API errors", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
     const error = new Error("Network error")
-    
+
     await logger.logApiRequest("POST", "/api/test", 500, 2000, {
-      error
+      error,
     })
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -114,8 +114,8 @@ describe("CloudLogger", () => {
         error: {
           type: "Error",
           message: "Network error",
-          stack: expect.any(String)
-        }
+          stack: expect.any(String),
+        },
       })
     )
 
@@ -124,13 +124,17 @@ describe("CloudLogger", () => {
 
   it("should log user actions", async () => {
     const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    
-    await logger.logUserAction("button_click", {
-      buttonId: "save-button",
-      page: "content-items"
-    }, {
-      queueItemId: "test-123"
-    })
+
+    await logger.logUserAction(
+      "button_click",
+      {
+        buttonId: "save-button",
+        page: "content-items",
+      },
+      {
+        queueItemId: "test-123",
+      }
+    )
 
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("[INFO] [database]"),
@@ -139,8 +143,8 @@ describe("CloudLogger", () => {
         action: "button_click",
         details: {
           buttonId: "save-button",
-          page: "content-items"
-        }
+          page: "content-items",
+        },
       })
     )
 
@@ -149,9 +153,9 @@ describe("CloudLogger", () => {
 
   it("should log component lifecycle", async () => {
     const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {})
-    
+
     await logger.logComponentLifecycle("ContentItemDialog", "mounted", {
-      itemType: "company"
+      itemType: "company",
     })
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -161,8 +165,8 @@ describe("CloudLogger", () => {
         action: "mounted",
         details: {
           component: "ContentItemDialog",
-          itemType: "company"
-        }
+          itemType: "company",
+        },
       })
     )
 
@@ -171,9 +175,9 @@ describe("CloudLogger", () => {
 
   it("should flush logs on destroy", async () => {
     const flushSpy = vi.spyOn(logger as any, "flush")
-    
+
     await logger.destroy()
-    
+
     expect(flushSpy).toHaveBeenCalled()
   })
 })

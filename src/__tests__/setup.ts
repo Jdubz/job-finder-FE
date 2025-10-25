@@ -1,6 +1,6 @@
 /**
  * Test Setup Configuration
- * 
+ *
  * Global test setup and configuration for unit tests
  */
 
@@ -11,7 +11,7 @@ import { setupTestCleanup, logMemoryUsage } from "./test-cleanup"
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -65,7 +65,7 @@ const originalConsoleWarn = console.warn
 beforeEach(() => {
   // Reset all mocks before each test
   vi.clearAllMocks()
-  
+
   // Suppress console errors and warnings during tests
   console.error = vi.fn()
   console.warn = vi.fn()
@@ -139,7 +139,7 @@ vi.mock("react", async () => {
   const actual = await vi.importActual("react")
   return {
     ...actual,
-    useCallback: (fn: unknown) => (fn as () => unknown),
+    useCallback: (fn: unknown) => fn as () => unknown,
     useMemo: (fn: unknown) => (fn as () => unknown)(),
   }
 })

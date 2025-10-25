@@ -1,6 +1,6 @@
 /**
  * DocumentHistoryList Component Tests
- * 
+ *
  * Comprehensive tests for the DocumentHistoryList component functionality
  */
 
@@ -60,13 +60,13 @@ const mockDocuments = [
 describe("DocumentHistoryList", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    
+
     // Setup default mocks
     mockUseAuth.mockReturnValue({
       user: mockUser,
       loading: false,
     })
-    
+
     mockUseGeneratorDocuments.mockReturnValue({
       documents: mockDocuments,
       loading: false,
@@ -132,7 +132,7 @@ describe("DocumentHistoryList", () => {
 
       expect(screen.getByText("Document History")).toBeInTheDocument()
       expect(screen.getByText("Your previously generated documents")).toBeInTheDocument()
-      
+
       // Should show skeleton loading items
       const skeletonItems = screen.getAllByTestId("skeleton-item")
       expect(skeletonItems).toHaveLength(3)
@@ -152,14 +152,16 @@ describe("DocumentHistoryList", () => {
       render(<DocumentHistoryList />)
 
       expect(screen.getByText("No documents yet")).toBeInTheDocument()
-      expect(screen.getByText("Generate your first resume or cover letter to get started")).toBeInTheDocument()
+      expect(
+        screen.getByText("Generate your first resume or cover letter to get started")
+      ).toBeInTheDocument()
     })
   })
 
   describe("error state", () => {
     it("should show error message when there's an error", () => {
       const mockError = new Error("Failed to load documents")
-      
+
       mockUseGeneratorDocuments.mockReturnValue({
         documents: [],
         loading: false,
@@ -191,14 +193,11 @@ describe("DocumentHistoryList", () => {
       const downloadButtons = screen.getAllByText("Download")
       fireEvent.click(downloadButtons[0])
 
-      expect(mockOpen).toHaveBeenCalledWith(
-        "https://storage.example.com/resume-1.pdf",
-        "_blank"
-      )
+      expect(mockOpen).toHaveBeenCalledWith("https://storage.example.com/resume-1.pdf", "_blank")
     })
 
     it("should not show download button for documents without URLs", () => {
-      const documentsWithoutUrls = mockDocuments.map(doc => ({
+      const documentsWithoutUrls = mockDocuments.map((doc) => ({
         ...doc,
         documentUrl: undefined,
       }))
@@ -276,10 +275,10 @@ describe("DocumentHistoryList", () => {
     })
 
     it("should show loading state on delete button during deletion", async () => {
-      const mockDeleteDocument = vi.fn().mockImplementation(() => 
-        new Promise(resolve => setTimeout(resolve, 100))
-      )
-      
+      const mockDeleteDocument = vi
+        .fn()
+        .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)))
+
       mockUseGeneratorDocuments.mockReturnValue({
         documents: mockDocuments,
         loading: false,
@@ -309,7 +308,7 @@ describe("DocumentHistoryList", () => {
     it("should handle delete errors", async () => {
       const deleteError = new Error("Failed to delete document")
       const mockDeleteDocument = vi.fn().mockRejectedValue(deleteError)
-      
+
       mockUseGeneratorDocuments.mockReturnValue({
         documents: mockDocuments,
         loading: false,
@@ -339,7 +338,7 @@ describe("DocumentHistoryList", () => {
   describe("refresh functionality", () => {
     it("should trigger refetch when refreshTrigger changes", () => {
       const mockRefetch = vi.fn()
-      
+
       mockUseGeneratorDocuments.mockReturnValue({
         documents: mockDocuments,
         loading: false,
@@ -392,7 +391,7 @@ describe("DocumentHistoryList", () => {
       render(<DocumentHistoryList />)
 
       const deleteButtons = screen.getAllByRole("button", { name: /delete/i })
-      deleteButtons.forEach(button => {
+      deleteButtons.forEach((button) => {
         expect(button).toHaveAttribute("aria-label")
       })
     })
@@ -401,7 +400,7 @@ describe("DocumentHistoryList", () => {
       render(<DocumentHistoryList />)
 
       const downloadButtons = screen.getAllByText("Download")
-      downloadButtons.forEach(button => {
+      downloadButtons.forEach((button) => {
         expect(button.closest("button")).toHaveAttribute("aria-label")
       })
     })
@@ -413,11 +412,11 @@ describe("DocumentHistoryList", () => {
       const deleteButtons = screen.getAllByRole("button", { name: /delete/i })
 
       // All interactive elements should be focusable
-      downloadButtons.forEach(button => {
+      downloadButtons.forEach((button) => {
         expect(button.closest("button")).not.toHaveAttribute("tabindex", "-1")
       })
 
-      deleteButtons.forEach(button => {
+      deleteButtons.forEach((button) => {
         expect(button).not.toHaveAttribute("tabindex", "-1")
       })
     })
@@ -429,9 +428,11 @@ describe("DocumentHistoryList", () => {
 
       // Check that the component renders without errors
       expect(screen.getByText("Document History")).toBeInTheDocument()
-      
+
       // Check that documents are displayed in a responsive layout
-      const documentItems = screen.getAllByText(/Software Engineer|Frontend Developer|Full Stack Developer/)
+      const documentItems = screen.getAllByText(
+        /Software Engineer|Frontend Developer|Full Stack Developer/
+      )
       expect(documentItems).toHaveLength(3)
     })
   })

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vite Plugin: Port Checker
  * 

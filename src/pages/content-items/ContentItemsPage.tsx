@@ -57,19 +57,19 @@ export function ContentItemsPage() {
     )
 
     const newHierarchy = buildHierarchy(filteredItems as unknown as ContentItemTypeUnion[])
-    
+
     // Only update hierarchy if it's actually different
-    setHierarchy(prevHierarchy => {
+    setHierarchy((prevHierarchy) => {
       if (prevHierarchy.length !== newHierarchy.length) {
         return newHierarchy
       }
-      
+
       // Check if any items have changed
       const hasChanged = prevHierarchy.some((prevItem, index) => {
         const newItem = newHierarchy[index]
         return !newItem || prevItem.id !== newItem.id
       })
-      
+
       return hasChanged ? newHierarchy : prevHierarchy
     })
   }, [contentItems, firestoreError])
@@ -91,7 +91,7 @@ export function ContentItemsPage() {
       if (processedItems.has(item.id)) {
         return
       }
-      
+
       const itemWithChildren = itemsMap.get(item.id)!
       processedItems.add(item.id)
 
@@ -213,7 +213,7 @@ export function ContentItemsPage() {
               `Clearing ${contentItems.length} existing items for import`,
               { details: { itemsToClear: contentItems.length, importMode: "replace" } }
             )
-            await Promise.all(contentItems.map(item => deleteContentItem(item.id)))
+            await Promise.all(contentItems.map((item) => deleteContentItem(item.id)))
           }
 
           // Import all items
@@ -272,11 +272,13 @@ export function ContentItemsPage() {
           }
 
           // Add new items mode: check for duplicates
-          const existingIds = new Set(contentItems.map(item => item.id))
-          
+          const existingIds = new Set(contentItems.map((item) => item.id))
+
           // Filter out items that already exist
-          const newItems = items.filter(item => !existingIds.has((item as Record<string, unknown>).id as string))
-          
+          const newItems = items.filter(
+            (item) => !existingIds.has((item as Record<string, unknown>).id as string)
+          )
+
           if (newItems.length === 0) {
             setAlert({
               type: "success",
@@ -284,7 +286,7 @@ export function ContentItemsPage() {
             })
             return
           }
-          
+
           if (newItems.length < items.length) {
             const skippedCount = items.length - newItems.length
             await logger.info(
@@ -426,12 +428,13 @@ export function ContentItemsPage() {
       >
         {/* Render children if they exist */}
         {item.children && item.children.length > 0 && (
-          <div className="mt-4">{item.children.map((child) => renderItemWithChildren(child, depth + 1))}</div>
+          <div className="mt-4">
+            {item.children.map((child) => renderItemWithChildren(child, depth + 1))}
+          </div>
         )}
       </ContentItem>
     )
   }
-
 
   if (loading) {
     return (
@@ -499,9 +502,7 @@ export function ContentItemsPage() {
 
       {/* Render all content items in hierarchy order */}
       {hierarchy.length > 0 ? (
-        <div className="space-y-4">
-          {hierarchy.map((item) => renderItemWithChildren(item, 0))}
-        </div>
+        <div className="space-y-4">{hierarchy.map((item) => renderItemWithChildren(item, 0))}</div>
       ) : (
         <div className="border-2 border-dashed rounded-lg p-12 text-center">
           <div className="mx-auto max-w-md space-y-3">

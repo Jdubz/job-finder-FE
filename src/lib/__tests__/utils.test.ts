@@ -1,6 +1,6 @@
 /**
  * Utils Tests
- * 
+ *
  * Tests for utility functions
  */
 
@@ -35,9 +35,9 @@ describe("cn utility function", () => {
 
   it("should handle objects with boolean values", () => {
     const result = cn({
-      "class1": true,
-      "class2": false,
-      "class3": true
+      class1: true,
+      class2: false,
+      class3: true,
     })
     expect(result).toBe("class1 class3")
   })
@@ -46,7 +46,7 @@ describe("cn utility function", () => {
     const result = cn(
       "base",
       ["array1", "array2"],
-      { "object1": true, "object2": false },
+      { object1: true, object2: false },
       "string",
       undefined,
       null
@@ -102,11 +102,11 @@ describe("cn utility function", () => {
 
   it("should handle deeply nested objects", () => {
     const result = cn({
-      "class1": true,
-      "class2": {
-        "class3": true,
-        "class4": false
-      }
+      class1: true,
+      class2: {
+        class3: true,
+        class4: false,
+      },
     })
     expect(result).toBe("class1 class2")
   })

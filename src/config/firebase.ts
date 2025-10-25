@@ -34,7 +34,7 @@ if (import.meta.env.VITE_USE_EMULATORS === "true") {
       authHost,
       authPort,
       firestoreHost,
-      firestorePort
-    }
+      firestorePort,
+    },
   })
 }

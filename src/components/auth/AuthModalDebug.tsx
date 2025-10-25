@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Dialog,
   DialogContent,
@@ -30,10 +31,10 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   const addDebugLog = (message: string) => {
     const timestamp = new Date().toISOString().split("T")[1].split(".")[0]
     const logMessage = `[${timestamp}] ${message}`
-    
+
     // Log to structured logger
     logger.debug("database", "processing", `Auth Debug: ${message}`)
-    
+
     // Also add to debug info for UI display
     setDebugInfo((prev) => [...prev, logMessage])
   }

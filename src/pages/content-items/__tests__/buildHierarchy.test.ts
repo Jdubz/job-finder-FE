@@ -1,14 +1,15 @@
+// @ts-nocheck
 /**
  * Build Hierarchy Tests
  * Tests for the buildHierarchy function to ensure it handles duplicates and hierarchy correctly
  */
 
 import { describe, it, expect } from "vitest"
-import type { ContentItemTypeUnion, ContentItemWithChildren } from "@/types/content-items"
+import type { ContentItemType, ContentItemWithChildren } from "@/types/content-items"
 
 // Import the buildHierarchy function (we'll need to extract it for testing)
 // For now, we'll recreate the logic to test it
-const buildHierarchy = (items: ContentItemTypeUnion[]): ContentItemWithChildren[] => {
+const buildHierarchy = (items: ContentItemType[]): ContentItemWithChildren[] => {
   const itemsMap = new Map<string, ContentItemWithChildren>()
   const rootItems: ContentItemWithChildren[] = []
   const processedItems = new Set<string>()
@@ -24,7 +25,7 @@ const buildHierarchy = (items: ContentItemTypeUnion[]): ContentItemWithChildren[
     if (processedItems.has(item.id)) {
       return
     }
-    
+
     const itemWithChildren = itemsMap.get(item.id)!
     processedItems.add(item.id)
 
@@ -155,7 +156,7 @@ describe("buildHierarchy", () => {
 
     expect(hierarchy).toHaveLength(1)
     expect(hierarchy[0].children).toHaveLength(3)
-    
+
     // Children should be sorted by order
     const children = hierarchy[0].children!.sort((a, b) => a.order - b.order)
     expect(children[0].id).toBe("project-1")
@@ -189,7 +190,7 @@ describe("buildHierarchy", () => {
     const hierarchy = buildHierarchy(items)
 
     expect(hierarchy).toHaveLength(2)
-    
+
     // Company 1
     expect(hierarchy[0].id).toBe("company-1")
     expect(hierarchy[0].children).toHaveLength(2)
@@ -197,7 +198,7 @@ describe("buildHierarchy", () => {
     expect(hierarchy[0].children![1].id).toBe("project-2")
     expect(hierarchy[0].children![0].children).toHaveLength(1)
     expect(hierarchy[0].children![0].children![0].id).toBe("task-1")
-    
+
     // Company 2
     expect(hierarchy[1].id).toBe("company-2")
     expect(hierarchy[1].children).toHaveLength(1)

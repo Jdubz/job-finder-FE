@@ -211,7 +211,7 @@ export class SystemHealthClient extends BaseApiClient {
   async resolveAlert(alertId: string): Promise<void> {
     // In production: return this.patch(`/alerts/${alertId}/resolve`)
     await logger.info("database", "completed", `Alert ${alertId} resolved`, {
-      details: { alertId }
+      details: { alertId },
     })
   }
 

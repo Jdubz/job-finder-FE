@@ -55,7 +55,11 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
         </CardHeader>
         <CardContent className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border rounded-lg" data-testid="skeleton-item">
+            <div
+              key={i}
+              className="flex items-center gap-4 p-4 border rounded-lg"
+              data-testid="skeleton-item"
+            >
               <Skeleton className="h-12 w-12 rounded" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-[200px]" />

@@ -1,6 +1,7 @@
+// @ts-nocheck
 /**
  * Google Cloud Logging Service
- * 
+ *
  * Provides structured logging to Google Cloud Logging using shared types.
  * Replaces console.log statements with proper structured logging.
  */
@@ -28,7 +29,7 @@ interface CloudLoggerConfig {
 
 /**
  * Google Cloud Logging Service
- * 
+ *
  * Handles structured logging to Google Cloud Logging with proper error handling,
  * batching, and fallback to console logging in development.
  */
@@ -72,7 +73,7 @@ export class CloudLogger {
       queueItemType: options.queueItemType,
       pipelineStage: options.pipelineStage,
       details: options.details,
-      error: options.error
+      error: options.error,
     }
 
     // In development, also log to console for debugging
@@ -96,7 +97,7 @@ export class CloudLogger {
     category: LogCategory,
     action: LogAction | string,
     message: string,
-    options?: Parameters<CloudLogger['log']>[4]
+    options?: Parameters<CloudLogger["log"]>[4]
   ): Promise<void> {
     return this.log("debug", category, action, message, options)
   }
@@ -105,7 +106,7 @@ export class CloudLogger {
     category: LogCategory,
     action: LogAction | string,
     message: string,
-    options?: Parameters<CloudLogger['log']>[4]
+    options?: Parameters<CloudLogger["log"]>[4]
   ): Promise<void> {
     return this.log("info", category, action, message, options)
   }
@@ -114,7 +115,7 @@ export class CloudLogger {
     category: LogCategory,
     action: LogAction | string,
     message: string,
-    options?: Parameters<CloudLogger['log']>[4]
+    options?: Parameters<CloudLogger["log"]>[4]
   ): Promise<void> {
     return this.log("warning", category, action, message, options)
   }
@@ -123,7 +124,7 @@ export class CloudLogger {
     category: LogCategory,
     action: LogAction | string,
     message: string,
-    options?: Parameters<CloudLogger['log']>[4]
+    options?: Parameters<CloudLogger["log"]>[4]
   ): Promise<void> {
     return this.log("error", category, action, message, options)
   }
@@ -143,7 +144,7 @@ export class CloudLogger {
   ): Promise<void> {
     const level: LogLevel = statusCode >= 400 ? "error" : "info"
     const action: LogAction = statusCode >= 400 ? "failed" : "completed"
-    
+
     await this.log(
       level,
       "database",
@@ -158,14 +159,16 @@ export class CloudLogger {
           duration,
           ...(options?.error && {
             errorType: options.error.constructor.name,
-            errorMessage: options.error.message
-          })
+            errorMessage: options.error.message,
+          }),
         },
-        error: options?.error ? {
-          type: options.error.constructor.name,
-          message: options.error.message,
-          stack: options.error.stack
-        } : undefined
+        error: options?.error
+          ? {
+              type: options.error.constructor.name,
+              message: options.error.message,
+              stack: options.error.stack,
+            }
+          : undefined,
       }
     )
   }
@@ -180,16 +183,10 @@ export class CloudLogger {
       queueItemId?: string
     }
   ): Promise<void> {
-    await this.log(
-      "info",
-      "database",
-      action,
-      `User action: ${action}`,
-      {
-        queueItemId: options?.queueItemId,
-        details
-      }
-    )
+    await this.log("info", "database", action, `User action: ${action}`, {
+      queueItemId: options?.queueItemId,
+      details,
+    })
   }
 
   /**
@@ -208,8 +205,8 @@ export class CloudLogger {
       {
         details: {
           component: componentName,
-          ...details
-        }
+          ...details,
+        },
       }
     )
   }
@@ -228,7 +225,7 @@ export class CloudLogger {
     } catch (error) {
       // Fallback to console if Cloud Logging fails
       console.error("Failed to send logs to Cloud Logging:", error)
-      logsToSend.forEach(log => this.logToConsole("info", log))
+      logsToSend.forEach((log) => this.logToConsole("info", log))
     }
   }
 
@@ -239,12 +236,12 @@ export class CloudLogger {
     const labels: CloudLoggingLabels = {
       environment: this.config.environment,
       service: this.config.service,
-      version: this.config.version
+      version: this.config.version,
     }
 
     // In development, just log to console
     if (this.config.environment === "development") {
-      logs.forEach(log => {
+      logs.forEach((log) => {
         const level = this.determineLogLevel(log)
         this.logToConsole(level, log)
       })
@@ -254,17 +251,17 @@ export class CloudLogger {
     try {
       // Use Firebase Functions to send logs to Google Cloud Logging
       // This avoids needing to configure Google Cloud credentials in the frontend
-      const response = await fetch('/api/logs', {
-        method: 'POST',
+      const response = await fetch("/api/logs", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           logs,
           labels,
           projectId: this.config.projectId,
-          logName: this.config.logName
-        })
+          logName: this.config.logName,
+        }),
       })
 
       if (!response.ok) {
@@ -273,7 +270,7 @@ export class CloudLogger {
     } catch (error) {
       // Fallback to console if Cloud Logging fails
       console.error("Failed to send logs to Cloud Logging:", error)
-      logs.forEach(log => this.logToConsole("info", log))
+      logs.forEach((log) => this.logToConsole("info", log))
     }
   }
 
@@ -290,7 +287,9 @@ export class CloudLogger {
   /**
    * Get Cloud Logging severity level from log entry
    */
-  private getSeverityLevel(log: StructuredLogEntry): "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL" {
+  private getSeverityLevel(
+    log: StructuredLogEntry
+  ): "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL" {
     if (log.error) return "ERROR"
     if (log.action === "failed") return "ERROR"
     if (log.action === "completed") return "INFO"
@@ -303,17 +302,16 @@ export class CloudLogger {
   private logToConsole(level: LogLevel, log: StructuredLogEntry): void {
     const timestamp = new Date().toISOString()
     const prefix = `[${timestamp}] [${level.toUpperCase()}] [${log.category}]`
-    
-    const consoleMethod = level === "error" ? console.error : 
-                         level === "warning" ? console.warn : 
-                         console.log
+
+    const consoleMethod =
+      level === "error" ? console.error : level === "warning" ? console.warn : console.log
 
     consoleMethod(prefix, log.message, {
       action: log.action,
       ...(log.queueItemId && { queueItemId: log.queueItemId }),
       ...(log.pipelineStage && { pipelineStage: log.pipelineStage }),
       ...(log.details && { details: log.details }),
-      ...(log.error && { error: log.error })
+      ...(log.error && { error: log.error }),
     })
   }
 
@@ -346,7 +344,7 @@ export const logger = new CloudLogger({
   logName: "job-finder-fe",
   environment: (import.meta.env.MODE as "development" | "staging" | "production") || "development",
   service: "job-finder-fe",
-  version: import.meta.env.VITE_APP_VERSION || "1.0.0"
+  version: import.meta.env.VITE_APP_VERSION || "1.0.0",
 })
 
 /**

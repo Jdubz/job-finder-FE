@@ -1,6 +1,6 @@
 /**
  * Content Item Dialog V2
- * 
+ *
  * Simplified version using GenericContentEdit component.
  * Reduces code complexity and improves maintainability.
  */
@@ -65,7 +65,7 @@ export function ContentItemDialogV2({
         setFormData(item as UpdateContentItemData)
         setVisibility(item.visibility || "published")
         logger.debug("database", "processing", `Edit content item: ${item.id}`, {
-          details: { itemType: item.type, itemId: item.id }
+          details: { itemType: item.type, itemId: item.id },
         })
       } else {
         // Create mode - initialize with empty data
@@ -102,9 +102,9 @@ export function ContentItemDialogV2({
         }
 
         await updateDoc(doc(db, "content-items", item.id), updateData)
-        
+
         await logger.info("database", "completed", `Updated content item: ${item.id}`, {
-          details: { itemType: type, itemId: item.id }
+          details: { itemType: type, itemId: item.id },
         })
       } else {
         // Create new item
@@ -116,9 +116,9 @@ export function ContentItemDialogV2({
         } as Record<string, unknown>
 
         await addDoc(collection(db, "content-items"), createData)
-        
+
         await logger.info("database", "completed", `Created content item: ${type}`, {
-          details: { itemType: type }
+          details: { itemType: type },
         })
       }
 
@@ -127,14 +127,14 @@ export function ContentItemDialogV2({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save content item"
       setError(errorMessage)
-      
+
       await logger.error("database", "failed", `Failed to save content item: ${errorMessage}`, {
         error: {
           type: err instanceof Error ? err.constructor.name : "UnknownError",
           message: errorMessage,
-          stack: err instanceof Error ? err.stack : undefined
+          stack: err instanceof Error ? err.stack : undefined,
         },
-        details: { itemType: type, itemId: item?.id }
+        details: { itemType: type, itemId: item?.id },
       })
     } finally {
       setLoading(false)
@@ -165,7 +165,10 @@ export function ContentItemDialogV2({
           {/* Visibility Setting */}
           <div className="space-y-2">
             <Label htmlFor="visibility">Visibility</Label>
-            <Select value={visibility} onValueChange={(value: ContentItemVisibility) => setVisibility(value)}>
+            <Select
+              value={visibility}
+              onValueChange={(value: ContentItemVisibility) => setVisibility(value)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -178,11 +181,7 @@ export function ContentItemDialogV2({
           </div>
 
           {/* Generic Content Edit Form */}
-          <GenericContentEdit
-            data={formData}
-            onChange={handleFormChange}
-            type={type}
-          />
+          <GenericContentEdit data={formData} onChange={handleFormChange} type={type} />
         </div>
 
         <DialogFooter>

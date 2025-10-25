@@ -1,6 +1,6 @@
 /**
  * Logging Service Exports
- * 
+ *
  * Central export point for all logging functionality
  */
 
@@ -14,5 +14,5 @@ export type {
   PipelineStage,
   CloudLogEntry,
   LogQueryOptions,
-  LogQueryResult
+  LogQueryResult,
 } from "@jsdubzw/job-finder-shared-types"

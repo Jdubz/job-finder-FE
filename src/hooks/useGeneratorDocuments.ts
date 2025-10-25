@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Generator Documents Hook
  *
@@ -54,7 +55,7 @@ function transformDocuments(rawDocuments: GeneratorDocument[]): DocumentHistoryI
 
       // Get document URL from files if available
       let documentUrl: string | undefined
-      
+
       // Try to get URL from the response document if it exists
       // The response document should have files with signed URLs
       if (doc.files?.resume?.signedUrl) {

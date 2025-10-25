@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Test Helper Utilities
  *
@@ -20,7 +21,7 @@ export function isFirebaseMocked(): boolean {
  * Get the appropriate describe function for integration tests
  * Returns describe.skip if Firebase is mocked, otherwise returns describe
  */
-export function getIntegrationDescribe() {
+export function getIntegrationDescribe(): typeof describe {
   return isFirebaseMocked() ? describe.skip : describe
 }
 

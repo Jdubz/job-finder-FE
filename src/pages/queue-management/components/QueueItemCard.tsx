@@ -107,7 +107,7 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
           <input
             type="checkbox"
             checked={selected}
-            aria-label={`Select ${item.jobTitle} at ${item.company}`}
+            aria-label={`Select job at ${item.company_name}`}
             onChange={(e) => onSelect(item.id!, e.target.checked)}
             className="mt-1 rounded border-gray-300"
           />
