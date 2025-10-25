@@ -172,7 +172,6 @@ kill: ## Kill all dev servers and emulators
 	@echo "$(CYAN)Killing all dev servers...$(RESET)"
 	@lsof -ti:5173 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 5173$(RESET)"
 	@lsof -ti:4173 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 4173$(RESET)"
-	@lsof -ti:5000 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 5000$(RESET)"
 	@lsof -ti:8080 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 8080$(RESET)"
 	@lsof -ti:9099 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 9099$(RESET)"
 	@lsof -ti:4000 | xargs kill -9 2>/dev/null || echo "$(YELLOW)No process on port 4000$(RESET)"
