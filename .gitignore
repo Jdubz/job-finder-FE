@@ -38,6 +38,9 @@ test-results
 playwright-report
 .playwright
 
+# TypeScript build info files
+*.tsbuildinfo
+
 # Prevent --no-verify bypass scripts
 git-bypass-*
 no-verify-*
