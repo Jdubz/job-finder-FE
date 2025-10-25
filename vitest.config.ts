@@ -23,12 +23,16 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: "./src/test/setup.ts",
+    setupFiles: ["./src/__tests__/setup.ts"],
 
-    // CRITICAL: Only include test files from source directory
-    include: ["src/**/*.{test,spec}.{ts,tsx}", "tests/**/*.{test,spec}.{ts,tsx}"],
+    // Include test files from source directory and tests directory
+    include: [
+      "src/**/*.{test,spec}.{ts,tsx}",
+      "src/__tests__/**/*.{test,spec}.{ts,tsx}",
+      "tests/**/*.{test,spec}.{ts,tsx}",
+    ],
 
-    // CRITICAL: Exclude everything else to prevent explosions
+    // Exclude everything else to prevent explosions
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
@@ -38,21 +42,31 @@ export default defineConfig({
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
     ],
 
-    // CRITICAL: Single process execution - NO parallelism
-    pool: "forks",
+    // Force sequential execution to prevent memory issues
+    pool: "forks", // Use forks for better isolation
     poolOptions: {
       forks: {
-        maxForks: 1, // ONLY 1 process at a time
+        maxForks: 1, // Only one process at a time
         minForks: 1,
       },
     },
 
-    // CRITICAL: No file parallelism
+    // Disable all parallelism
     fileParallelism: false,
+    sequence: {
+      concurrent: false, // Force sequential execution
+    },
 
-    // CRITICAL: No test parallelism
+    // Test timeout configuration
     testTimeout: 30000,
     hookTimeout: 30000,
+
+    // Memory optimization settings
+    isolate: false, // Disable isolation to reduce memory overhead
+    passWithNoTests: true, // Don't fail if no tests are found
+    
+    // Reduce memory usage by limiting concurrent operations
+    maxConcurrency: 1,
 
     // Coverage configuration
     coverage: {
@@ -62,10 +76,24 @@ export default defineConfig({
         "**/node_modules/**",
         "**/dist/**",
         "**/tests/**",
+        "**/__tests__/**",
         "**/*.d.ts",
         "**/*.config.*",
         "**/coverage/**",
+        "**/setup.ts",
+        "**/testHelpers.ts",
       ],
+      include: [
+        "src/**/*.{ts,tsx}",
+      ],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
     },
   },
 })

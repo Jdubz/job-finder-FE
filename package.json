@@ -4,7 +4,8 @@
   "version": "0.0.28",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev-with-port-check.js",
+    "dev:new": "vite",
     "build": "tsc -b && vite build --mode production",
     "build:staging": "tsc -b && vite build --mode staging",
     "build:production": "tsc -b && vite build --mode production",
@@ -15,6 +16,11 @@
     "test": "vitest",
     "test:ci": "vitest run",
     "test:unit": "vitest run src",
+    "test:unit:safe": "NODE_OPTIONS='--max-old-space-size=4096' vitest run src --no-coverage --reporter=verbose --no-isolate",
+    "test:unit:single": "NODE_OPTIONS='--max-old-space-size=4096' vitest run src --no-coverage --reporter=verbose --no-isolate --run",
+    "test:safe": "bash scripts/run-tests-safely.sh all",
+    "test:safe:unit": "bash scripts/run-tests-safely.sh unit",
+    "test:safe:integration": "bash scripts/run-tests-safely.sh integration",
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -52,8 +58,7 @@
     "react-hook-form": "^7.65.0",
     "react-router-dom": "^7.9.4",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.1.12"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

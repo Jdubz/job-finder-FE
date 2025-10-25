@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 import { consoleLogger } from "./vite-plugin-console-logger"
 import { jsonLogger } from "./vite-plugin-json-logger"
+import { portChecker } from "./vite-plugin-port-checker"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -15,6 +16,10 @@ export default defineConfig({
     react(),
     tsconfigPaths({
       projects: ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.vitest.json"],
+    }),
+    portChecker({
+      port: 5173,
+      projectName: "job-finder-FE"
     }),
     consoleLogger({
       backendUrl: "http://localhost:5000",
@@ -27,6 +32,7 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+    strictPort: false, // Allow port switching as fallback
   },
   resolve: {
     alias: {

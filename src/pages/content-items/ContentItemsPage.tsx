@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Plus, Download, Upload, AlertCircle, FileText } from "lucide-react"
 import { ContentItem } from "./components/ContentItem"
 import { ContentItemDialog } from "./components/ContentItemDialog"
+import { logger } from "@/services/logging"
 
 export function ContentItemsPage() {
   const { isEditor } = useAuth()
@@ -56,13 +57,28 @@ export function ContentItemsPage() {
     )
 
     const newHierarchy = buildHierarchy(filteredItems as unknown as ContentItemTypeUnion[])
-    setHierarchy(newHierarchy)
+    
+    // Only update hierarchy if it's actually different
+    setHierarchy(prevHierarchy => {
+      if (prevHierarchy.length !== newHierarchy.length) {
+        return newHierarchy
+      }
+      
+      // Check if any items have changed
+      const hasChanged = prevHierarchy.some((prevItem, index) => {
+        const newItem = newHierarchy[index]
+        return !newItem || prevItem.id !== newItem.id
+      })
+      
+      return hasChanged ? newHierarchy : prevHierarchy
+    })
   }, [contentItems, firestoreError])
 
   // Build hierarchy from flat list
   const buildHierarchy = (items: ContentItemTypeUnion[]): ContentItemWithChildren[] => {
     const itemsMap = new Map<string, ContentItemWithChildren>()
     const rootItems: ContentItemWithChildren[] = []
+    const processedItems = new Set<string>()
 
     // First pass: create map of all items
     items.forEach((item) => {
@@ -71,7 +87,13 @@ export function ContentItemsPage() {
 
     // Second pass: build parent-child relationships
     items.forEach((item) => {
+      // Skip if already processed to prevent duplicates
+      if (processedItems.has(item.id)) {
+        return
+      }
+      
       const itemWithChildren = itemsMap.get(item.id)!
+      processedItems.add(item.id)
 
       // Only treat as root if parentId is explicitly null or undefined
       // Skip items with parentId that points to missing parent (orphaned items)
@@ -165,6 +187,72 @@ export function ContentItemsPage() {
     }
   }
 
+  const handleReplaceAllItems = async () => {
+    try {
+      const input = document.createElement("input")
+      input.type = "file"
+      input.accept = ".json"
+
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) return
+
+        try {
+          const text = await file.text()
+          const items = JSON.parse(text) as CreateContentItemData[]
+
+          if (!Array.isArray(items)) {
+            throw new Error("Invalid file format")
+          }
+
+          // Replace all mode: clear existing items first
+          if (contentItems.length > 0) {
+            await logger.info(
+              "database",
+              "processing",
+              `Clearing ${contentItems.length} existing items for import`,
+              { details: { itemsToClear: contentItems.length, importMode: "replace" } }
+            )
+            await Promise.all(contentItems.map(item => deleteContentItem(item.id)))
+          }
+
+          // Import all items
+          await Promise.all(
+            items.map((item) => {
+              // Remove timestamp fields - let the service create them
+              const { createdAt, updatedAt, createdBy, updatedBy, ...itemData } = item
+              return createContentItem({
+                ...itemData,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                visibility: (itemData.visibility || "draft") as any,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any)
+            })
+          )
+
+          setAlert({
+            type: "success",
+            message: `Replaced all content-items with ${items.length} imported items`,
+          })
+        } catch (error) {
+          console.error("Failed to replace all:", error)
+          setAlert({
+            type: "error",
+            message: "Failed to replace all. Please check the file format.",
+          })
+        }
+      }
+
+      input.click()
+    } catch (error) {
+      console.error("Failed to replace all content items:", error)
+      setAlert({
+        type: "error",
+        message: "Failed to replace all. Please try again.",
+      })
+    }
+  }
+
   const handleImportItems = async () => {
     try {
       const input = document.createElement("input")
@@ -183,20 +271,46 @@ export function ContentItemsPage() {
             throw new Error("Invalid file format")
           }
 
+          // Add new items mode: check for duplicates
+          const existingIds = new Set(contentItems.map(item => item.id))
+          
+          // Filter out items that already exist
+          const newItems = items.filter(item => !existingIds.has(item.id))
+          
+          if (newItems.length === 0) {
+            setAlert({
+              type: "info",
+              message: "No new items to import - all items already exist",
+            })
+            return
+          }
+          
+          if (newItems.length < items.length) {
+            const skippedCount = items.length - newItems.length
+            await logger.info(
+              "database",
+              "processing",
+              `Skipped ${skippedCount} duplicate items during import`,
+              { details: { skippedCount, totalItems: items.length, newItems: newItems.length } }
+            )
+          }
+
           await Promise.all(
-            items.map((item) =>
-              createContentItem({
-                ...item,
+            newItems.map((item) => {
+              // Remove timestamp fields - let the service create them
+              const { createdAt, updatedAt, createdBy, updatedBy, ...itemData } = item
+              return createContentItem({
+                ...itemData,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                visibility: (item.visibility || "draft") as any,
+                visibility: (itemData.visibility || "draft") as any,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
               } as any)
-            )
+            })
           )
 
           setAlert({
             type: "success",
-            message: `Imported ${items.length} items successfully`,
+            message: `Imported ${newItems.length} items successfully`,
           })
         } catch (error) {
           console.error("Failed to import:", error)
@@ -300,10 +414,10 @@ export function ContentItemsPage() {
   }
 
   // Recursive rendering function
-  const renderItemWithChildren = (item: ContentItemWithChildren) => {
+  const renderItemWithChildren = (item: ContentItemWithChildren, depth = 0) => {
     return (
       <ContentItem
-        key={item.id}
+        key={`${item.id}-${depth}`}
         item={item}
         isEditor={isEditor}
         onUpdate={handleUpdateItem}
@@ -312,18 +426,12 @@ export function ContentItemsPage() {
       >
         {/* Render children if they exist */}
         {item.children && item.children.length > 0 && (
-          <div className="mt-4">{item.children.map((child) => renderItemWithChildren(child))}</div>
+          <div className="mt-4">{item.children.map((child) => renderItemWithChildren(child, depth + 1))}</div>
         )}
       </ContentItem>
     )
   }
 
-  // Separate companies and other root items
-  const companies = hierarchy.filter((item) => item.type === "company")
-  const profileSections = hierarchy.filter((item) => item.type === "profile-section")
-  const otherItems = hierarchy.filter(
-    (item) => item.type !== "company" && item.type !== "profile-section"
-  )
 
   if (loading) {
     return (
@@ -363,7 +471,11 @@ export function ContentItemsPage() {
             </Button>
             <Button variant="outline" size="sm" onClick={handleImportItems}>
               <Upload className="mr-2 h-4 w-4" />
-              Import
+              Add New
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleReplaceAllItems}>
+              <Upload className="mr-2 h-4 w-4" />
+              Replace All
             </Button>
             <Button variant="outline" size="sm" onClick={handleDownloadResume}>
               <FileText className="mr-2 h-4 w-4" />
@@ -385,40 +497,28 @@ export function ContentItemsPage() {
         )}
       </div>
 
-      {/* Profile Sections */}
-      {profileSections.length > 0 && (
+      {/* Render all content items in hierarchy order */}
+      {hierarchy.length > 0 ? (
         <div className="space-y-4">
-          {profileSections.map((section) => renderItemWithChildren(section))}
-        </div>
-      )}
-
-      {/* Companies (Work Experience) */}
-      {companies.length > 0 ? (
-        <div className="space-y-4">
-          {companies.map((company) => renderItemWithChildren(company))}
+          {hierarchy.map((item) => renderItemWithChildren(item, 0))}
         </div>
       ) : (
         <div className="border-2 border-dashed rounded-lg p-12 text-center">
           <div className="mx-auto max-w-md space-y-3">
-            <h3 className="text-lg font-medium">No work experience yet</h3>
+            <h3 className="text-lg font-medium">No content yet</h3>
             <p className="text-sm text-muted-foreground">
               {isEditor
                 ? "Add your professional experience to showcase your career history and accomplishments."
-                : "Check back later for experience details."}
+                : "Check back later for content details."}
             </p>
             {isEditor && (
               <Button onClick={handleCreateNew} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Your First Experience
+                Add Your First Content
               </Button>
             )}
           </div>
         </div>
-      )}
-
-      {/* Other Content (Skills, Education, etc.) */}
-      {otherItems.length > 0 && (
-        <div className="space-y-4">{otherItems.map((item) => renderItemWithChildren(item))}</div>
       )}
 
       {/* Create Content Dialog */}

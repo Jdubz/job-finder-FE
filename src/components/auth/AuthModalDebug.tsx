@@ -11,6 +11,7 @@ import { signInWithPopup, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "@/config/firebase"
 import { LogOut, Shield, Info, AlertTriangle } from "lucide-react"
 import { useState, useEffect } from "react"
+import { logger } from "@/services/logging"
 
 interface AuthModalProps {
   open: boolean
@@ -29,7 +30,11 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
   const addDebugLog = (message: string) => {
     const timestamp = new Date().toISOString().split("T")[1].split(".")[0]
     const logMessage = `[${timestamp}] ${message}`
-    console.log(`🔐 ${logMessage}`)
+    
+    // Log to structured logger
+    logger.debug("database", "processing", `Auth Debug: ${message}`)
+    
+    // Also add to debug info for UI display
     setDebugInfo((prev) => [...prev, logMessage])
   }
 

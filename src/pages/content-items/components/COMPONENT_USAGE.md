@@ -101,16 +101,21 @@ import {
   ProfileSectionList,
 } from "@/pages/content-items/components"
 import type { ContentItemWithChildren } from "@/types/content-items"
+import { logger } from "@/services/logging"
 
 function MyContentPage() {
   const handleEdit = (item: ContentItemWithChildren) => {
     // Open edit dialog
-    console.log("Edit:", item)
+    logger.info("database", "processing", `Edit content item: ${item.id}`, {
+      details: { itemType: item.type, itemId: item.id }
+    })
   }
 
   const handleDelete = (id: string) => {
     // Delete item
-    console.log("Delete:", id)
+    logger.info("database", "processing", `Delete content item: ${id}`, {
+      details: { itemId: id }
+    })
   }
 
   return (

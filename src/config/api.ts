@@ -82,9 +82,6 @@ export const api = {
 
     // Experience management
     manageExperience: `${BASE_URL}/manageExperience${FUNCTION_SUFFIX}`,
-
-    // File management
-    manageFiles: `${BASE_URL}/manageFiles${FUNCTION_SUFFIX}`,
   },
 
   // Firestore collections (accessed via Firebase SDK, not REST)
@@ -116,17 +113,4 @@ export async function authenticatedFetch(
   })
 }
 
-// Legacy exports for backward compatibility (deprecated)
-export const FUNCTION_URLS = {
-  jobQueue: api.functions.manageJobQueue,
-  generator: api.functions.manageGenerator,
-  contentItems: api.functions.manageContentItems,
-  contact: api.functions.handleContactForm,
-}
-
-export const API_ENDPOINTS = {
-  jobQueue: "/job-queue",
-  jobMatches: "/job-matches",
-  generator: "/generator",
-  contentItems: "/content-items",
-}
+// Legacy exports removed - use api.functions directly
