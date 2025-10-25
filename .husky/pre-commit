@@ -1,5 +1,4 @@
 #!/bin/sh
-. "$(dirname "$0")/_/h"
 
 # Pre-commit hook: Blocking lint and typecheck
 echo "🔍 Running pre-commit checks..."
