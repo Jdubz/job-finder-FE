@@ -12,7 +12,6 @@ import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/fi
 import type {
   ContentItem,
   ContentItemType,
-  CreateContentItemData,
   UpdateContentItemData,
   ContentItemVisibility,
 } from "@/types/content-items"
@@ -114,7 +113,7 @@ export function ContentItemDialogV2({
           ...formData,
           createdAt: serverTimestamp(),
           createdBy: user.uid,
-        } as any
+        } as Record<string, unknown>
 
         await addDoc(collection(db, "content-items"), createData)
         

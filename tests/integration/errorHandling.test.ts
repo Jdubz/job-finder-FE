@@ -14,7 +14,6 @@ import {
   getIntegrationDescribe,
 } from "../utils/testHelpers"
 import { mockErrorResponses } from "../fixtures/mockData"
-import { FUNCTION_URLS } from "@/config/api"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
 const describeIntegration = getIntegrationDescribe()
@@ -165,7 +164,7 @@ describeIntegration("Error Handling Integration", () => {
       await cleanupTestAuth()
 
       // Try to make an unauthenticated request (this simulates the error case)
-      const testUrl = FUNCTION_URLS.generator || "http://localhost:5001/test"
+      const testUrl = "http://localhost:5001/test"
 
       try {
         const response = await makeUnauthenticatedRequest(testUrl, {
@@ -186,7 +185,7 @@ describeIntegration("Error Handling Integration", () => {
       // Sign in first
       await signInTestUser("regular")
 
-      const testUrl = FUNCTION_URLS.generator || "http://localhost:5001/test"
+      const testUrl = "http://localhost:5001/test"
 
       try {
         const response = await makeAuthenticatedRequest(testUrl, {
