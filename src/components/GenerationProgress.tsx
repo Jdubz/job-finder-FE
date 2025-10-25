@@ -64,15 +64,24 @@ export function GenerationProgress({ steps }: GenerationProgressProps) {
   const getStepIcon = (status: GenerationStep["status"]) => {
     switch (status) {
       case "pending":
-        return <Circle className="w-5 h-5 text-muted-foreground" />
+        return <Circle className="w-5 h-5 text-muted-foreground" data-testid="pending-icon" />
       case "in_progress":
-        return <Loader2 className="w-5 h-5 text-primary animate-spin" />
+        return <Loader2 className="w-5 h-5 text-primary animate-spin" data-testid="spinner-icon" />
       case "completed":
-        return <CheckCircle2 className="w-5 h-5 text-green-600 fill-green-100" />
+        return (
+          <CheckCircle2
+            className="w-5 h-5 text-green-600 fill-green-100"
+            data-testid="check-icon"
+          />
+        )
       case "failed":
-        return <XCircle className="w-5 h-5 text-destructive fill-red-100" />
+        return (
+          <XCircle className="w-5 h-5 text-destructive fill-red-100" data-testid="error-icon" />
+        )
       case "skipped":
-        return <Circle className="w-5 h-5 text-muted-foreground opacity-50" />
+        return (
+          <Circle className="w-5 h-5 text-muted-foreground opacity-50" data-testid="skipped-icon" />
+        )
       default:
         return null
     }
@@ -96,11 +105,17 @@ export function GenerationProgress({ steps }: GenerationProgressProps) {
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="space-y-4">
+        <div className="space-y-4" data-testid="generation-progress">
           {steps.map((step) => (
-            <div key={step.id} className="flex items-start gap-3">
+            <div
+              key={step.id}
+              className={`flex items-start gap-3 ${step.status}`}
+              data-step-id={step.id}
+            >
               {/* Icon */}
-              <div className="pt-0.5">{getStepIcon(step.status)}</div>
+              <div className="pt-0.5" data-testid={`${step.status}-icon`}>
+                {getStepIcon(step.status)}
+              </div>
 
               {/* Step Info - Show only one message at a time */}
               <div className="flex-1 min-w-0">

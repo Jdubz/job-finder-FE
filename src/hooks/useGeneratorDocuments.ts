@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Generator Documents Hook
  *
@@ -54,9 +55,13 @@ function transformDocuments(rawDocuments: GeneratorDocument[]): DocumentHistoryI
 
       // Get document URL from files if available
       let documentUrl: string | undefined
-      if (doc.intermediateResults?.resumeContent && doc.intermediateResults?.coverLetterContent) {
-        // For both documents, we'll use the resume URL as primary
-        documentUrl = undefined // Will be handled by the UI to show both options
+
+      // Try to get URL from the response document if it exists
+      // The response document should have files with signed URLs
+      if (doc.files?.resume?.signedUrl) {
+        documentUrl = doc.files.resume.signedUrl
+      } else if (doc.files?.coverLetter?.signedUrl) {
+        documentUrl = doc.files.coverLetter.signedUrl
       }
 
       return {

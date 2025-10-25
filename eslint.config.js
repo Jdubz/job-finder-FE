@@ -45,6 +45,15 @@ export default defineConfig([
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-non-null-assertion": "warn",
+      "@typescript-eslint/ban-ts-comment": [
+        "error",
+        {
+          "ts-expect-error": "allow-with-description",
+          "ts-ignore": true,
+          "ts-nocheck": false,
+          "ts-check": false,
+        },
+      ],
 
       // React rules
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],

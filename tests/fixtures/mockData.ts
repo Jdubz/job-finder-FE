@@ -16,41 +16,37 @@ import type {
  */
 export const mockQueueItem: QueueItem = {
   id: "queue-test-123",
-  userId: "test-user-123",
-  linkedInUrl: "https://www.linkedin.com/jobs/view/123456789",
-  jobTitle: "Senior Software Engineer",
-  company: "Test Company Inc",
+  type: "job",
   status: "pending",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  stage: "queued",
-  priority: 0,
+  url: "https://www.linkedin.com/jobs/view/123456789",
+  company_name: "Test Company Inc",
+  company_id: null,
+  source: "user_submission",
+  submitted_by: "test-user-123",
+  retry_count: 0,
+  max_retries: 3,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
 }
 
 export const mockProcessingQueueItem: QueueItem = {
   ...mockQueueItem,
   id: "queue-test-processing",
   status: "processing",
-  stage: "scraping",
-  startedAt: new Date().toISOString(),
 }
 
 export const mockCompletedQueueItem: QueueItem = {
   ...mockQueueItem,
   id: "queue-test-completed",
-  status: "completed",
-  stage: "completed",
-  completedAt: new Date().toISOString(),
-  matchScore: 85,
+  status: "success",
+  completed_at: new Date().toISOString(),
 }
 
 export const mockFailedQueueItem: QueueItem = {
   ...mockQueueItem,
   id: "queue-test-failed",
   status: "failed",
-  stage: "failed",
-  error: "Failed to scrape job details",
-  failedAt: new Date().toISOString(),
+  error_details: "Failed to scrape job details",
 }
 
 /**
@@ -58,40 +54,33 @@ export const mockFailedQueueItem: QueueItem = {
  */
 export const mockJobMatch: JobMatch = {
   id: "match-test-123",
-  userId: "test-user-123",
-  queueItemId: "queue-test-123",
+  url: "https://www.linkedin.com/jobs/view/123456789",
+  companyName: "Test Company Inc",
+  companyId: null,
   jobTitle: "Senior Software Engineer",
-  company: "Test Company Inc",
   location: "San Francisco, CA",
-  salary: "$150,000 - $200,000",
-  matchScore: 85,
-  status: "new",
-  linkedInUrl: "https://www.linkedin.com/jobs/view/123456789",
+  salaryRange: "$150,000 - $200,000",
   jobDescription: "We are looking for an experienced software engineer to join our team...",
-  requirements: [
-    "5+ years of software development experience",
-    "Strong proficiency in React and TypeScript",
-    "Experience with cloud platforms (AWS, GCP, or Azure)",
-    "Excellent problem-solving skills",
-  ],
-  responsibilities: [
-    "Design and implement scalable web applications",
-    "Collaborate with cross-functional teams",
-    "Mentor junior developers",
-    "Participate in code reviews",
-  ],
+  companyInfo: null,
+  matchScore: 85,
+  matchedSkills: ["React", "TypeScript", "Node.js", "AWS"],
+  missingSkills: [],
+  matchReasons: ["Strong match based on technical skills and experience level"],
+  keyStrengths: ["React", "TypeScript", "Cloud platforms"],
+  potentialConcerns: [],
+  experienceMatch: 85,
+  applicationPriority: "High",
+  customizationRecommendations: [],
+  analyzedAt: new Date().toISOString(),
   createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  analyzed: true,
-  aiMatchReasoning: "Strong match based on technical skills and experience level",
-  recommendedSkills: ["React", "TypeScript", "Node.js", "AWS"],
+  submittedBy: "test-user-123",
+  queueItemId: "queue-test-123",
 }
 
 export const mockHighScoreJobMatch: JobMatch = {
   ...mockJobMatch,
   id: "match-test-high-score",
   matchScore: 95,
-  status: "viewed",
 }
 
 export const mockLowScoreJobMatch: JobMatch = {
@@ -99,14 +88,12 @@ export const mockLowScoreJobMatch: JobMatch = {
   id: "match-test-low-score",
   matchScore: 65,
   jobTitle: "Junior Developer",
-  company: "Startup Inc",
+  companyName: "Startup Inc",
 }
 
 export const mockAppliedJobMatch: JobMatch = {
   ...mockJobMatch,
   id: "match-test-applied",
-  status: "applied",
-  appliedAt: new Date().toISOString(),
 }
 
 /**
@@ -260,17 +247,16 @@ export const mockStopList = {
 }
 
 export const mockQueueSettings: QueueSettings = {
-  max_concurrent_jobs: 5,
-  retry_attempts: 3,
-  retry_delay_seconds: 60,
-  job_timeout_seconds: 300,
+  maxRetries: 3,
+  retryDelaySeconds: 60,
+  processingTimeout: 300,
 }
 
 export const mockAISettings: AISettings = {
-  model: "gpt-4",
-  temperature: 0.7,
-  max_tokens: 2000,
-  top_p: 1.0,
+  provider: "claude",
+  model: "claude-3-5-sonnet-20241022",
+  minMatchScore: 70,
+  costBudgetDaily: 10,
 }
 
 /**

@@ -8,25 +8,9 @@ import { FormActions } from "./FormActions"
 import { Button } from "../../../components/ui/button"
 import { Card } from "../../../components/ui/card"
 
-// Import view components
-import { CompanyView } from "./content-types/CompanyView"
-import { ProjectView } from "./content-types/ProjectView"
-import { SkillGroupView } from "./content-types/SkillGroupView"
-import { EducationView } from "./content-types/EducationView"
-import { ProfileSectionView } from "./content-types/ProfileSectionView"
-import { TextSectionView } from "./content-types/TextSectionView"
-import { AccomplishmentView } from "./content-types/AccomplishmentView"
-import { TimelineEventView } from "./content-types/TimelineEventView"
-
-// Import edit components
-import { CompanyEdit } from "./content-types/CompanyEdit"
-import { ProjectEdit } from "./content-types/ProjectEdit"
-import { SkillGroupEdit } from "./content-types/SkillGroupEdit"
-import { EducationEdit } from "./content-types/EducationEdit"
-import { ProfileSectionEdit } from "./content-types/ProfileSectionEdit"
-import { TextSectionEdit } from "./content-types/TextSectionEdit"
-import { AccomplishmentEdit } from "./content-types/AccomplishmentEdit"
-import { TimelineEventEdit } from "./content-types/TimelineEventEdit"
+// Import generic components
+import { GenericContentView } from "./content-types/GenericContentView"
+import { GenericContentEdit } from "./content-types/GenericContentEdit"
 
 interface ContentItemProps {
   item: ContentItemType
@@ -119,23 +103,8 @@ export const ContentItem: React.FC<ContentItemProps> = ({
     return (
       <Card className="border-2 border-primary">
         <div className="p-6 space-y-6">
-          {/* Render appropriate edit component based on type */}
-          {item.type === "company" && <CompanyEdit data={editData} onChange={setEditData} />}
-          {item.type === "project" && <ProjectEdit data={editData} onChange={setEditData} />}
-          {item.type === "skill-group" && <SkillGroupEdit data={editData} onChange={setEditData} />}
-          {item.type === "education" && <EducationEdit data={editData} onChange={setEditData} />}
-          {item.type === "profile-section" && (
-            <ProfileSectionEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "text-section" && (
-            <TextSectionEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "accomplishment" && (
-            <AccomplishmentEdit data={editData} onChange={setEditData} />
-          )}
-          {item.type === "timeline-event" && (
-            <TimelineEventEdit data={editData} onChange={setEditData} />
-          )}
+          {/* Render generic edit component */}
+          <GenericContentEdit data={editData} onChange={setEditData} type={item.type} />
 
           <FormActions
             onCancel={handleCancel}
@@ -163,15 +132,8 @@ export const ContentItem: React.FC<ContentItemProps> = ({
   return (
     <Card>
       <div className="p-6 space-y-4">
-        {/* Render appropriate view component based on type */}
-        {item.type === "company" && <CompanyView item={item} />}
-        {item.type === "project" && <ProjectView item={item} />}
-        {item.type === "skill-group" && <SkillGroupView item={item} />}
-        {item.type === "education" && <EducationView item={item} />}
-        {item.type === "profile-section" && <ProfileSectionView item={item} />}
-        {item.type === "text-section" && <TextSectionView item={item} />}
-        {item.type === "accomplishment" && <AccomplishmentView item={item} />}
-        {item.type === "timeline-event" && <TimelineEventView item={item} />}
+        {/* Render generic view component */}
+        <GenericContentView item={item} />
 
         {/* Render children (nested items) */}
         {children && <div className="mt-6 space-y-4">{children}</div>}

@@ -8,7 +8,6 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest"
 import { generatorClient } from "@/api/generator-client"
 import { signInTestUser, cleanupTestAuth, generateTestId, getIntegrationDescribe } from "../utils/testHelpers"
 import { mockGenerateResumeRequest, mockGenerateCoverLetterRequest } from "../fixtures/mockData"
-import { auth } from "@/config/firebase"
 
 // Skip integration tests if Firebase is mocked (unit test mode)
 const describeIntegration = getIntegrationDescribe()

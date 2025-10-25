@@ -1,10 +1,11 @@
 {
   "name": "job-finder-fe",
   "private": true,
-  "version": "0.0.26",
+  "version": "0.0.34",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev-with-port-check.js",
+    "dev:new": "vite",
     "build": "tsc -b && vite build --mode production",
     "build:staging": "tsc -b && vite build --mode staging",
     "build:production": "tsc -b && vite build --mode production",
@@ -12,13 +13,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "test": "vitest",
-    "test:ci": "vitest run",
-    "test:unit": "vitest run src",
-    "test:integration": "vitest run tests/integration",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
+    "test": "bash scripts/run-tests-safely.sh all",
+    "test:unit": "bash scripts/run-tests-safely.sh unit",
+    "test:integration": "bash scripts/run-tests-safely.sh integration",
+    "test:watch": "NODE_OPTIONS='--max-old-space-size=4096' vitest --no-coverage --no-isolate",
+    "test:ui": "NODE_OPTIONS='--max-old-space-size=4096' vitest --ui --no-coverage --no-isolate",
+    "test:coverage": "NODE_OPTIONS='--max-old-space-size=4096' vitest --coverage --no-isolate",
     "test:e2e": "playwright test",
     "test:e2e:critical": "playwright test --project=chromium --grep @critical",
     "test:e2e:ui": "playwright test --ui",
@@ -28,7 +28,9 @@
     "preview": "vite preview",
     "type-check": "tsc -b --noEmit",
     "check:env": "bash scripts/check-env.sh",
-    "prepare": "husky || exit 0"
+    "prepare": "husky",
+    "prevent-no-verify": "./scripts/setup-no-verify-prevention.sh",
+    "activate-git-prevention": "source scripts/activate-git-prevention.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -52,8 +54,7 @@
     "react-hook-form": "^7.65.0",
     "react-router-dom": "^7.9.4",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.1.12"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -75,7 +76,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
-    "husky": "^9.1.5",
+    "husky": "^9.1.7",
     "jsdom": "^27.0.1",
     "lint-staged": "^16.2.6",
     "postcss": "^8.5.6",
@@ -84,6 +85,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   },
   "lint-staged": {

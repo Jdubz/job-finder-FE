@@ -109,7 +109,7 @@ export class GeneratorClient extends BaseApiClient {
    * Generate a resume or cover letter
    */
   async generateDocument(request: GenerateDocumentRequest): Promise<GenerateDocumentResponse> {
-    return this.post<GenerateDocumentResponse>("/manageGenerator", request)
+    return this.post<GenerateDocumentResponse>("/generator/generate", request)
   }
 
   /**
@@ -117,28 +117,28 @@ export class GeneratorClient extends BaseApiClient {
    */
   async getHistory(userId?: string): Promise<DocumentHistoryItem[]> {
     const params = userId ? `?userId=${userId}` : ""
-    return this.get<DocumentHistoryItem[]>(`/manageGenerator/history${params}`)
+    return this.get<DocumentHistoryItem[]>(`/generator/requests${params}`)
   }
 
   /**
    * Get user's default settings
    */
   async getUserDefaults(): Promise<UserDefaults> {
-    return this.get<UserDefaults>("/manageGenerator/defaults")
+    return this.get<UserDefaults>("/generator/defaults")
   }
 
   /**
    * Update user's default settings
    */
   async updateUserDefaults(defaults: Partial<UserDefaults>): Promise<{ success: boolean }> {
-    return this.put<{ success: boolean }>("/manageGenerator/defaults", defaults)
+    return this.put<{ success: boolean }>("/generator/defaults", defaults)
   }
 
   /**
    * Delete a document from history
    */
   async deleteDocument(documentId: string): Promise<{ success: boolean }> {
-    return this.delete<{ success: boolean }>(`/manageGenerator/${documentId}`)
+    return this.delete<{ success: boolean }>(`/generator/requests/${documentId}`)
   }
 
   /**

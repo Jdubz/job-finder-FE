@@ -18,6 +18,7 @@ import { JobMatchCard } from "./components/JobMatchCard"
 import { JobDetailsDialog } from "./components/JobDetailsDialog"
 import { ROUTES } from "@/types/routes"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
+import { logger } from "@/services/logging"
 
 export function JobApplicationsPage() {
   const { user, isEditor } = useAuth()
@@ -37,25 +38,40 @@ export function JobApplicationsPage() {
   // Subscribe to real-time job matches
   useEffect(() => {
     if (!user) {
-      console.log("JobApplicationsPage: No user, skipping subscription")
+      logger.debug("database", "idle", "JobApplicationsPage: No user, skipping subscription")
       setLoading(false)
       return
     }
 
-    console.log("JobApplicationsPage: Subscribing to job matches for all users")
-    console.log("  Current user:", user.uid)
+    logger.info(
+      "database",
+      "started",
+      "JobApplicationsPage: Subscribing to job matches for all users",
+      {
+        details: { userId: user.uid },
+      }
+    )
 
     // All authenticated users see all matches (no userId filtering)
     const unsubscribe = jobMatchesClient.subscribeToMatches(
       null, // No user filtering - show all matches
       (updatedMatches) => {
-        console.log("JobApplicationsPage: Received job matches:", updatedMatches.length, "matches")
+        logger.info(
+          "database",
+          "completed",
+          `JobApplicationsPage: Received ${updatedMatches.length} job matches`,
+          {
+            details: { matchCount: updatedMatches.length },
+          }
+        )
         if (updatedMatches.length > 0) {
-          console.log("JobApplicationsPage: First match sample:", {
-            id: updatedMatches[0].id,
-            companyName: updatedMatches[0].companyName,
-            jobTitle: updatedMatches[0].jobTitle,
-            submittedBy: updatedMatches[0].submittedBy,
+          logger.debug("database", "processing", "JobApplicationsPage: First match sample", {
+            details: {
+              id: updatedMatches[0].id,
+              companyName: updatedMatches[0].companyName,
+              jobTitle: updatedMatches[0].jobTitle,
+              submittedBy: updatedMatches[0].submittedBy,
+            },
           })
         }
         setMatches(updatedMatches)
@@ -64,14 +80,20 @@ export function JobApplicationsPage() {
       },
       undefined,
       (err) => {
-        console.error("JobApplicationsPage: Job matches subscription error:", err)
+        logger.error("database", "failed", "JobApplicationsPage: Job matches subscription error", {
+          error: {
+            type: err.constructor.name,
+            message: err.message,
+            stack: err.stack,
+          },
+        })
         setError("Failed to load job matches. Please refresh the page.")
         setLoading(false)
       }
     )
 
     return () => {
-      console.log("JobApplicationsPage: Unsubscribing from job matches")
+      logger.debug("database", "stopped", "JobApplicationsPage: Unsubscribing from job matches")
       unsubscribe()
     }
   }, [user])

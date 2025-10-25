@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseApp } from "firebase/app"
 import { getAuth, type Auth, connectAuthEmulator } from "firebase/auth"
 import { getFirestore, type Firestore, connectFirestoreEmulator } from "firebase/firestore"
+import { logger } from "@/services/logging"
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -28,7 +29,12 @@ if (import.meta.env.VITE_USE_EMULATORS === "true") {
   connectAuthEmulator(auth, `http://${authHost}:${authPort}`, { disableWarnings: true })
   connectFirestoreEmulator(db, firestoreHost, parseInt(firestorePort, 10))
 
-  console.log("🔧 Connected to Firebase emulators")
-  console.log(`  Auth: ${authHost}:${authPort}`)
-  console.log(`  Firestore: ${firestoreHost}:${firestorePort}`)
+  logger.info("database", "started", "Connected to Firebase emulators", {
+    details: {
+      authHost,
+      authPort,
+      firestoreHost,
+      firestorePort,
+    },
+  })
 }

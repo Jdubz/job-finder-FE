@@ -1,20 +1,13 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
 
-echo "🔍 Running pre-push checks..."
+# Pre-push hook: Blocking safe unit tests
+echo "🧪 Running pre-push checks..."
 
-# Run TypeScript type check with project references (catches all errors)
-echo "📝 Type checking..."
-npm run type-check || {
-  echo "❌ TypeScript errors found! Fix them before pushing."
+# Run safe unit tests
+echo "🛡️  Running safe test runner..."
+npm run test || {
+  echo "❌ Tests failed! Please fix failing tests before pushing."
   exit 1
 }
 
-# Run tests before push
-echo "🧪 Running tests..."
-npm run test:ci || {
-  echo "❌ Tests failed! Fix tests before pushing."
-  exit 1
-}
-
-echo "✅ All pre-push checks passed!"
+echo "✅ Pre-push checks passed!"

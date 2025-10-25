@@ -1,4 +1,5 @@
 import { BaseApiClient } from "./base-client"
+import { logger } from "@/services/logging"
 
 export interface SystemHealthMetrics {
   api: {
@@ -209,7 +210,9 @@ export class SystemHealthClient extends BaseApiClient {
    */
   async resolveAlert(alertId: string): Promise<void> {
     // In production: return this.patch(`/alerts/${alertId}/resolve`)
-    console.log(`Alert ${alertId} resolved`)
+    await logger.info("database", "completed", `Alert ${alertId} resolved`, {
+      details: { alertId },
+    })
   }
 
   /**
