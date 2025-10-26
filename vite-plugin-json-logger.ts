@@ -59,7 +59,7 @@ interface StructuredLogEntry {
 
 export function jsonLogger(options: JsonLoggerOptions = {}): Plugin {
   const {
-    logFile = path.resolve(__dirname, "../dev-monitor/logs/frontend.log"),
+    logFile = path.resolve(__dirname, "./logs/frontend.log"),
     serviceName = "frontend-dev",
     enableConsole = true,
   } = options

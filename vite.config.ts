@@ -26,7 +26,7 @@ export default defineConfig({
     }),
     jsonLogger({
       serviceName: "job-finder-frontend",
-      logFile: path.resolve(__dirname, "../dev-monitor/logs/job-finder-frontend.log"),
+      logFile: path.resolve(__dirname, "./logs/frontend.log"),
     }),
   ],
   server: {

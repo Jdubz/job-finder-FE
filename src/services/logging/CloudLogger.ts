@@ -239,11 +239,12 @@ export class CloudLogger {
       version: this.config.version,
     }
 
-    // In development, just log to console
+    // In development, log to console and file
     if (this.config.environment === "development") {
       logs.forEach((log) => {
         const level = this.determineLogLevel(log)
         this.logToConsole(level, log)
+        this.logToFile(level, log)
       })
       return
     }
@@ -313,6 +314,33 @@ export class CloudLogger {
       ...(log.details && { details: log.details }),
       ...(log.error && { error: log.error }),
     })
+  }
+
+  /**
+   * Log to file for development debugging
+   */
+  private logToFile(level: LogLevel, log: StructuredLogEntry): void {
+    try {
+      const timestamp = new Date().toISOString()
+      const logEntry = {
+        timestamp,
+        level: level.toUpperCase(),
+        category: log.category,
+        action: log.action,
+        message: log.message,
+        ...(log.queueItemId && { queueItemId: log.queueItemId }),
+        ...(log.pipelineStage && { pipelineStage: log.pipelineStage }),
+        ...(log.details && { details: log.details }),
+        ...(log.error && { error: log.error }),
+      }
+
+      // In browser environment, we can't directly write to files
+      // Instead, we'll use a simple approach that works with the app-monitor
+      // The app-monitor will collect console logs and write them to files
+      console.log(`[FILE_LOG] ${JSON.stringify(logEntry)}`)
+    } catch (error) {
+      console.error('Failed to log to file:', error)
+    }
   }
 
   /**
