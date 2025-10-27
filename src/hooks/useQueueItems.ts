@@ -19,6 +19,7 @@ interface UseQueueItemsResult {
   queueItems: DocumentWithId<QueueItemDocument>[]
   loading: boolean
   error: Error | null
+  submitJob: (url: string, companyName?: string, generationId?: string) => Promise<string>
   updateQueueItem: (id: string, data: Partial<QueueItemDocument>) => Promise<void>
   deleteQueueItem: (id: string) => Promise<void>
   refetch: () => Promise<void>
@@ -54,6 +55,43 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
   })
 
   /**
+   * Submit a job to the queue
+   */
+  const submitJob = useCallback(
+    async (url: string, companyName?: string, generationId?: string): Promise<string> => {
+      if (!user?.uid) {
+        throw new Error("User must be authenticated to submit jobs")
+      }
+
+      const now = new Date()
+      const queueItem: Omit<QueueItemDocument, "id"> = {
+        type: "job",
+        status: generationId ? "success" : "pending",
+        url,
+        company_name: companyName || "",
+        company_id: null,
+        source: "user_submission",
+        submitted_by: user.uid,
+        retry_count: 0,
+        max_retries: 3, // Default from BE
+        created_at: now,
+        updated_at: now,
+        ...(generationId && {
+          result_message: "Documents already generated via Document Builder",
+          completed_at: now,
+          metadata: {
+            generationId,
+            documentsPreGenerated: true,
+          },
+        }),
+      }
+
+      return service.createDocument("job-queue", queueItem)
+    },
+    [service, user?.uid]
+  )
+
+  /**
    * Update a queue item
    */
   const updateQueueItem = useCallback(
@@ -77,6 +115,7 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
     queueItems,
     loading,
     error,
+    submitJob,
     updateQueueItem,
     deleteQueueItem,
     refetch,
