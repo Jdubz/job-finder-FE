@@ -213,7 +213,7 @@ describe("useContentItems", () => {
           parentId: null,
           order: 0,
           visibility: "published" as const,
-        }),
+        } as any),
       ).rejects.toThrow("User must be authenticated")
     })
 
@@ -229,7 +229,7 @@ describe("useContentItems", () => {
         parentId: null,
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -257,7 +257,7 @@ describe("useContentItems", () => {
           parentId: null,
           order: 0,
           visibility: "published" as const,
-        }),
+        } as any),
       ).rejects.toThrow("Creation failed")
     })
   })
@@ -418,7 +418,7 @@ describe("useContentItems", () => {
         startDate: "2024-01",
         parentId: null,
         order: 0,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -440,7 +440,7 @@ describe("useContentItems", () => {
         parentId: "company-1",
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -462,7 +462,7 @@ describe("useContentItems", () => {
         parentId: null,
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -484,7 +484,7 @@ describe("useContentItems", () => {
         parentId: null,
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -508,7 +508,7 @@ describe("useContentItems", () => {
         parentId: "company-1",
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -533,7 +533,7 @@ describe("useContentItems", () => {
         parentId: null,
         order: 0,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
@@ -558,7 +558,7 @@ describe("useContentItems", () => {
         parentId: null,
         order: 5,
         visibility: "published" as const,
-      })
+      } as any)
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",

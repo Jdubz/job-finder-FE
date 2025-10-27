@@ -68,7 +68,7 @@ vi.mock("@/services/logging", () => ({
 const mockContentItems = [
   {
     id: "item-1",
-    type: "skill-group",
+    type: "skill-group" as const,
     category: "Frontend",
     skills: ["React", "Vue"],
     parentId: null,
@@ -81,7 +81,7 @@ const mockContentItems = [
   },
   {
     id: "item-2",
-    type: "skill-group",
+    type: "skill-group" as const,
     category: "Backend",
     skills: ["Node.js", "Python"],
     parentId: null,
@@ -94,7 +94,7 @@ const mockContentItems = [
   },
   {
     id: "item-3",
-    type: "project",
+    type: "project" as const,
     name: "E-commerce Project",
     description: "Full-stack e-commerce application",
     parentId: null,
@@ -107,20 +107,20 @@ const mockContentItems = [
   },
 ]
 
-    const _mockHierarchy = [
-  {
-    ...mockContentItems[0],
-    children: [],
-  },
-  {
-    ...mockContentItems[1],
-    children: [],
-  },
-  {
-    ...mockContentItems[2],
-    children: [],
-  },
-]
+    // const _mockHierarchy = [
+    //   {
+    //     ...mockContentItems[0],
+    //     children: [],
+    //   },
+    //   {
+    //     ...mockContentItems[1],
+    //     children: [],
+    //   },
+    //   {
+    //     ...mockContentItems[2],
+    //     children: [],
+    //   },
+    // ]
 
 describe("ContentItemsPage", () => {
   const mockUseContentItems = vi.mocked(useContentItems)
@@ -332,7 +332,7 @@ describe("ContentItemsPage", () => {
     })
 
     it("should handle conflict resolution", async () => {
-      const user = userEvent.setup()
+      const _user = userEvent.setup()
       
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,

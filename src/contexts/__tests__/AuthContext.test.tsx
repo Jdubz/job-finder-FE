@@ -446,7 +446,7 @@ describe("AuthContext", () => {
       let authCallback: (user: any) => void = () => {}
       
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        authCallback = callback
+        authCallback = callback as (user: any) => void
         return () => {}
       })
 

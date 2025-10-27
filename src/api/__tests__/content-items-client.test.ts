@@ -468,7 +468,7 @@ describe("Content Items Client", () => {
     })
 
     it("should handle partial deletion failures", async () => {
-      const itemIds = ["item-1", "invalid-id"]
+      const _itemIds = ["item-1", "invalid-id"]
 
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,

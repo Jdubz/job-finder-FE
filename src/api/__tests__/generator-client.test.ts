@@ -374,8 +374,14 @@ describe("GeneratorClient", () => {
   describe("updateUserDefaults", () => {
     it("should update user defaults", async () => {
       const mockDefaults = {
-        style: "modern",
-        emphasize: ["React", "TypeScript"],
+        name: "John Doe",
+        email: "john@example.com",
+        phone: "+1234567890",
+        location: "New York",
+        linkedin: "https://linkedin.com/in/johndoe",
+        github: "https://github.com/johndoe",
+        portfolio: "https://johndoe.com",
+        summary: "Experienced developer"
       }
 
       const mockResponse = {
@@ -406,8 +412,14 @@ describe("GeneratorClient", () => {
 
     it("should handle update errors", async () => {
       const mockDefaults = {
-        style: "modern",
-        emphasize: ["React", "TypeScript"],
+        name: "John Doe",
+        email: "john@example.com",
+        phone: "+1234567890",
+        location: "New York",
+        linkedin: "https://linkedin.com/in/johndoe",
+        github: "https://github.com/johndoe",
+        portfolio: "https://johndoe.com",
+        summary: "Experienced developer"
       }
 
       vi.mocked(fetch).mockResolvedValue({
