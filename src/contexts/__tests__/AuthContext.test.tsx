@@ -68,7 +68,9 @@ describe("AuthContext", () => {
               mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
                 // Simulate no user
                 if (typeof callback === 'function') {
-                  callback(null)
+                  if (typeof callback === 'function') {
+          callback(null)
+        }
                 }
                 return () => {}
               })
@@ -97,7 +99,9 @@ describe("AuthContext", () => {
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
           callback(mockUser as any)
+        }
         }
         return () => {}
       })
@@ -124,8 +128,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -151,8 +159,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -176,8 +188,12 @@ describe("AuthContext", () => {
         getIdTokenResult: vi.fn().mockRejectedValue(new Error("Token error")),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -220,8 +236,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -255,8 +275,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -303,8 +327,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -332,8 +360,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -358,8 +390,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -384,8 +420,12 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -405,7 +445,7 @@ describe("AuthContext", () => {
     it("should handle user state changes", async () => {
       let authCallback: (user: any) => void = () => {}
       
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         authCallback = callback
         return () => {}
       })
@@ -460,8 +500,12 @@ describe("AuthContext", () => {
           }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -481,8 +525,12 @@ describe("AuthContext", () => {
       })
 
       // Trigger auth state change again
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
+        }
         return () => {}
       })
 
@@ -494,10 +542,12 @@ describe("AuthContext", () => {
 
   describe("error handling", () => {
     it("should handle auth state change errors gracefully", async () => {
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         // Simulate error in auth state change
         try {
+          if (typeof callback === 'function') {
           callback(null)
+        }
         } catch (error) {
           // Error should be handled gracefully
         }
@@ -516,9 +566,11 @@ describe("AuthContext", () => {
     })
 
     it("should handle Firebase auth errors", async () => {
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         // Simulate Firebase error
-        callback(null)
+        if (typeof callback === 'function') {
+          callback(null)
+        }
         return () => {}
       })
 
