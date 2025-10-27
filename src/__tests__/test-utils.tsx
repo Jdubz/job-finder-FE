@@ -4,8 +4,8 @@
  * Provides React 19 compatible testing utilities
  */
 
-import { ReactElement } from 'react'
-import { render as rtlRender, RenderOptions } from '@testing-library/react'
+import type { ReactElement } from 'react'
+import { render as rtlRender, type RenderOptions } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 
 // Custom render function that wraps components with necessary providers

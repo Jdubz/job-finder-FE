@@ -247,10 +247,12 @@ export class FirestoreService {
       queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
     let hasError = false
+    let unsubscribed = false
     
-    return onSnapshot(
+    const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
+        if (unsubscribed) return
         hasError = false // Reset error flag on successful snapshot
         const documents = snapshot.docs.map((doc) => {
           const data = convertTimestamps(doc.data())
@@ -263,6 +265,7 @@ export class FirestoreService {
         onData(documents)
       },
       (error) => {
+        if (unsubscribed) return
         // Only call error handler once to prevent infinite loops
         if (!hasError) {
           hasError = true
@@ -278,6 +281,12 @@ export class FirestoreService {
         }
       }
     )
+    
+    // Return wrapped unsubscribe to prevent callbacks after unsubscribe
+    return () => {
+      unsubscribed = true
+      unsubscribe()
+    }
   }
 
   /**
@@ -292,10 +301,12 @@ export class FirestoreService {
     const docRef = doc(this.db, collectionName, documentId)
     
     let hasError = false
+    let unsubscribed = false
 
-    return onSnapshot(
+    const unsubscribe = onSnapshot(
       docRef,
       (docSnap) => {
+        if (unsubscribed) return
         hasError = false // Reset error flag on successful snapshot
         if (!docSnap.exists()) {
           onData(null)
@@ -309,6 +320,7 @@ export class FirestoreService {
         } as DocumentWithId<CollectionTypeMap[K]>)
       },
       (error) => {
+        if (unsubscribed) return
         // Only call error handler once to prevent infinite loops
         if (!hasError) {
           hasError = true
@@ -324,6 +336,12 @@ export class FirestoreService {
         }
       }
     )
+    
+    // Return wrapped unsubscribe to prevent callbacks after unsubscribe
+    return () => {
+      unsubscribed = true
+      unsubscribe()
+    }
   }
 }
 

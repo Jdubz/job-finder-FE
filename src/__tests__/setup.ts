@@ -26,7 +26,11 @@ import "@testing-library/jest-dom"
 import { setupTestCleanup, logMemoryUsage } from "./test-cleanup"
 
 // Export act globally for React Testing Library (React 19 compatibility)
-globalThis.IS_REACT_ACT_ENVIRONMENT = true
+interface GlobalWithReactAct {
+  IS_REACT_ACT_ENVIRONMENT: boolean
+}
+
+;(globalThis as unknown as GlobalWithReactAct).IS_REACT_ACT_ENVIRONMENT = true
 
 
 
