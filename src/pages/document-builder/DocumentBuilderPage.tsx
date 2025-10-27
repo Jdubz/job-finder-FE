@@ -23,7 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, FileText, Sparkles, Download } from "lucide-react"
+import { Loader2, Sparkles, Download } from "lucide-react"
 import { GenerationProgress } from "@/components/GenerationProgress"
 
 // Helper function to normalize job match data from different sources

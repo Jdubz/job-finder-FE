@@ -7,6 +7,15 @@
 import { vi, beforeEach, afterEach } from "vitest"
 import "@testing-library/jest-dom"
 import { setupTestCleanup, logMemoryUsage } from "./test-cleanup"
+import { act } from "react"
+
+// Export act globally for React Testing Library
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
+
+// Polyfill React.act for testing-library
+if (typeof window !== 'undefined') {
+  ;(window as unknown as { React: { act: typeof act } }).React = { act }
+}
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
@@ -131,16 +140,6 @@ vi.mock("react-router-dom", async () => {
       state: null,
     }),
     useNavigate: () => vi.fn(),
-  }
-})
-
-// Mock React hooks
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react")
-  return {
-    ...actual,
-    useCallback: (fn: unknown) => fn as () => unknown,
-    useMemo: (fn: unknown) => (fn as () => unknown)(),
   }
 })
 
