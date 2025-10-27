@@ -11,6 +11,11 @@ export const ROUTES = {
   JOB_FINDER: "/job-finder",
   QUEUE_MANAGEMENT: "/queue-management",
   JOB_FINDER_CONFIG: "/job-finder-config",
+  // Legal pages
+  TERMS_OF_USE: "/terms-of-use",
+  PRIVACY_POLICY: "/privacy-policy",
+  COOKIE_POLICY: "/cookie-policy",
+  DISCLAIMER: "/disclaimer",
   // Auth
   LOGIN: "/login",
   UNAUTHORIZED: "/unauthorized",
@@ -36,6 +41,10 @@ export const PUBLIC_ROUTES: RoutePath[] = [
   ROUTES.DOCUMENT_BUILDER,
   ROUTES.AI_PROMPTS,
   ROUTES.SETTINGS,
+  ROUTES.TERMS_OF_USE,
+  ROUTES.PRIVACY_POLICY,
+  ROUTES.COOKIE_POLICY,
+  ROUTES.DISCLAIMER,
   ROUTES.LOGIN,
   ROUTES.UNAUTHORIZED,
 ]

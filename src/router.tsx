@@ -55,6 +55,18 @@ const DocumentHistoryPage = lazy(() =>
 const UnauthorizedPage = lazy(() =>
   import("@/pages/auth/UnauthorizedPage").then((m) => ({ default: m.UnauthorizedPage }))
 )
+const TermsOfUsePage = lazy(() =>
+  import("@/pages/legal/TermsOfUsePage").then((m) => ({ default: m.TermsOfUsePage }))
+)
+const PrivacyPolicyPage = lazy(() =>
+  import("@/pages/legal/PrivacyPolicyPage").then((m) => ({ default: m.PrivacyPolicyPage }))
+)
+const CookiePolicyPage = lazy(() =>
+  import("@/pages/legal/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage }))
+)
+const DisclaimerPage = lazy(() =>
+  import("@/pages/legal/DisclaimerPage").then((m) => ({ default: m.DisclaimerPage }))
+)
 
 // Loading fallback component
 function PageLoader() {
@@ -97,6 +109,38 @@ export const router = createBrowserRouter([
         element: (
           <LazyPage>
             <UnauthorizedPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.TERMS_OF_USE,
+        element: (
+          <LazyPage>
+            <TermsOfUsePage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.PRIVACY_POLICY,
+        element: (
+          <LazyPage>
+            <PrivacyPolicyPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.COOKIE_POLICY,
+        element: (
+          <LazyPage>
+            <CookiePolicyPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.DISCLAIMER,
+        element: (
+          <LazyPage>
+            <DisclaimerPage />
           </LazyPage>
         ),
       },
