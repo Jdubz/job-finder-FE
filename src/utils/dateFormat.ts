@@ -3,6 +3,22 @@
  * All dates use "MMM YYYY" format (e.g., "Dec 2020")
  */
 
+import type { TimestampLike } from "@jsdubzw/job-finder-shared-types"
+
+/**
+ * Convert TimestampLike to Date
+ * Handles both Date objects and Firestore Timestamps
+ * @param timestamp TimestampLike value (Date or FirestoreTimestamp)
+ * @returns Date object
+ */
+export function toDate(timestamp: TimestampLike): Date {
+  if (timestamp instanceof Date) {
+    return timestamp
+  }
+  // FirestoreTimestamp has a toDate() method
+  return timestamp.toDate()
+}
+
 /**
  * Convert YYYY-MM format to "MMM YYYY" display format
  * @param dateStr Date string in YYYY-MM format

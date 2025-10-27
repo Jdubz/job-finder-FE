@@ -157,7 +157,7 @@ export class FirestoreService {
    */
   async createDocument<K extends keyof CollectionTypeMap>(
     collectionName: K,
-    data: Omit<CollectionTypeMap[K], "createdAt" | "updatedAt"> & {
+    data: Omit<CollectionTypeMap[K], "id" | "createdAt" | "updatedAt"> & {
       createdAt?: Timestamp | Date
       updatedAt?: Timestamp | Date
     }
@@ -181,7 +181,7 @@ export class FirestoreService {
   async setDocument<K extends keyof CollectionTypeMap>(
     collectionName: K,
     documentId: string,
-    data: Omit<CollectionTypeMap[K], "createdAt" | "updatedAt"> & {
+    data: Omit<CollectionTypeMap[K], "id" | "createdAt" | "updatedAt"> & {
       createdAt?: Timestamp | Date
       updatedAt?: Timestamp | Date
     },

@@ -19,6 +19,7 @@ import { JobDetailsDialog } from "./components/JobDetailsDialog"
 import { ROUTES } from "@/types/routes"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 import { logger } from "@/services/logging"
+import { toDate } from "@/utils/dateFormat"
 
 export function JobApplicationsPage() {
   const { user, isEditor } = useAuth()
@@ -123,7 +124,7 @@ export function JobApplicationsPage() {
         case "score":
           return b.matchScore - a.matchScore
         case "date":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          return toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime()
         case "company":
           return a.companyName.localeCompare(b.companyName)
         default:

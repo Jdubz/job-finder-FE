@@ -4,7 +4,7 @@
  * Generic hook for subscribing to Firestore collections with automatic cleanup
  */
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useFirestore } from "@/contexts/FirestoreContext"
 import type {
   CollectionTypeMap,
@@ -40,6 +40,9 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
+  // Memoize the stringified constraints to avoid unnecessary re-renders
+  const constraintsKey = useMemo(() => JSON.stringify(constraints), [constraints])
+
   useEffect(() => {
     if (!enabled) {
       setLoading(false)
@@ -66,7 +69,7 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
     return () => {
       unsubscribe()
     }
-  }, [collectionName, JSON.stringify(constraints), cacheKey, enabled, subscribeToCollection])
+  }, [collectionName, constraintsKey, cacheKey, enabled, subscribeToCollection, constraints])
 
   const refetch = useCallback(async () => {
     setLoading(true)

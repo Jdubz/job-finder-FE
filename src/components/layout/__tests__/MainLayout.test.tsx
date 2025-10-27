@@ -1,143 +1,129 @@
-/**
- * MainLayout Component Tests
- *
- * Tests for the MainLayout component functionality
- */
-
-import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
 import { MainLayout } from "../MainLayout"
+import { vi } from "vitest"
 
-// Mock the Navigation component
+// Mock the child components
 vi.mock("../Navigation", () => ({
-  Navigation: () => <div data-testid="navigation">Navigation</div>,
+  Navigation: () => <div data-testid="navigation">Navigation Component</div>,
 }))
 
-// Test component to render inside the layout
-const TestPage = () => <div data-testid="test-page">Test Page Content</div>
+vi.mock("../Footer", () => ({
+  Footer: () => <div data-testid="footer">Footer Component</div>,
+}))
+
+// Mock react-router-dom
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    Outlet: () => <div data-testid="outlet">Outlet Content</div>,
+  }
+})
 
 describe("MainLayout", () => {
-  const renderWithRouter = (component: React.ReactElement) => {
-    return render(
+  it("renders all layout components", () => {
+    render(
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={component}>
-            <Route index element={<TestPage />} />
-          </Route>
-        </Routes>
+        <MainLayout />
       </BrowserRouter>
     )
-  }
 
-  describe("rendering", () => {
-    it("should render navigation component", () => {
-      renderWithRouter(<MainLayout />)
-
-      expect(screen.getByTestId("navigation")).toBeInTheDocument()
-    })
-
-    it("should render outlet content", () => {
-      renderWithRouter(<MainLayout />)
-
-      expect(screen.getByTestId("test-page")).toBeInTheDocument()
-      expect(screen.getByText("Test Page Content")).toBeInTheDocument()
-    })
-
-    it("should have correct layout structure", () => {
-      renderWithRouter(<MainLayout />)
-
-      const container = screen.getByTestId("navigation").parentElement
-      expect(container).toHaveClass("min-h-screen", "bg-background")
-    })
-
-    it("should have main content area with correct classes", () => {
-      renderWithRouter(<MainLayout />)
-
-      const main = screen.getByRole("main")
-      expect(main).toBeInTheDocument()
-      expect(main).toHaveClass("container", "mx-auto", "px-4", "py-8")
-    })
+    expect(screen.getByTestId("navigation")).toBeInTheDocument()
+    expect(screen.getByTestId("outlet")).toBeInTheDocument()
+    expect(screen.getByTestId("footer")).toBeInTheDocument()
   })
 
-  describe("layout structure", () => {
-    it("should have navigation at the top", () => {
-      renderWithRouter(<MainLayout />)
+  it("has proper flexbox structure", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
 
-      const navigation = screen.getByTestId("navigation")
-      const main = screen.getByRole("main")
-
-      // Navigation should come before main in the DOM
-      expect(
-        navigation.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBeTruthy()
-    })
-
-    it("should have main content below navigation", () => {
-      renderWithRouter(<MainLayout />)
-
-      const main = screen.getByRole("main")
-      expect(main).toBeInTheDocument()
-    })
+    const rootDiv = container.firstChild
+    expect(rootDiv).toHaveClass("min-h-screen", "bg-background", "flex", "flex-col")
   })
 
-  describe("responsive design", () => {
-    it("should handle different screen sizes", () => {
-      renderWithRouter(<MainLayout />)
+  it("has proper main content styling", () => {
+    render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
 
-      // Should render without errors
-      expect(screen.getByTestId("navigation")).toBeInTheDocument()
-      expect(screen.getByTestId("test-page")).toBeInTheDocument()
-    })
+    const main = screen.getByTestId("outlet").parentElement
+    expect(main).toHaveClass("container", "mx-auto", "px-4", "py-8", "flex-1")
   })
 
-  describe("accessibility", () => {
-    it("should have proper main landmark", () => {
-      renderWithRouter(<MainLayout />)
+  it("renders navigation at the top", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
 
-      const main = screen.getByRole("main")
-      expect(main).toBeInTheDocument()
-    })
+    const rootDiv = container.firstChild as HTMLElement
+    const children = Array.from(rootDiv?.children || [])
 
-    it("should have proper document structure", () => {
-      renderWithRouter(<MainLayout />)
-
-      // Should have a proper document structure
-      expect(document.body).toBeInTheDocument()
-    })
+    expect(children[0]).toContainElement(screen.getByTestId("navigation"))
   })
 
-  describe("content rendering", () => {
-    it("should render different content based on route", () => {
-      const AnotherPage = () => <div data-testid="another-page">Another Page</div>
+  it("renders footer at the bottom", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
 
-      render(
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<TestPage />} />
-              <Route path="another" element={<AnotherPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      )
+    const rootDiv = container.firstChild as HTMLElement
+    const children = Array.from(rootDiv?.children || [])
 
-      expect(screen.getByTestId("test-page")).toBeInTheDocument()
-    })
+    expect(children[children.length - 1]).toContainElement(screen.getByTestId("footer"))
   })
 
-  describe("edge cases", () => {
-    it("should handle empty outlet", () => {
-      render(
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<MainLayout />} />
-          </Routes>
-        </BrowserRouter>
-      )
+  it("renders outlet between navigation and footer", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
 
-      expect(screen.getByTestId("navigation")).toBeInTheDocument()
-      expect(screen.getByRole("main")).toBeInTheDocument()
-    })
+    const rootDiv = container.firstChild as HTMLElement
+    const children = Array.from(rootDiv?.children || [])
+
+    const navigation = screen.getByTestId("navigation")
+    const outlet = screen.getByTestId("outlet")
+    const footer = screen.getByTestId("footer")
+
+    const navigationIndex = children.findIndex((child) => child.contains(navigation))
+    const mainIndex = children.findIndex((child) => child.contains(outlet))
+    const footerIndex = children.findIndex((child) => child.contains(footer))
+
+    expect(navigationIndex).toBe(0)
+    expect(mainIndex).toBe(1)
+    expect(footerIndex).toBe(2)
+  })
+
+  it("has proper background styling", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
+
+    const rootDiv = container.firstChild
+    expect(rootDiv).toHaveClass("bg-background")
+  })
+
+  it("has minimum height styling", () => {
+    const { container } = render(
+      <BrowserRouter>
+        <MainLayout />
+      </BrowserRouter>
+    )
+
+    const rootDiv = container.firstChild
+    expect(rootDiv).toHaveClass("min-h-screen")
   })
 })

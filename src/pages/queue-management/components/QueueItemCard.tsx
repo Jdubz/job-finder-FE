@@ -26,6 +26,13 @@ interface QueueItemCardProps {
 }
 
 export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: QueueItemCardProps) {
+  if (!item.id) {
+    return null
+  }
+
+  // TypeScript type narrowing - at this point we know item.id is defined
+  const itemId = item.id
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -108,7 +115,7 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
             type="checkbox"
             checked={selected}
             aria-label={`Select job at ${item.company_name}`}
-            onChange={(e) => onSelect(item.id!, e.target.checked)}
+            onChange={(e) => onSelect(itemId, e.target.checked)}
             className="mt-1 rounded border-gray-300"
           />
 
@@ -188,7 +195,7 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onRetry(item.id!)}
+                onClick={() => onRetry(itemId)}
                 className="h-8 px-2"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -198,7 +205,7 @@ export function QueueItemCard({ item, selected, onSelect, onRetry, onCancel }: Q
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onCancel(item.id!)}
+                onClick={() => onCancel(itemId)}
                 className="h-8 px-2"
               >
                 <Trash2 className="h-3 w-3" />

@@ -115,7 +115,7 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
           {documents.length} document{documents.length === 1 ? "" : "s"} generated
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3" data-testid="document-history-list">
         {documents.map((doc) => (
           <div
             key={doc.id}
@@ -166,7 +166,7 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDownload(doc.documentUrl!)}
+                  onClick={() => handleDownload(doc.documentUrl as string)}
                   aria-label={`Download ${doc.jobTitle} ${doc.type}`}
                 >
                   <Download className="w-4 h-4 mr-2" />

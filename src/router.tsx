@@ -1,8 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router-dom"
-import { lazy, Suspense } from "react"
+import { lazy } from "react"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { ROUTES } from "@/types/routes"
+import { LazyPage } from "@/components/common/LazyPage"
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import("@/pages/HomePage").then((m) => ({ default: m.HomePage })))
@@ -55,20 +56,18 @@ const DocumentHistoryPage = lazy(() =>
 const UnauthorizedPage = lazy(() =>
   import("@/pages/auth/UnauthorizedPage").then((m) => ({ default: m.UnauthorizedPage }))
 )
-
-// Loading fallback component
-function PageLoader() {
-  return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-muted-foreground">Loading...</div>
-    </div>
-  )
-}
-
-// Wrapper for lazy loaded components with Suspense
-function LazyPage({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={<PageLoader />}>{children}</Suspense>
-}
+const TermsOfUsePage = lazy(() =>
+  import("@/pages/legal/TermsOfUsePage").then((m) => ({ default: m.TermsOfUsePage }))
+)
+const PrivacyPolicyPage = lazy(() =>
+  import("@/pages/legal/PrivacyPolicyPage").then((m) => ({ default: m.PrivacyPolicyPage }))
+)
+const CookiePolicyPage = lazy(() =>
+  import("@/pages/legal/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage }))
+)
+const DisclaimerPage = lazy(() =>
+  import("@/pages/legal/DisclaimerPage").then((m) => ({ default: m.DisclaimerPage }))
+)
 
 export const router = createBrowserRouter([
   {
@@ -97,6 +96,38 @@ export const router = createBrowserRouter([
         element: (
           <LazyPage>
             <UnauthorizedPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.TERMS_OF_USE,
+        element: (
+          <LazyPage>
+            <TermsOfUsePage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.PRIVACY_POLICY,
+        element: (
+          <LazyPage>
+            <PrivacyPolicyPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.COOKIE_POLICY,
+        element: (
+          <LazyPage>
+            <CookiePolicyPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: ROUTES.DISCLAIMER,
+        element: (
+          <LazyPage>
+            <DisclaimerPage />
           </LazyPage>
         ),
       },

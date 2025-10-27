@@ -6,16 +6,32 @@
 
 import type { Timestamp } from "firebase/firestore"
 import type {
-  QueueItemDocument,
-  CompanyDocument,
-  ContentItemDocument,
-  ContactSubmissionDocument,
-  UserDocument,
+  QueueItem,
+  Company,
+  ContentItem,
   StopList,
   QueueSettings,
   AISettings,
-  PersonalInfo,
+  PersonalInfoDocument as PersonalInfo,
 } from "@jsdubzw/job-finder-shared-types"
+
+// Type aliases for backward compatibility with FE naming convention
+export type QueueItemDocument = QueueItem
+export type CompanyDocument = Company
+export type ContentItemDocument = ContentItem
+// Note: ContactSubmissionDocument and UserDocument are FE-specific and not in shared-types
+export type ContactSubmissionDocument = {
+  name: string
+  email: string
+  message: string
+  createdAt: Timestamp
+}
+export type UserDocument = {
+  uid: string
+  email: string
+  displayName?: string
+  createdAt: Timestamp
+}
 
 /**
  * Convert Firestore Timestamps to Dates for client-side usage

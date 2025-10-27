@@ -25,8 +25,8 @@ export const mockQueueItem: QueueItem = {
   submitted_by: "test-user-123",
   retry_count: 0,
   max_retries: 3,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
+  created_at: new Date(),
+  updated_at: new Date(),
 }
 
 export const mockProcessingQueueItem: QueueItem = {
@@ -39,7 +39,7 @@ export const mockCompletedQueueItem: QueueItem = {
   ...mockQueueItem,
   id: "queue-test-completed",
   status: "success",
-  completed_at: new Date().toISOString(),
+  completed_at: new Date(),
 }
 
 export const mockFailedQueueItem: QueueItem = {
@@ -71,8 +71,8 @@ export const mockJobMatch: JobMatch = {
   experienceMatch: 85,
   applicationPriority: "High",
   customizationRecommendations: [],
-  analyzedAt: new Date().toISOString(),
-  createdAt: new Date().toISOString(),
+  analyzedAt: new Date(),
+  createdAt: new Date(),
   submittedBy: "test-user-123",
   queueItemId: "queue-test-123",
 }
@@ -117,8 +117,8 @@ export const mockExperienceItem = {
   skills: ["React", "TypeScript", "Node.js", "AWS"],
   visibility: "public" as const,
   order: 0,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
 }
 
 export const mockProjectItem = {
@@ -137,8 +137,8 @@ export const mockProjectItem = {
   ],
   visibility: "public" as const,
   order: 0,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
 }
 
 export const mockSkillItem = {
@@ -151,8 +151,8 @@ export const mockSkillItem = {
   description: "Expert-level React development with hooks and context",
   visibility: "public" as const,
   order: 0,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
 }
 
 /**
@@ -352,7 +352,7 @@ export const mockQueueStats = {
  */
 export const mockSystemHealth = {
   status: "healthy" as const,
-  timestamp: new Date().toISOString(),
+  timestamp: new Date(),
   services: {
     database: { status: "healthy", latency: 15 },
     queue: { status: "healthy", latency: 20 },

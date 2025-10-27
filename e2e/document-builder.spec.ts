@@ -153,7 +153,7 @@ test.describe("Document History List", () => {
     }
 
     // Look for document list
-    const documentList = page.locator('[data-testid="document-history-list"], ul, table')
+    const documentList = page.locator('[data-testid="document-history-list"]')
 
     if (await documentList.isVisible()) {
       await expect(documentList).toBeVisible()

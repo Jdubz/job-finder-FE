@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { jobQueueClient } from "@/api"
+import { useQueueItems } from "@/hooks/useQueueItems"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 import { QueueStatusTable } from "./components/QueueStatusTable"
-import type { SubmitJobRequest } from "@jsdubzw/job-finder-shared-types"
 
 export function JobFinderPage() {
   const { user, isEditor } = useAuth()
+  const { submitJob: submitJobToQueue } = useQueueItems()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -35,25 +35,13 @@ export function JobFinderPage() {
     try {
       setIsSubmitting(true)
 
-      const request: SubmitJobRequest = {
-        url: jobUrl.trim(),
-        companyName: companyName.trim() || undefined,
-        companyUrl: companyUrl.trim() || undefined,
-      }
+      await submitJobToQueue(jobUrl.trim(), companyName.trim() || undefined)
 
-      const response = await jobQueueClient.submitJob(request)
-
-      if (response.status === "success") {
-        setSuccess(response.message || "Job submitted successfully!")
-        // Clear form
-        setJobUrl("")
-        setCompanyName("")
-        setCompanyUrl("")
-      } else if (response.status === "skipped") {
-        setSuccess(response.message || "Job was skipped (duplicate or filtered)")
-      } else {
-        setError(response.message || "Failed to submit job")
-      }
+      setSuccess("Job submitted successfully!")
+      // Clear form
+      setJobUrl("")
+      setCompanyName("")
+      setCompanyUrl("")
     } catch (err) {
       console.error("Failed to submit job:", err)
       setError(err instanceof Error ? err.message : "Failed to submit job. Please try again.")
