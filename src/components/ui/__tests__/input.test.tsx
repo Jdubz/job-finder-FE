@@ -130,11 +130,7 @@ describe("Input", () => {
   describe("accessibility", () => {
     it("should have proper ARIA attributes", () => {
       render(
-        <Input
-          aria-label="Test input"
-          aria-describedby="description"
-          placeholder="Test input"
-        />
+        <Input aria-label="Test input" aria-describedby="description" placeholder="Test input" />
       )
 
       const input = screen.getByRole("textbox")

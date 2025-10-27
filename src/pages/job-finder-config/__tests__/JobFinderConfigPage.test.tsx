@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import { JobFinderConfigPage } from "../JobFinderConfigPage"
@@ -96,7 +96,7 @@ describe("JobFinderConfigPage", () => {
     it("should show loading state while fetching configuration", () => {
       // Mock slow response
       vi.mocked(configClient.getStopList).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(mockStopList), 100))
+        () => new Promise((resolve) => setTimeout(() => resolve(mockStopList), 100))
       )
 
       renderWithRouter(<JobFinderConfigPage />)
@@ -117,7 +117,11 @@ describe("JobFinderConfigPage", () => {
 
       renderWithRouter(<JobFinderConfigPage />)
 
-      expect(screen.getByText("You do not have permission to access job finder configuration. Editor role required.")).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          "You do not have permission to access job finder configuration. Editor role required."
+        )
+      ).toBeInTheDocument()
     })
   })
 
@@ -477,7 +481,7 @@ describe("JobFinderConfigPage", () => {
 
       expect(configClient.updateAISettings).toHaveBeenCalledWith(
         expect.objectContaining({
-          costBudgetDaily: 25.50,
+          costBudgetDaily: 25.5,
         }),
         "test@example.com"
       )

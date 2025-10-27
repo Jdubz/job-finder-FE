@@ -55,7 +55,7 @@ describe("Content Items Client", () => {
       expect(result).toEqual(mockItems)
       expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining("/manageContentItems"),
-        expect.any(Object),
+        expect.any(Object)
       )
     })
 
@@ -251,10 +251,7 @@ describe("Content Items Client", () => {
       const result = await contentItemsClient.getItem("item-1")
 
       expect(result).toEqual(mockItem)
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/item-1"),
-        expect.any(Object),
-      )
+      expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/item-1"), expect.any(Object))
     })
 
     it("should handle not found errors", async () => {
@@ -308,7 +305,7 @@ describe("Content Items Client", () => {
         expect.objectContaining({
           method: "POST",
           body: expect.stringContaining("New Corp"),
-        }),
+        })
       )
     })
 
@@ -322,9 +319,7 @@ describe("Content Items Client", () => {
         }),
       } as Response)
 
-      await expect(
-        contentItemsClient.createItem({} as any),
-      ).rejects.toThrow()
+      await expect(contentItemsClient.createItem({} as any)).rejects.toThrow()
     })
   })
 
@@ -359,7 +354,7 @@ describe("Content Items Client", () => {
         expect.objectContaining({
           method: "PATCH",
           body: expect.stringContaining("Senior Developer"),
-        }),
+        })
       )
     })
 
@@ -373,9 +368,7 @@ describe("Content Items Client", () => {
         }),
       } as Response)
 
-      await expect(
-        contentItemsClient.updateItem("item-1", {}),
-      ).rejects.toThrow()
+      await expect(contentItemsClient.updateItem("item-1", {})).rejects.toThrow()
     })
   })
 
@@ -395,7 +388,7 @@ describe("Content Items Client", () => {
         expect.stringContaining("/item-1"),
         expect.objectContaining({
           method: "DELETE",
-        }),
+        })
       )
     })
 
@@ -436,7 +429,7 @@ describe("Content Items Client", () => {
         expect.objectContaining({
           method: "POST",
           body: JSON.stringify({ items: updates }),
-        }),
+        })
       )
     })
   })
@@ -463,7 +456,7 @@ describe("Content Items Client", () => {
         expect.objectContaining({
           method: "POST",
           body: JSON.stringify({ itemIds }),
-        }),
+        })
       )
     })
 
@@ -524,13 +517,9 @@ describe("Content Items Client", () => {
 
   describe("Request Options", () => {
     it("should respect timeout option", async () => {
-      vi.mocked(fetch).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 1000)),
-      )
+      vi.mocked(fetch).mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000)))
 
-      await expect(
-        contentItemsClient.getItems(undefined, { timeout: 100 }),
-      ).rejects.toThrow()
+      await expect(contentItemsClient.getItems(undefined, { timeout: 100 })).rejects.toThrow()
     })
 
     it("should include custom headers", async () => {

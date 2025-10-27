@@ -136,7 +136,7 @@ describe("useContentItems", () => {
       expect(useFirestoreCollection).toHaveBeenCalledWith(
         expect.objectContaining({
           enabled: false,
-        }),
+        })
       )
     })
 
@@ -153,7 +153,7 @@ describe("useContentItems", () => {
               }),
             ]),
           }),
-        }),
+        })
       )
     })
   })
@@ -187,7 +187,7 @@ describe("useContentItems", () => {
           userId: "test-user-123",
           createdBy: "test-user-123",
           updatedBy: "test-user-123",
-        }),
+        })
       )
       expect(itemId).toBe("new-item-id")
     })
@@ -213,7 +213,7 @@ describe("useContentItems", () => {
           parentId: null,
           order: 0,
           visibility: "published" as const,
-        } as any),
+        } as any)
       ).rejects.toThrow("User must be authenticated")
     })
 
@@ -235,14 +235,12 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           userId: "test-user-123",
-        }),
+        })
       )
     })
 
     it("should handle create errors", async () => {
-      mockFirestoreService.createDocument.mockRejectedValue(
-        new Error("Creation failed"),
-      )
+      mockFirestoreService.createDocument.mockRejectedValue(new Error("Creation failed"))
 
       const { result } = renderHook(() => useContentItems())
 
@@ -257,7 +255,7 @@ describe("useContentItems", () => {
           parentId: null,
           order: 0,
           visibility: "published" as const,
-        } as any),
+        } as any)
       ).rejects.toThrow("Creation failed")
     })
   })
@@ -282,7 +280,7 @@ describe("useContentItems", () => {
           role: "Senior Developer",
           endDate: "2024-12",
           updatedBy: "test-user-123",
-        }),
+        })
       )
     })
 
@@ -297,7 +295,7 @@ describe("useContentItems", () => {
       const { result } = renderHook(() => useContentItems())
 
       await expect(
-        result.current.updateContentItem("company-1", { role: "Manager" }),
+        result.current.updateContentItem("company-1", { role: "Manager" })
       ).rejects.toThrow("User must be authenticated")
     })
 
@@ -313,20 +311,18 @@ describe("useContentItems", () => {
         "company-1",
         expect.objectContaining({
           updatedBy: "test-user-123",
-        }),
+        })
       )
     })
 
     it("should handle update errors", async () => {
-      mockFirestoreService.updateDocument.mockRejectedValue(
-        new Error("Update failed"),
-      )
+      mockFirestoreService.updateDocument.mockRejectedValue(new Error("Update failed"))
 
       const { result } = renderHook(() => useContentItems())
 
-      await expect(
-        result.current.updateContentItem("company-1", { role: "Test" }),
-      ).rejects.toThrow("Update failed")
+      await expect(result.current.updateContentItem("company-1", { role: "Test" })).rejects.toThrow(
+        "Update failed"
+      )
     })
   })
 
@@ -338,10 +334,7 @@ describe("useContentItems", () => {
 
       await result.current.deleteContentItem("company-1")
 
-      expect(mockFirestoreService.deleteDocument).toHaveBeenCalledWith(
-        "content-items",
-        "company-1",
-      )
+      expect(mockFirestoreService.deleteDocument).toHaveBeenCalledWith("content-items", "company-1")
     })
 
     it("should throw error when user is not authenticated", async () => {
@@ -355,20 +348,16 @@ describe("useContentItems", () => {
       const { result } = renderHook(() => useContentItems())
 
       await expect(result.current.deleteContentItem("company-1")).rejects.toThrow(
-        "User must be authenticated",
+        "User must be authenticated"
       )
     })
 
     it("should handle delete errors", async () => {
-      mockFirestoreService.deleteDocument.mockRejectedValue(
-        new Error("Delete failed"),
-      )
+      mockFirestoreService.deleteDocument.mockRejectedValue(new Error("Delete failed"))
 
       const { result } = renderHook(() => useContentItems())
 
-      await expect(result.current.deleteContentItem("company-1")).rejects.toThrow(
-        "Delete failed",
-      )
+      await expect(result.current.deleteContentItem("company-1")).rejects.toThrow("Delete failed")
     })
   })
 
@@ -424,7 +413,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           type: "company",
-        }),
+        })
       )
     })
 
@@ -446,7 +435,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           type: "project",
-        }),
+        })
       )
     })
 
@@ -468,7 +457,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           type: "skill-group",
-        }),
+        })
       )
     })
 
@@ -490,7 +479,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           type: "text-section",
-        }),
+        })
       )
     })
   })
@@ -514,7 +503,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           parentId: "company-1",
-        }),
+        })
       )
     })
 
@@ -539,7 +528,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           parentId: null,
-        }),
+        })
       )
     })
 
@@ -564,7 +553,7 @@ describe("useContentItems", () => {
         "content-items",
         expect.objectContaining({
           order: 5,
-        }),
+        })
       )
     })
   })

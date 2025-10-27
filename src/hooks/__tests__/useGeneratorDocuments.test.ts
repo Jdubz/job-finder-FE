@@ -202,17 +202,15 @@ describe("useGeneratorDocuments Hook", () => {
       renderHook(() => useGeneratorDocuments())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
-      expect(callArgs.constraints?.orderBy).toEqual([
-        { field: "createdAt", direction: "desc" },
-      ])
+
+      expect(callArgs.constraints?.orderBy).toEqual([{ field: "createdAt", direction: "desc" }])
     })
 
     it("should not filter by userId (editors see all)", () => {
       renderHook(() => useGeneratorDocuments())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       // Should NOT have userId or submitted_by filter
       expect(callArgs.constraints?.where || []).toHaveLength(0)
     })
@@ -233,7 +231,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const resumeDoc = result.current.documents.find((d) => d.id === "doc-1")
-      
+
       expect(resumeDoc).toEqual({
         id: "doc-1",
         type: "resume",
@@ -250,7 +248,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const coverDoc = result.current.documents.find((d) => d.id === "doc-2")
-      
+
       expect(coverDoc).toEqual({
         id: "doc-2",
         type: "cover_letter",
@@ -267,7 +265,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const bothDoc = result.current.documents.find((d) => d.id === "doc-3")
-      
+
       expect(bothDoc?.type).toBe("both")
       expect(bothDoc?.documentUrl).toBe("https://storage.example.com/resume2.pdf")
     })
@@ -276,7 +274,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const failedDoc = result.current.documents.find((d) => d.id === "doc-4")
-      
+
       expect(failedDoc?.documentUrl).toBeUndefined()
       expect(failedDoc?.status).toBe("failed")
     })
@@ -310,7 +308,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const doc = result.current.documents.find((d) => d.id === "doc-1")
-      
+
       expect(doc?.createdAt).toBeInstanceOf(Date)
       expect(doc?.createdAt.toISOString()).toBe("2024-01-15T10:00:00.000Z")
     })
@@ -319,7 +317,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const doc = result.current.documents.find((d) => d.id === "doc-2")
-      
+
       expect(doc?.createdAt).toBeInstanceOf(Date)
       // Timestamp with seconds: 1705226400
       expect(doc?.createdAt.getTime()).toBe(1705226400000)
@@ -329,7 +327,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const doc = result.current.documents.find((d) => d.id === "doc-3")
-      
+
       expect(doc?.createdAt).toBeInstanceOf(Date)
       expect(doc?.createdAt.toISOString()).toBe("2024-01-13T10:00:00.000Z")
     })
@@ -338,7 +336,7 @@ describe("useGeneratorDocuments Hook", () => {
       const { result } = renderHook(() => useGeneratorDocuments())
 
       const doc = result.current.documents.find((d) => d.id === "doc-4")
-      
+
       expect(doc?.createdAt).toBeInstanceOf(Date)
       expect(doc?.createdAt.getTime()).toBe(1705053600000)
     })
@@ -404,19 +402,14 @@ describe("useGeneratorDocuments Hook", () => {
 
       await result.current.deleteDocument("doc-1")
 
-      expect(mockDeleteDocument).toHaveBeenCalledWith(
-        "generator-documents",
-        "doc-1"
-      )
+      expect(mockDeleteDocument).toHaveBeenCalledWith("generator-documents", "doc-1")
     })
 
     it("should handle delete errors", async () => {
       mockDeleteDocument.mockRejectedValue(new Error("Delete failed"))
       const { result } = renderHook(() => useGeneratorDocuments())
 
-      await expect(
-        result.current.deleteDocument("doc-1")
-      ).rejects.toThrow("Delete failed")
+      await expect(result.current.deleteDocument("doc-1")).rejects.toThrow("Delete failed")
     })
 
     it("should delete document by ID", async () => {
@@ -425,10 +418,7 @@ describe("useGeneratorDocuments Hook", () => {
 
       await result.current.deleteDocument("doc-999")
 
-      expect(mockDeleteDocument).toHaveBeenCalledWith(
-        "generator-documents",
-        "doc-999"
-      )
+      expect(mockDeleteDocument).toHaveBeenCalledWith("generator-documents", "doc-999")
     })
   })
 

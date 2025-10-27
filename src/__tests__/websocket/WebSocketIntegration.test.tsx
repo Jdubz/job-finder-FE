@@ -35,16 +35,14 @@ vi.mock("@/contexts/WebSocketContext", () => ({
 // Mock component to test WebSocket functionality
 const TestComponent = () => {
   const { isConnected, lastMessage, sendMessage } = mockWebSocketContext
-  
+
   return (
     <div>
-      <div data-testid="connection-status">
-        {isConnected ? "Connected" : "Disconnected"}
-      </div>
+      <div data-testid="connection-status">{isConnected ? "Connected" : "Disconnected"}</div>
       <div data-testid="last-message">
         {lastMessage ? JSON.stringify(lastMessage) : "No message"}
       </div>
-      <button 
+      <button
         onClick={() => sendMessage("test-message", { data: "test" })}
         data-testid="send-message"
       >
@@ -83,7 +81,9 @@ describe("WebSocket Integration", () => {
       const sendButton = screen.getByTestId("send-message")
       sendButton.click()
 
-      expect(mockWebSocketContext.sendMessage).toHaveBeenCalledWith("test-message", { data: "test" })
+      expect(mockWebSocketContext.sendMessage).toHaveBeenCalledWith("test-message", {
+        data: "test",
+      })
     })
   })
 
@@ -96,7 +96,7 @@ describe("WebSocket Integration", () => {
         message: "Processing files...",
       }
 
-                  mockWebSocketContext.lastMessage = taskProgressMessage as any
+      mockWebSocketContext.lastMessage = taskProgressMessage as any
 
       render(<TestComponent />)
 
@@ -112,7 +112,7 @@ describe("WebSocket Integration", () => {
         result: "Task completed successfully",
       }
 
-                  mockWebSocketContext.lastMessage = taskCompleteMessage as any
+      mockWebSocketContext.lastMessage = taskCompleteMessage as any
 
       render(<TestComponent />)
 
@@ -128,13 +128,11 @@ describe("WebSocket Integration", () => {
         error: "Task failed with error",
       }
 
-                  mockWebSocketContext.lastMessage = taskErrorMessage as any
+      mockWebSocketContext.lastMessage = taskErrorMessage as any
 
       render(<TestComponent />)
 
-      expect(screen.getByTestId("last-message")).toHaveTextContent(
-        JSON.stringify(taskErrorMessage)
-      )
+      expect(screen.getByTestId("last-message")).toHaveTextContent(JSON.stringify(taskErrorMessage))
     })
 
     it("should handle system health updates", () => {
@@ -148,7 +146,7 @@ describe("WebSocket Integration", () => {
         timestamp: new Date().toISOString(),
       }
 
-                  mockWebSocketContext.lastMessage = systemHealthMessage as any
+      mockWebSocketContext.lastMessage = systemHealthMessage as any
 
       render(<TestComponent />)
 
@@ -207,20 +205,18 @@ describe("WebSocket Integration", () => {
         timestamp: new Date().toISOString(),
       }
 
-                  mockWebSocketContext.lastMessage = complexMessage as any
+      mockWebSocketContext.lastMessage = complexMessage as any
 
       render(<TestComponent />)
 
-      expect(screen.getByTestId("last-message")).toHaveTextContent(
-        JSON.stringify(complexMessage)
-      )
+      expect(screen.getByTestId("last-message")).toHaveTextContent(JSON.stringify(complexMessage))
     })
   })
 
   describe("error handling", () => {
     it("should handle malformed messages gracefully", () => {
       // Simulate malformed message
-                  mockWebSocketContext.lastMessage = "invalid-json" as any
+      mockWebSocketContext.lastMessage = "invalid-json" as any
 
       render(<TestComponent />)
 

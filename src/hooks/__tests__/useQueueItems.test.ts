@@ -168,7 +168,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       // Should NOT filter by submitted_by
       expect(callArgs.constraints?.where || []).not.toContainEqual(
         expect.objectContaining({ field: "submitted_by" })
@@ -179,17 +179,15 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
-      expect(callArgs.constraints?.orderBy).toEqual([
-        { field: "created_at", direction: "desc" },
-      ])
+
+      expect(callArgs.constraints?.orderBy).toEqual([{ field: "created_at", direction: "desc" }])
     })
 
     it("should apply default limit of 50", () => {
       renderHook(() => useQueueItems())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.limit).toBe(50)
     })
 
@@ -197,7 +195,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems({ limit: 100 }))
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.limit).toBe(100)
     })
   })
@@ -207,7 +205,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems({ status: "pending" }))
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.where).toContainEqual({
         field: "status",
         operator: "==",
@@ -219,7 +217,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems({ status: "processing" }))
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.where).toContainEqual({
         field: "status",
         operator: "==",
@@ -231,7 +229,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems({ status: "success" }))
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.where).toContainEqual({
         field: "status",
         operator: "==",
@@ -243,7 +241,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems({ status: "failed" }))
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.where).toContainEqual({
         field: "status",
         operator: "==",
@@ -255,7 +253,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       expect(callArgs.constraints?.where || []).toHaveLength(0)
     })
   })
@@ -267,11 +265,9 @@ describe("useQueueItems Hook", () => {
 
       await result.current.updateQueueItem("queue-1", { status: "processing" })
 
-      expect(mockUpdateDocument).toHaveBeenCalledWith(
-        "job-queue",
-        "queue-1",
-        { status: "processing" }
-      )
+      expect(mockUpdateDocument).toHaveBeenCalledWith("job-queue", "queue-1", {
+        status: "processing",
+      })
     })
 
     it("should update queue item with error message", async () => {
@@ -283,11 +279,10 @@ describe("useQueueItems Hook", () => {
         error_details: "Generation failed",
       })
 
-      expect(mockUpdateDocument).toHaveBeenCalledWith(
-        "job-queue",
-        "queue-1",
-        { status: "failed", error_details: "Generation failed" }
-      )
+      expect(mockUpdateDocument).toHaveBeenCalledWith("job-queue", "queue-1", {
+        status: "failed",
+        error_details: "Generation failed",
+      })
     })
 
     it("should handle update errors", async () => {
@@ -311,11 +306,7 @@ describe("useQueueItems Hook", () => {
 
       await result.current.updateQueueItem("queue-1", updates)
 
-      expect(mockUpdateDocument).toHaveBeenCalledWith(
-        "job-queue",
-        "queue-1",
-        updates
-      )
+      expect(mockUpdateDocument).toHaveBeenCalledWith("job-queue", "queue-1", updates)
     })
   })
 
@@ -333,9 +324,7 @@ describe("useQueueItems Hook", () => {
       mockDeleteDocument.mockRejectedValue(new Error("Delete failed"))
       const { result } = renderHook(() => useQueueItems())
 
-      await expect(
-        result.current.deleteQueueItem("queue-1")
-      ).rejects.toThrow("Delete failed")
+      await expect(result.current.deleteQueueItem("queue-1")).rejects.toThrow("Delete failed")
     })
 
     it("should delete item by ID", async () => {
@@ -486,7 +475,7 @@ describe("useQueueItems Hook", () => {
 
     it("should handle queue with only one status", () => {
       const pendingOnly = mockQueueItems.filter((item) => item.status === "pending")
-      
+
       vi.mocked(useFirestoreCollection).mockReturnValue({
         data: pendingOnly as any,
         loading: false,
@@ -557,7 +546,7 @@ describe("useQueueItems Hook", () => {
       renderHook(() => useQueueItems())
 
       const callArgs = vi.mocked(useFirestoreCollection).mock.calls[0][0]
-      
+
       // Should NOT have submitted_by filter
       expect(callArgs.constraints?.where || []).not.toContainEqual(
         expect.objectContaining({ field: "submitted_by" })

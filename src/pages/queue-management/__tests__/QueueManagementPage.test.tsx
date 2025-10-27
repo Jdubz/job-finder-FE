@@ -181,16 +181,19 @@ describe("QueueManagementPage", () => {
 
       // Update with new items
       vi.mocked(useQueueItems).mockReturnValue({
-        queueItems: [...mockQueueItems, {
-          id: "queue-5",
-          type: "linkedin-job",
-          status: "pending",
-          url: "https://linkedin.com/jobs/111",
-          title: "New Job",
-          company: "NewCorp",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }] as any,
+        queueItems: [
+          ...mockQueueItems,
+          {
+            id: "queue-5",
+            type: "linkedin-job",
+            status: "pending",
+            url: "https://linkedin.com/jobs/111",
+            title: "New Job",
+            company: "NewCorp",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ] as any,
         loading: false,
         error: null,
         updateQueueItem: mockUpdateQueueItem,
@@ -214,8 +217,8 @@ describe("QueueManagementPage", () => {
       })
 
       // Find and click status filter
-      const statusFilter = screen.getByRole("combobox", { name: /status/i }) ||
-                          screen.getAllByRole("combobox")[0]
+      const statusFilter =
+        screen.getByRole("combobox", { name: /status/i }) || screen.getAllByRole("combobox")[0]
       await user.click(statusFilter)
 
       const pendingOption = screen.getByText(/^pending$/i)
@@ -235,8 +238,7 @@ describe("QueueManagementPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "Senior")
 
       await waitFor(() => {
@@ -253,8 +255,7 @@ describe("QueueManagementPage", () => {
         expect(screen.getByText("Tech Corp")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "BigCorp")
 
       await waitFor(() => {
@@ -272,8 +273,7 @@ describe("QueueManagementPage", () => {
       })
 
       // Apply filter
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "Senior")
 
       await waitFor(() => {
@@ -308,7 +308,7 @@ describe("QueueManagementPage", () => {
           "queue-4",
           expect.objectContaining({
             status: "pending",
-          }),
+          })
         )
       })
     })
@@ -348,7 +348,7 @@ describe("QueueManagementPage", () => {
           expect.any(String),
           expect.objectContaining({
             status: "skipped",
-          }),
+          })
         )
       })
     })
@@ -475,16 +475,19 @@ describe("QueueManagementPage", () => {
 
       // Simulate new item arriving
       vi.mocked(useQueueItems).mockReturnValue({
-        queueItems: [...mockQueueItems, {
-          id: "queue-new",
-          type: "linkedin-job",
-          status: "pending",
-          url: "https://linkedin.com/jobs/new",
-          title: "New Position",
-          company: "NewCo",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }] as any,
+        queueItems: [
+          ...mockQueueItems,
+          {
+            id: "queue-new",
+            type: "linkedin-job",
+            status: "pending",
+            url: "https://linkedin.com/jobs/new",
+            title: "New Position",
+            company: "NewCo",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ] as any,
         loading: false,
         error: null,
         updateQueueItem: mockUpdateQueueItem,
@@ -558,7 +561,9 @@ describe("QueueManagementPage", () => {
       })
 
       // Should show bulk actions
-      expect(screen.getByRole("button", { name: /retry selected|delete selected/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", { name: /retry selected|delete selected/i })
+      ).toBeInTheDocument()
     })
   })
 

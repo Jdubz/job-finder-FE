@@ -339,7 +339,7 @@ export class CloudLogger {
       // The app-monitor will collect console logs and write them to files
       console.log(`[FILE_LOG] ${JSON.stringify(logEntry)}`)
     } catch (error) {
-      console.error('Failed to log to file:', error)
+      console.error("Failed to log to file:", error)
     }
   }
 

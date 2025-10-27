@@ -25,9 +25,7 @@ describe("HomePage", () => {
   it("should render subtitle description", () => {
     renderHomePage()
 
-    expect(
-      screen.getByText(/AI-powered job discovery and matching platform/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/AI-powered job discovery and matching platform/i)).toBeInTheDocument()
   })
 
   it("should render Document Builder feature card", () => {
@@ -43,9 +41,7 @@ describe("HomePage", () => {
     renderHomePage()
 
     expect(screen.getByText("Job Applications")).toBeInTheDocument()
-    expect(
-      screen.getByText(/Track and manage your job application pipeline/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Track and manage your job application pipeline/i)).toBeInTheDocument()
   })
 
   it("should render Smart Matching feature card", () => {

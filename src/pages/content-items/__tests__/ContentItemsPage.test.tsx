@@ -107,27 +107,27 @@ const mockContentItems = [
   },
 ]
 
-    // const _mockHierarchy = [
-    //   {
-    //     ...mockContentItems[0],
-    //     children: [],
-    //   },
-    //   {
-    //     ...mockContentItems[1],
-    //     children: [],
-    //   },
-    //   {
-    //     ...mockContentItems[2],
-    //     children: [],
-    //   },
-    // ]
+// const _mockHierarchy = [
+//   {
+//     ...mockContentItems[0],
+//     children: [],
+//   },
+//   {
+//     ...mockContentItems[1],
+//     children: [],
+//   },
+//   {
+//     ...mockContentItems[2],
+//     children: [],
+//   },
+// ]
 
 describe("ContentItemsPage", () => {
   const mockUseContentItems = vi.mocked(useContentItems)
 
   beforeEach(() => {
     vi.clearAllMocks()
-    
+
     // Setup default mocks
     mockUseContentItems.mockReturnValue({
       contentItems: mockContentItems,
@@ -239,7 +239,7 @@ describe("ContentItemsPage", () => {
     it("should delete item when delete button is clicked", async () => {
       const user = userEvent.setup()
       const mockDeleteContentItem = vi.fn()
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -308,7 +308,7 @@ describe("ContentItemsPage", () => {
     it("should auto-save changes", async () => {
       const user = userEvent.setup()
       const mockUpdateContentItem = vi.fn()
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -335,7 +335,7 @@ describe("ContentItemsPage", () => {
 
     it("should handle conflict resolution", async () => {
       // const _user = userEvent.setup()
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -373,7 +373,7 @@ describe("ContentItemsPage", () => {
 
       // Check for proper heading structure
       expect(screen.getByRole("heading", { name: /content items/i })).toBeInTheDocument()
-      
+
       // Check for proper button labels
       expect(screen.getByRole("button", { name: /add skill/i })).toBeInTheDocument()
       expect(screen.getByRole("button", { name: /add project/i })).toBeInTheDocument()
@@ -404,7 +404,7 @@ describe("ContentItemsPage", () => {
     it("should show error message when create fails", async () => {
       const user = userEvent.setup()
       const mockCreateContentItem = vi.fn().mockRejectedValue(new Error("Create failed"))
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -428,7 +428,7 @@ describe("ContentItemsPage", () => {
     it("should show error message when update fails", async () => {
       const user = userEvent.setup()
       const mockUpdateContentItem = vi.fn().mockRejectedValue(new Error("Update failed"))
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -452,7 +452,7 @@ describe("ContentItemsPage", () => {
     it("should show error message when delete fails", async () => {
       const user = userEvent.setup()
       const mockDeleteContentItem = vi.fn().mockRejectedValue(new Error("Delete failed"))
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -477,7 +477,7 @@ describe("ContentItemsPage", () => {
   describe("success feedback", () => {
     it("should show success message after successful operations", async () => {
       const user = userEvent.setup()
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,
@@ -501,7 +501,7 @@ describe("ContentItemsPage", () => {
     it("should auto-dismiss success messages after 3 seconds", async () => {
       vi.useFakeTimers()
       const user = userEvent.setup()
-      
+
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
         loading: false,

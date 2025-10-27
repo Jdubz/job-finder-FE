@@ -157,9 +157,9 @@ describe("Prompts Client", () => {
     it("should handle save errors", async () => {
       vi.mocked(setDoc).mockRejectedValue(new Error("Permission denied"))
 
-      await expect(
-        promptsClient.savePrompts(DEFAULT_PROMPTS, mockUserEmail)
-      ).rejects.toThrow("Failed to save AI prompts")
+      await expect(promptsClient.savePrompts(DEFAULT_PROMPTS, mockUserEmail)).rejects.toThrow(
+        "Failed to save AI prompts"
+      )
     })
 
     it("should save all prompt fields", async () => {
@@ -208,9 +208,9 @@ describe("Prompts Client", () => {
     it("should handle reset errors", async () => {
       vi.mocked(setDoc).mockRejectedValue(new Error("Database error"))
 
-      await expect(
-        promptsClient.resetToDefaults(mockUserEmail)
-      ).rejects.toThrow("Failed to save AI prompts")
+      await expect(promptsClient.resetToDefaults(mockUserEmail)).rejects.toThrow(
+        "Failed to save AI prompts"
+      )
     })
   })
 
@@ -268,21 +268,21 @@ describe("Prompts Client", () => {
     it("should validate default resume prompt", () => {
       const required = ["jobDescription", "jobTitle", "companyName", "userExperience", "userSkills"]
 
-      const result = promptsClient.validatePrompt(
-        DEFAULT_PROMPTS.resumeGeneration,
-        required
-      )
+      const result = promptsClient.validatePrompt(DEFAULT_PROMPTS.resumeGeneration, required)
 
       expect(result.valid).toBe(true)
     })
 
     it("should validate default cover letter prompt", () => {
-      const required = ["jobDescription", "jobTitle", "companyName", "userExperience", "matchReason"]
+      const required = [
+        "jobDescription",
+        "jobTitle",
+        "companyName",
+        "userExperience",
+        "matchReason",
+      ]
 
-      const result = promptsClient.validatePrompt(
-        DEFAULT_PROMPTS.coverLetterGeneration,
-        required
-      )
+      const result = promptsClient.validatePrompt(DEFAULT_PROMPTS.coverLetterGeneration, required)
 
       expect(result.valid).toBe(true)
     })

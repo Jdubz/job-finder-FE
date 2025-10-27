@@ -183,9 +183,7 @@ describe("useFirestoreCollection", () => {
       return unsubscribe
     })
 
-    mockFirestoreService.getDocuments.mockResolvedValue([
-      { id: "4", name: "Item 4", order: 4 },
-    ])
+    mockFirestoreService.getDocuments.mockResolvedValue([{ id: "4", name: "Item 4", order: 4 }])
 
     const { result } = renderHook(() =>
       useFirestoreCollection({
@@ -203,10 +201,7 @@ describe("useFirestoreCollection", () => {
       expect(result.current.data).toEqual([{ id: "4", name: "Item 4", order: 4 }])
     })
 
-    expect(mockFirestoreService.getDocuments).toHaveBeenCalledWith(
-      "content-items",
-      undefined
-    )
+    expect(mockFirestoreService.getDocuments).toHaveBeenCalledWith("content-items", undefined)
   })
 
   it("should handle refetch error", async () => {

@@ -203,8 +203,7 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "Senior")
 
       await waitFor(() => {
@@ -221,8 +220,7 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Tech Corp")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "BigCorp")
 
       await waitFor(() => {
@@ -239,8 +237,7 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Tech Corp")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "TECH")
 
       await waitFor(() => {
@@ -256,8 +253,7 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "Senior")
 
       await waitFor(() => {
@@ -281,8 +277,8 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const typeFilter = screen.getByRole("combobox", { name: /type/i }) ||
-                        screen.getAllByRole("combobox")[0]
+      const typeFilter =
+        screen.getByRole("combobox", { name: /type/i }) || screen.getAllByRole("combobox")[0]
       await user.click(typeFilter)
 
       const resumeOption = screen.getByText(/^resume$/i)
@@ -303,8 +299,8 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Senior Developer")).toBeInTheDocument()
       })
 
-      const typeFilter = screen.getByRole("combobox", { name: /type/i }) ||
-                        screen.getAllByRole("combobox")[0]
+      const typeFilter =
+        screen.getByRole("combobox", { name: /type/i }) || screen.getAllByRole("combobox")[0]
       await user.click(typeFilter)
 
       const coverOption = screen.getByText(/cover.*letter/i)
@@ -324,8 +320,8 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const typeFilter = screen.getByRole("combobox", { name: /type/i }) ||
-                        screen.getAllByRole("combobox")[0]
+      const typeFilter =
+        screen.getByRole("combobox", { name: /type/i }) || screen.getAllByRole("combobox")[0]
       await user.click(typeFilter)
 
       const allOption = screen.getByText(/^all$/i)
@@ -350,10 +346,7 @@ describe("DocumentHistoryPage", () => {
       const downloadButton = screen.getAllByRole("button", { name: /download/i })[0]
       await user.click(downloadButton)
 
-      expect(global.open).toHaveBeenCalledWith(
-        "https://storage.example.com/resume1.pdf",
-        "_blank",
-      )
+      expect(global.open).toHaveBeenCalledWith("https://storage.example.com/resume1.pdf", "_blank")
     })
 
     it("should view document", async () => {
@@ -367,10 +360,7 @@ describe("DocumentHistoryPage", () => {
       const viewButton = screen.getAllByRole("button", { name: /view|eye/i })[0]
       await user.click(viewButton)
 
-      expect(global.open).toHaveBeenCalledWith(
-        "https://storage.example.com/resume1.pdf",
-        "_blank",
-      )
+      expect(global.open).toHaveBeenCalledWith("https://storage.example.com/resume1.pdf", "_blank")
     })
 
     it("should delete document with confirmation", async () => {
@@ -388,7 +378,7 @@ describe("DocumentHistoryPage", () => {
       await user.click(deleteButton)
 
       expect(global.confirm).toHaveBeenCalled()
-      
+
       await waitFor(() => {
         expect(mockDeleteDocument).toHaveBeenCalledWith("doc-1")
       })
@@ -427,9 +417,7 @@ describe("DocumentHistoryPage", () => {
       await user.click(deleteButton)
 
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith(
-          expect.stringContaining("failed"),
-        )
+        expect(global.alert).toHaveBeenCalledWith(expect.stringContaining("failed"))
       })
     })
 
@@ -448,8 +436,9 @@ describe("DocumentHistoryPage", () => {
       await user.click(deleteButton)
 
       await waitFor(() => {
-        expect(screen.getByText(/deleting/i) || 
-               screen.getByRole("button", { name: /delete/i })).toBeDisabled()
+        expect(
+          screen.getByText(/deleting/i) || screen.getByRole("button", { name: /delete/i })
+        ).toBeDisabled()
       })
     })
   })
@@ -464,15 +453,14 @@ describe("DocumentHistoryPage", () => {
       })
 
       // Apply type filter
-      const typeFilter = screen.getByRole("combobox", { name: /type/i }) ||
-                        screen.getAllByRole("combobox")[0]
+      const typeFilter =
+        screen.getByRole("combobox", { name: /type/i }) || screen.getAllByRole("combobox")[0]
       await user.click(typeFilter)
       const resumeOption = screen.getByText(/^resume$/i)
       await user.click(resumeOption)
 
       // Apply search
-      const searchInput = screen.getByPlaceholderText(/search/i) ||
-                         screen.getByRole("textbox")
+      const searchInput = screen.getByPlaceholderText(/search/i) || screen.getByRole("textbox")
       await user.type(searchInput, "Full")
 
       await waitFor(() => {
@@ -488,9 +476,8 @@ describe("DocumentHistoryPage", () => {
       render(<DocumentHistoryPage />)
 
       await waitFor(() => {
-        const documents = screen.getAllByRole("article") || 
-                         screen.getAllByRole("listitem")
-        
+        const documents = screen.getAllByRole("article") || screen.getAllByRole("listitem")
+
         // Most recent first
         expect(documents[0]).toHaveTextContent("Software Engineer")
       })
@@ -502,8 +489,7 @@ describe("DocumentHistoryPage", () => {
       render(<DocumentHistoryPage />)
 
       await waitFor(() => {
-        expect(screen.getByText(/4.*documents?/i) || 
-               screen.getByText("4")).toBeInTheDocument()
+        expect(screen.getByText(/4.*documents?/i) || screen.getByText("4")).toBeInTheDocument()
       })
     })
 
@@ -515,15 +501,14 @@ describe("DocumentHistoryPage", () => {
         expect(screen.getByText("Software Engineer")).toBeInTheDocument()
       })
 
-      const typeFilter = screen.getByRole("combobox", { name: /type/i }) ||
-                        screen.getAllByRole("combobox")[0]
+      const typeFilter =
+        screen.getByRole("combobox", { name: /type/i }) || screen.getAllByRole("combobox")[0]
       await user.click(typeFilter)
       const resumeOption = screen.getByText(/^resume$/i)
       await user.click(resumeOption)
 
       await waitFor(() => {
-        expect(screen.getByText(/2.*documents?/i) || 
-               screen.getByText("2")).toBeInTheDocument()
+        expect(screen.getByText(/2.*documents?/i) || screen.getByText("2")).toBeInTheDocument()
       })
     })
   })

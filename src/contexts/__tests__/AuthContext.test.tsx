@@ -24,14 +24,16 @@ vi.mock("@/config/firebase", () => ({
 // Mock component to test the context
 const TestComponent = () => {
   const { user, loading, isEditor, signOut } = useAuth()
-  
+
   if (loading) return <div>Loading...</div>
-  
+
   return (
     <div>
       <div data-testid="user-email">{user?.email || "No user"}</div>
       <div data-testid="is-editor">{isEditor ? "Editor" : "Viewer"}</div>
-      <button onClick={signOut} data-testid="sign-out">Sign Out</button>
+      <button onClick={signOut} data-testid="sign-out">
+        Sign Out
+      </button>
     </div>
   )
 }
@@ -50,10 +52,10 @@ describe("AuthContext", () => {
 
   describe("AuthProvider", () => {
     it("should provide loading state initially", () => {
-              mockOnAuthStateChanged.mockImplementation((_auth, _callback) => {
-                // Don't call callback immediately to test loading state
-                return () => {}
-              })
+      mockOnAuthStateChanged.mockImplementation((_auth, _callback) => {
+        // Don't call callback immediately to test loading state
+        return () => {}
+      })
 
       render(
         <AuthProvider>
@@ -65,15 +67,15 @@ describe("AuthContext", () => {
     })
 
     it("should handle unauthenticated user", async () => {
-              mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-                // Simulate no user
-                if (typeof callback === 'function') {
-                  if (typeof callback === 'function') {
-          callback(null)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        // Simulate no user
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(null)
+          }
         }
-                }
-                return () => {}
-              })
+        return () => {}
+      })
 
       render(
         <AuthProvider>
@@ -93,15 +95,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "viewer" }
+          claims: { role: "viewer" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -124,15 +126,15 @@ describe("AuthContext", () => {
         email: "editor@example.com",
         displayName: "Editor User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "editor" }
+          claims: { role: "editor" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -155,15 +157,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: {}
+          claims: {},
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -189,10 +191,10 @@ describe("AuthContext", () => {
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -232,15 +234,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "viewer" }
+          claims: { role: "viewer" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -271,15 +273,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "viewer" }
+          claims: { role: "viewer" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -297,7 +299,7 @@ describe("AuthContext", () => {
       })
 
       const signOutButton = screen.getByTestId("sign-out")
-      
+
       // Should not throw error
       await expect(async () => {
         signOutButton.click()
@@ -323,15 +325,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "editor" }
+          claims: { role: "editor" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -356,15 +358,15 @@ describe("AuthContext", () => {
         email: "editor@example.com",
         displayName: "Editor User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "editor" }
+          claims: { role: "editor" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -386,15 +388,15 @@ describe("AuthContext", () => {
         email: "viewer@example.com",
         displayName: "Viewer User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "viewer" }
+          claims: { role: "viewer" },
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -416,15 +418,15 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: {}
+          claims: {},
         }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -444,7 +446,7 @@ describe("AuthContext", () => {
   describe("session management", () => {
     it("should handle user state changes", async () => {
       let authCallback: (user: any) => void = () => {}
-      
+
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         authCallback = callback as (user: any) => void
         return () => {}
@@ -467,7 +469,7 @@ describe("AuthContext", () => {
         email: "user@example.com",
         displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: "viewer" }
+          claims: { role: "viewer" },
         }),
       }
 
@@ -491,20 +493,21 @@ describe("AuthContext", () => {
         uid: "user-123",
         email: "user@example.com",
         displayName: "Test User",
-        getIdTokenResult: vi.fn()
+        getIdTokenResult: vi
+          .fn()
           .mockResolvedValueOnce({
-            claims: { role: "viewer" }
+            claims: { role: "viewer" },
           })
           .mockResolvedValueOnce({
-            claims: { role: "editor" }
+            claims: { role: "editor" },
           }),
       }
 
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -521,15 +524,15 @@ describe("AuthContext", () => {
 
       // Simulate token refresh with role change
       mockUser.getIdTokenResult.mockResolvedValue({
-        claims: { role: "editor" }
+        claims: { role: "editor" },
       })
 
       // Trigger auth state change again
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
-        if (typeof callback === 'function') {
-          if (typeof callback === 'function') {
-          callback(mockUser as any)
-        }
+        if (typeof callback === "function") {
+          if (typeof callback === "function") {
+            callback(mockUser as any)
+          }
         }
         return () => {}
       })
@@ -545,9 +548,9 @@ describe("AuthContext", () => {
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         // Simulate error in auth state change
         try {
-          if (typeof callback === 'function') {
-          callback(null)
-        }
+          if (typeof callback === "function") {
+            callback(null)
+          }
         } catch (error) {
           // Error should be handled gracefully
         }
@@ -568,7 +571,7 @@ describe("AuthContext", () => {
     it("should handle Firebase auth errors", async () => {
       mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         // Simulate Firebase error
-        if (typeof callback === 'function') {
+        if (typeof callback === "function") {
           callback(null)
         }
         return () => {}

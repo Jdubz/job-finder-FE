@@ -381,7 +381,7 @@ describe("GeneratorClient", () => {
         linkedin: "https://linkedin.com/in/johndoe",
         github: "https://github.com/johndoe",
         portfolio: "https://johndoe.com",
-        summary: "Experienced developer"
+        summary: "Experienced developer",
       }
 
       const mockResponse = {
@@ -419,7 +419,7 @@ describe("GeneratorClient", () => {
         linkedin: "https://linkedin.com/in/johndoe",
         github: "https://github.com/johndoe",
         portfolio: "https://johndoe.com",
-        summary: "Experienced developer"
+        summary: "Experienced developer",
       }
 
       vi.mocked(fetch).mockResolvedValue({

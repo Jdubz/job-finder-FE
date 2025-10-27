@@ -52,13 +52,7 @@ describe("Card", () => {
       render(<Card>Card content</Card>)
 
       const card = screen.getByText("Card content")
-      expect(card).toHaveClass(
-        "rounded-xl",
-        "border",
-        "bg-card",
-        "text-card-foreground",
-        "shadow"
-      )
+      expect(card).toHaveClass("rounded-xl", "border", "bg-card", "text-card-foreground", "shadow")
     })
 
     it("should apply custom className alongside base classes", () => {
@@ -153,11 +147,7 @@ describe("CardTitle", () => {
       render(<CardTitle>Title content</CardTitle>)
 
       const title = screen.getByText("Title content")
-      expect(title).toHaveClass(
-        "font-semibold",
-        "leading-none",
-        "tracking-tight"
-      )
+      expect(title).toHaveClass("font-semibold", "leading-none", "tracking-tight")
     })
   })
 

@@ -206,9 +206,9 @@ describe("usePersonalInfo", () => {
       expect(result.current.loading).toBe(false)
     })
 
-    await expect(
-      result.current.updatePersonalInfo({ name: "Test" })
-    ).rejects.toThrow("User must be authenticated")
+    await expect(result.current.updatePersonalInfo({ name: "Test" })).rejects.toThrow(
+      "User must be authenticated"
+    )
   })
 
   it("should handle update error", async () => {
@@ -225,9 +225,9 @@ describe("usePersonalInfo", () => {
       expect(result.current.personalInfo).toBeTruthy()
     })
 
-    await expect(
-      result.current.updatePersonalInfo({ name: "Test" })
-    ).rejects.toThrow("Update failed")
+    await expect(result.current.updatePersonalInfo({ name: "Test" })).rejects.toThrow(
+      "Update failed"
+    )
 
     expect(result.current.error).toEqual(error)
   })

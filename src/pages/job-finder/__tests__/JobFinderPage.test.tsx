@@ -213,9 +213,11 @@ describe("JobFinderPage", () => {
     })
 
     it("should disable submit button while submitting", async () => {
-      const mockSubmitJob = vi.fn().mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ status: "success" }), 100))
-      )
+      const mockSubmitJob = vi
+        .fn()
+        .mockImplementation(
+          () => new Promise((resolve) => setTimeout(() => resolve({ status: "success" }), 100))
+        )
       ;(jobQueueClient.submitJob as any) = mockSubmitJob
 
       render(<JobFinderPage />)
