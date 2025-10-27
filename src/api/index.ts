@@ -19,4 +19,3 @@ export type {
   DocumentHistoryItem,
   UserDefaults,
 } from "./generator-client"
-

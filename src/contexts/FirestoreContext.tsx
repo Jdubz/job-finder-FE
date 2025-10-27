@@ -236,6 +236,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
 /**
  * Hook to access Firestore context
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useFirestore() {
   const context = useContext(FirestoreContext)
   if (!context) {

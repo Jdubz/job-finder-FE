@@ -166,7 +166,7 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDownload(doc.documentUrl!)}
+                  onClick={() => handleDownload(doc.documentUrl as string)}
                   aria-label={`Download ${doc.jobTitle} ${doc.type}`}
                 >
                   <Download className="w-4 h-4 mr-2" />

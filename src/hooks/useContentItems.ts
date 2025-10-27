@@ -15,7 +15,10 @@ interface UseContentItemsResult {
   loading: boolean
   error: Error | null
   createContentItem: (
-    data: Omit<ContentItemDocument, "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+    data: Omit<
+      ContentItemDocument,
+      "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+    >
   ) => Promise<string>
   updateContentItem: (id: string, data: Partial<ContentItemDocument>) => Promise<void>
   deleteContentItem: (id: string) => Promise<void>
@@ -50,7 +53,10 @@ export function useContentItems(): UseContentItemsResult {
    */
   const createContentItem = useCallback(
     async (
-      data: Omit<ContentItemDocument, "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+      data: Omit<
+        ContentItemDocument,
+        "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+      >
     ) => {
       if (!user?.uid) {
         throw new Error("User must be authenticated to create content items")

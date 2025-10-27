@@ -92,15 +92,21 @@ export function ContentItemsPage() {
         return
       }
 
-      const itemWithChildren = itemsMap.get(item.id)!
+      const itemWithChildren = itemsMap.get(item.id)
+      if (!itemWithChildren) {
+        return
+      }
+
       processedItems.add(item.id)
 
       // Only treat as root if parentId is explicitly null or undefined
       // Skip items with parentId that points to missing parent (orphaned items)
       if (item.parentId) {
         if (itemsMap.has(item.parentId)) {
-          const parent = itemsMap.get(item.parentId)!
-          parent.children!.push(itemWithChildren)
+          const parent = itemsMap.get(item.parentId)
+          if (parent && parent.children) {
+            parent.children.push(itemWithChildren)
+          }
         }
         // If parent doesn't exist, skip this item (orphaned)
       } else {

@@ -12,7 +12,8 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Job Finder App Manager</h3>
             <p className="text-sm text-muted-foreground">
-              Streamline your job search with intelligent application management and automated tools.
+              Streamline your job search with intelligent application management and automated
+              tools.
             </p>
           </div>
 
@@ -21,32 +22,32 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link 
-                  to={ROUTES.HOME} 
+                <Link
+                  to={ROUTES.HOME}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Home
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.HOW_IT_WORKS} 
+                <Link
+                  to={ROUTES.HOW_IT_WORKS}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.CONTENT_ITEMS} 
+                <Link
+                  to={ROUTES.CONTENT_ITEMS}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Content Items
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.DOCUMENT_BUILDER} 
+                <Link
+                  to={ROUTES.DOCUMENT_BUILDER}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Document Builder
@@ -60,32 +61,32 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link 
-                  to={ROUTES.TERMS_OF_USE} 
+                <Link
+                  to={ROUTES.TERMS_OF_USE}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Terms of Use
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.PRIVACY_POLICY} 
+                <Link
+                  to={ROUTES.PRIVACY_POLICY}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.COOKIE_POLICY} 
+                <Link
+                  to={ROUTES.COOKIE_POLICY}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cookie Policy
                 </Link>
               </li>
               <li>
-                <Link 
-                  to={ROUTES.DISCLAIMER} 
+                <Link
+                  to={ROUTES.DISCLAIMER}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Disclaimer
@@ -99,25 +100,25 @@ export function Footer() {
             <h3 className="text-lg font-semibold">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link 
-                  to={ROUTES.SETTINGS} 
+                <Link
+                  to={ROUTES.SETTINGS}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Settings
                 </Link>
               </li>
               <li>
-                <a 
-                  href="mailto:support@jobfinderapp.com" 
+                <a
+                  href="mailto:support@jobfinderapp.com"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Contact Support
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/your-org/job-finder-app" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/your-org/job-finder-app"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -135,9 +136,7 @@ export function Footer() {
               © {currentYear} Job Finder App Manager. All rights reserved.
             </p>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">
-                Made with ❤️ for job seekers
-              </span>
+              <span className="text-sm text-muted-foreground">Made with ❤️ for job seekers</span>
             </div>
           </div>
         </div>

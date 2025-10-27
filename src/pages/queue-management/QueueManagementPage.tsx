@@ -411,24 +411,27 @@ export function QueueManagementPage() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {filteredItems.map((item) => (
-                <QueueItemCard
-                  key={item.id}
-                  item={item}
-                  selected={selectedItems.has(item.id!)}
-                  onSelect={(id: string, selected: boolean) => {
-                    const newSelected = new Set(selectedItems)
-                    if (selected) {
-                      newSelected.add(id)
-                    } else {
-                      newSelected.delete(id)
-                    }
-                    setSelectedItems(newSelected)
-                  }}
-                  onRetry={handleRetryItem}
-                  onCancel={handleCancelItem}
-                />
-              ))}
+              {filteredItems.map((item) => {
+                if (!item.id) return null
+                return (
+                  <QueueItemCard
+                    key={item.id}
+                    item={item}
+                    selected={selectedItems.has(item.id)}
+                    onSelect={(id: string, selected: boolean) => {
+                      const newSelected = new Set(selectedItems)
+                      if (selected) {
+                        newSelected.add(id)
+                      } else {
+                        newSelected.delete(id)
+                      }
+                      setSelectedItems(newSelected)
+                    }}
+                    onRetry={handleRetryItem}
+                    onCancel={handleCancelItem}
+                  />
+                )
+              })}
             </div>
           )}
         </TabsContent>

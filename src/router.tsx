@@ -1,8 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router-dom"
-import { lazy, Suspense } from "react"
+import { lazy } from "react"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { ROUTES } from "@/types/routes"
+import { LazyPage } from "@/components/common/LazyPage"
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import("@/pages/HomePage").then((m) => ({ default: m.HomePage })))
@@ -67,20 +68,6 @@ const CookiePolicyPage = lazy(() =>
 const DisclaimerPage = lazy(() =>
   import("@/pages/legal/DisclaimerPage").then((m) => ({ default: m.DisclaimerPage }))
 )
-
-// Loading fallback component
-function PageLoader() {
-  return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-muted-foreground">Loading...</div>
-    </div>
-  )
-}
-
-// Wrapper for lazy loaded components with Suspense
-function LazyPage({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={<PageLoader />}>{children}</Suspense>
-}
 
 export const router = createBrowserRouter([
   {
