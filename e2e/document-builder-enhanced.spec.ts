@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { mockAuthentication } from './fixtures/helpers'
 
 /**
  * Enhanced Document Builder E2E Tests
@@ -71,11 +70,11 @@ test.describe('Document Builder Enhanced @critical', () => {
     ]
 
     // At least one auth element should be present
-    let foundAuth = false
+    let _foundAuth = false
     for (const element of authElements) {
       const exists = await element.isVisible().catch(() => false)
       if (exists) {
-        foundAuth = true
+        _foundAuth = true
         break
       }
     }
@@ -94,11 +93,11 @@ test.describe('Document Builder Enhanced @critical', () => {
     ]
 
     // At least one content element should be present
-    let foundContent = false
+    let _foundContent = false
     for (const element of contentElements) {
       const exists = await element.isVisible().catch(() => false)
       if (exists) {
-        foundContent = true
+        _foundContent = true
         break
       }
     }
