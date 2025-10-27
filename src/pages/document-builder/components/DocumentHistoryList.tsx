@@ -115,7 +115,7 @@ export function DocumentHistoryList({ refreshTrigger = 0 }: DocumentHistoryListP
           {documents.length} document{documents.length === 1 ? "" : "s"} generated
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3" data-testid="document-history-list">
         {documents.map((doc) => (
           <div
             key={doc.id}
