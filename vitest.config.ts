@@ -19,6 +19,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    conditions: ['development', 'browser'],
   },
   test: {
     globals: true,

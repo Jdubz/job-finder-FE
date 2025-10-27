@@ -5,9 +5,6 @@ import { vi } from "vitest"
 
 /**
  * MainLayout Component Tests
- * 
- * NOTE: These tests are temporarily skipped due to React 19 compatibility issues
- * with @testing-library/react and React.act. Will be re-enabled when RTL updates.
  */
 
 // Mock the child components
@@ -28,7 +25,7 @@ vi.mock("react-router-dom", async (importOriginal) => {
   }
 })
 
-describe.skip("MainLayout", () => {
+describe("MainLayout", () => {
   it("renders all layout components", () => {
     render(
       <BrowserRouter>
