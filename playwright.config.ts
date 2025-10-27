@@ -15,10 +15,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
 
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
 
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Use more workers for faster execution */
+  workers: process.env.CI ? 2 : 4,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [["html"], ["list"], ["json", { outputFile: "playwright-report/results.json" }]],
@@ -36,7 +36,14 @@ export default defineConfig({
 
     /* Video on failure */
     video: "retain-on-failure",
+
+    /* Timeout settings for faster failure detection */
+    actionTimeout: 5000,
+    navigationTimeout: 10000,
   },
+
+  /* Global test timeout */
+  timeout: 30000,
 
   /* Configure projects for major browsers */
   projects: [

@@ -10,7 +10,6 @@ import {
   Settings,
   Briefcase,
   ListChecks,
-  Activity,
   Sparkles,
   FolderOpen,
 } from "lucide-react"
@@ -45,7 +44,6 @@ const jobFinderLinks: NavLink[] = [
 
 const systemLinks: NavLink[] = [
   { to: ROUTES.JOB_FINDER_CONFIG, label: "Configuration", icon: Settings },
-  { to: ROUTES.SYSTEM_HEALTH, label: "System Health", icon: Activity },
 ]
 
 export function Navigation() {

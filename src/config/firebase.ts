@@ -15,7 +15,10 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app: FirebaseApp = initializeApp(firebaseConfig)
 export const auth: Auth = getAuth(app)
-export const db: Firestore = getFirestore(app)
+
+// Initialize Firestore with database ID if specified
+const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID
+export const db: Firestore = databaseId ? getFirestore(app, databaseId) : getFirestore(app)
 
 // Connect to Firebase emulators in development/test environments
 if (import.meta.env.VITE_USE_EMULATORS === "true") {
