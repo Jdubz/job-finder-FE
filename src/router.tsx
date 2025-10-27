@@ -47,11 +47,6 @@ const JobFinderConfigPage = lazy(() =>
     default: m.JobFinderConfigPage,
   }))
 )
-const SystemHealthPage = lazy(() =>
-  import("@/pages/system-health/SystemHealthPage").then((m) => ({
-    default: m.SystemHealthPage,
-  }))
-)
 const DocumentHistoryPage = lazy(() =>
   import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
     default: m.DocumentHistoryPage,
@@ -178,14 +173,6 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <JobFinderConfigPage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.SYSTEM_HEALTH,
-            element: (
-              <LazyPage>
-                <SystemHealthPage />
               </LazyPage>
             ),
           },

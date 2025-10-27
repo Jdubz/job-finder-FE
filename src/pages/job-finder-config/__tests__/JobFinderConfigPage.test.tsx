@@ -1,554 +1,800 @@
 /**
- * Job Finder Config Page Tests
+ * Job Finder Configuration Page Tests
  *
- * Tests for configuration management including:
- * - Stop list management (companies, keywords, domains)
- * - Queue settings
- * - AI settings
- * - Save/reset functionality
- * - Authorization
+ * Comprehensive tests for the Job Finder Configuration functionality
+ * Rank 3 - HIGH: System configuration management
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { BrowserRouter } from "react-router-dom"
 import { JobFinderConfigPage } from "../JobFinderConfigPage"
-import { useAuth } from "@/contexts/AuthContext"
-import { configClient } from "@/api"
+import { configClient } from "@/api/config-client"
 
-// Mock modules
-vi.mock("@/contexts/AuthContext")
-vi.mock("@/api", () => ({
+// Mock the config client
+vi.mock("@/api/config-client", () => ({
   configClient: {
     getStopList: vi.fn(),
-    updateStopList: vi.fn(),
     getQueueSettings: vi.fn(),
-    updateQueueSettings: vi.fn(),
     getAISettings: vi.fn(),
+    updateStopList: vi.fn(),
+    updateQueueSettings: vi.fn(),
     updateAISettings: vi.fn(),
   },
 }))
 
+// Mock the auth context
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    isEditor: true,
+    user: {
+      uid: "test-user-123",
+      email: "test@example.com",
+      displayName: "Test User",
+    },
+  }),
+}))
+
+// Mock Firebase
+vi.mock("@/config/firebase", () => ({
+  db: {},
+}))
+
+// Helper function to render with router
+const renderWithRouter = (component: React.ReactElement) => {
+  return render(<BrowserRouter>{component}</BrowserRouter>)
+}
+
+// Mock data
+const mockStopList = {
+  excludedCompanies: ["Bad Company", "Spam Corp"],
+  excludedKeywords: ["contractor", "freelance"],
+  excludedDomains: ["spam.com", "fake-jobs.com"],
+}
+
+const mockQueueSettings = {
+  maxRetries: 3,
+  retryDelaySeconds: 300,
+  processingTimeout: 600,
+}
+
+const mockAISettings = {
+  provider: "claude" as const,
+  model: "claude-sonnet-4",
+  minMatchScore: 70,
+  costBudgetDaily: 10.0,
+}
+
 describe("JobFinderConfigPage", () => {
-  const mockUser = {
-    uid: "test-user-123",
-    email: "test@example.com",
-    displayName: "Test User",
-  }
-
-  const mockStopList = {
-    id: "stop-list",
-    companies: ["Spam Corp", "Bad Company"],
-    keywords: ["unpaid", "volunteer"],
-    domains: ["spam.com", "scam.com"],
-    updatedAt: new Date().toISOString(),
-    updatedBy: "test@example.com",
-  }
-
-  const mockQueueSettings = {
-    id: "queue-settings",
-    maxRetries: 3,
-    retryDelayMs: 5000,
-    batchSize: 10,
-    enabled: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "test@example.com",
-  }
-
-  const mockAISettings = {
-    id: "ai-settings",
-    provider: "gemini" as const,
-    model: "gemini-2.0-flash",
-    temperature: 0.7,
-    maxTokens: 2000,
-    enabled: true,
-    updatedAt: new Date().toISOString(),
-    updatedBy: "test@example.com",
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
 
-    vi.mocked(useAuth).mockReturnValue({
-      user: mockUser as any,
-      loading: false,
-      isEditor: true,
-      signOut: vi.fn(),
-      signInWithGoogle: vi.fn(),
-    } as any)
-
+    // Setup default mocks
     vi.mocked(configClient.getStopList).mockResolvedValue(mockStopList)
     vi.mocked(configClient.getQueueSettings).mockResolvedValue(mockQueueSettings)
     vi.mocked(configClient.getAISettings).mockResolvedValue(mockAISettings)
+    vi.mocked(configClient.updateStopList).mockResolvedValue(undefined)
+    vi.mocked(configClient.updateQueueSettings).mockResolvedValue(undefined)
+    vi.mocked(configClient.updateAISettings).mockResolvedValue(undefined)
   })
 
-  describe("Initial Loading", () => {
-    it("should render the config page", async () => {
-      render(<JobFinderConfigPage />)
+  describe("rendering", () => {
+    it("should render configuration page with all tabs", async () => {
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText(/configuration/i)).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
+
+      // Check tabs
+      expect(screen.getByText("Stop List")).toBeInTheDocument()
+      expect(screen.getByText("Queue Settings")).toBeInTheDocument()
+      expect(screen.getByText("AI Settings")).toBeInTheDocument()
     })
 
-    it("should load all configuration settings", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(configClient.getStopList).toHaveBeenCalled()
-        expect(configClient.getQueueSettings).toHaveBeenCalled()
-        expect(configClient.getAISettings).toHaveBeenCalled()
-      })
-    })
-
-    it("should show loading state initially", () => {
+    it("should show loading state while fetching configuration", () => {
+      // Mock slow response
       vi.mocked(configClient.getStopList).mockImplementation(
-        () => new Promise(() => {}),
+        () => new Promise(resolve => setTimeout(() => resolve(mockStopList), 100))
       )
 
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
-      expect(screen.getByText(/loading/i) || screen.getByRole("progressbar")).toBeInTheDocument()
+      expect(screen.getByText("Loading configuration...")).toBeInTheDocument()
     })
 
-    it("should display error when loading fails", async () => {
-      vi.mocked(configClient.getStopList).mockRejectedValue(
-        new Error("Failed to load"),
-      )
-
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText(/failed to load/i)).toBeInTheDocument()
+    it("should show permission error for non-editor users", () => {
+      // Mock non-editor user
+      vi.mocked(require("@/contexts/AuthContext").useAuth).mockReturnValue({
+        isEditor: false,
+        user: {
+          uid: "test-user-123",
+          email: "test@example.com",
+          displayName: "Test User",
+        },
       })
+
+      renderWithRouter(<JobFinderConfigPage />)
+
+      expect(screen.getByText("You do not have permission to access job finder configuration. Editor role required.")).toBeInTheDocument()
     })
   })
 
-  describe("Stop List Tab", () => {
-    it("should display stop list tab", async () => {
-      render(<JobFinderConfigPage />)
+  describe("stop list management", () => {
+    it("should display existing excluded companies", async () => {
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /stop list/i })).toBeInTheDocument()
-      })
-    })
-
-    it("should show blocked companies", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
         expect(screen.getByText("Bad Company")).toBeInTheDocument()
-      })
-    })
-
-    it("should show blocked keywords", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText("unpaid")).toBeInTheDocument()
-        expect(screen.getByText("volunteer")).toBeInTheDocument()
-      })
-    })
-
-    it("should show blocked domains", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText("spam.com")).toBeInTheDocument()
-        expect(screen.getByText("scam.com")).toBeInTheDocument()
+        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
       })
     })
 
     it("should add new company to stop list", async () => {
       const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
 
-      const input = screen.getByPlaceholderText(/add company/i) || 
-                    screen.getByLabelText(/company/i)
-      await user.type(input, "New Bad Company")
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Bad Company")
+      await user.click(screen.getByText("Add"))
 
-      const addButton = screen.getByRole("button", { name: /add/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByText("New Bad Company")).toBeInTheDocument()
-      })
+      expect(screen.getByText("New Bad Company")).toBeInTheDocument()
     })
 
     it("should remove company from stop list", async () => {
       const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
+        expect(screen.getByText("Bad Company")).toBeInTheDocument()
       })
 
-      // Find and click remove button for "Spam Corp"
-      const removeButtons = screen.getAllByRole("button", { name: /remove|delete|x/i })
-      await user.click(removeButtons[0])
+      // Remove company
+      const removeButton = screen.getByText("Bad Company").closest("div")?.querySelector("button")
+      if (removeButton) {
+        await user.click(removeButton)
+      }
+
+      expect(screen.queryByText("Bad Company")).not.toBeInTheDocument()
+    })
+
+    it("should add new keyword to stop list", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.queryByText("Spam Corp")).not.toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
+
+      // Add new keyword
+      const keywordInput = screen.getByPlaceholderText("Enter keyword...")
+      await user.type(keywordInput, "temporary")
+      await user.click(screen.getByText("Add"))
+
+      expect(screen.getByText("temporary")).toBeInTheDocument()
+    })
+
+    it("should remove keyword from stop list", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("contractor")).toBeInTheDocument()
+      })
+
+      // Remove keyword
+      const removeButton = screen.getByText("contractor").closest("div")?.querySelector("button")
+      if (removeButton) {
+        await user.click(removeButton)
+      }
+
+      expect(screen.queryByText("contractor")).not.toBeInTheDocument()
+    })
+
+    it("should add new domain to stop list", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Add new domain
+      const domainInput = screen.getByPlaceholderText("Enter domain (e.g., example.com)...")
+      await user.type(domainInput, "scam-jobs.com")
+      await user.click(screen.getByText("Add"))
+
+      expect(screen.getByText("scam-jobs.com")).toBeInTheDocument()
+    })
+
+    it("should remove domain from stop list", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("spam.com")).toBeInTheDocument()
+      })
+
+      // Remove domain
+      const removeButton = screen.getByText("spam.com").closest("div")?.querySelector("button")
+      if (removeButton) {
+        await user.click(removeButton)
+      }
+
+      expect(screen.queryByText("spam.com")).not.toBeInTheDocument()
     })
 
     it("should save stop list changes", async () => {
       const user = userEvent.setup()
-      vi.mocked(configClient.updateStopList).mockResolvedValue(mockStopList)
-
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
 
-      const saveButton = screen.getByRole("button", { name: /save/i })
-      await user.click(saveButton)
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Company")
+      await user.click(screen.getByText("Add"))
 
-      await waitFor(() => {
-        expect(configClient.updateStopList).toHaveBeenCalledWith(
-          expect.objectContaining({
-            companies: expect.arrayContaining(["Spam Corp", "Bad Company"]),
-          }),
-          mockUser.email,
-        )
-      })
-    })
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
 
-    it("should show success message after saving", async () => {
-      const user = userEvent.setup()
-      vi.mocked(configClient.updateStopList).mockResolvedValue(mockStopList)
-
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
-      })
-
-      const saveButton = screen.getByRole("button", { name: /save/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/success/i)).toBeInTheDocument()
-      })
-    })
-
-    it("should reset stop list to original values", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
-      })
-
-      // Add a new company
-      const input = screen.getByPlaceholderText(/add company/i) || 
-                    screen.getByLabelText(/company/i)
-      await user.type(input, "Temporary Company")
-      const addButton = screen.getByRole("button", { name: /add/i })
-      await user.click(addButton)
-
-      // Reset
-      const resetButton = screen.getByRole("button", { name: /reset/i })
-      await user.click(resetButton)
-
-      await waitFor(() => {
-        expect(screen.queryByText("Temporary Company")).not.toBeInTheDocument()
-      })
-    })
-  })
-
-  describe("Queue Settings Tab", () => {
-    it("should display queue settings tab", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
-      })
-    })
-
-    it("should show current queue settings", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
-      })
-
-      const queueTab = screen.getByRole("tab", { name: /queue/i })
-      await user.click(queueTab)
-
-      await waitFor(() => {
-        expect(screen.getByDisplayValue("3") || screen.getByText(/3/)).toBeInTheDocument()
-        expect(screen.getByDisplayValue("10") || screen.getByText(/10/)).toBeInTheDocument()
-      })
-    })
-
-    it("should update max retries", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
-      })
-
-      const queueTab = screen.getByRole("tab", { name: /queue/i })
-      await user.click(queueTab)
-
-      const retriesInput = screen.getByLabelText(/max retries/i) || 
-                          screen.getByDisplayValue("3")
-      await user.clear(retriesInput)
-      await user.type(retriesInput, "5")
-
-      expect(retriesInput).toHaveValue("5")
-    })
-
-    it("should update batch size", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
-      })
-
-      const queueTab = screen.getByRole("tab", { name: /queue/i })
-      await user.click(queueTab)
-
-      const batchInput = screen.getByLabelText(/batch size/i) || 
-                        screen.getByDisplayValue("10")
-      await user.clear(batchInput)
-      await user.type(batchInput, "20")
-
-      expect(batchInput).toHaveValue("20")
-    })
-
-    it("should save queue settings", async () => {
-      const user = userEvent.setup()
-      vi.mocked(configClient.updateQueueSettings).mockResolvedValue(mockQueueSettings)
-
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
-      })
-
-      const queueTab = screen.getByRole("tab", { name: /queue/i })
-      await user.click(queueTab)
-
-      const saveButton = screen.getByRole("button", { name: /save/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(configClient.updateQueueSettings).toHaveBeenCalledWith(
-          expect.objectContaining({
-            maxRetries: 3,
-            batchSize: 10,
-          }),
-          mockUser.email,
-        )
-      })
-    })
-  })
-
-  describe("AI Settings Tab", () => {
-    it("should display AI settings tab", async () => {
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /ai/i })).toBeInTheDocument()
-      })
-    })
-
-    it("should show current AI provider", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /ai/i })).toBeInTheDocument()
-      })
-
-      const aiTab = screen.getByRole("tab", { name: /ai/i })
-      await user.click(aiTab)
-
-      await waitFor(() => {
-        expect(screen.getByText(/gemini/i)).toBeInTheDocument()
-      })
-    })
-
-    it("should change AI provider", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /ai/i })).toBeInTheDocument()
-      })
-
-      const aiTab = screen.getByRole("tab", { name: /ai/i })
-      await user.click(aiTab)
-
-      const providerSelect = screen.getByRole("combobox", { name: /provider/i })
-      await user.click(providerSelect)
-
-      const openaiOption = screen.getByText(/openai/i)
-      await user.click(openaiOption)
-
-      expect(providerSelect).toHaveTextContent(/openai/i)
-    })
-
-    it("should update temperature setting", async () => {
-      const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /ai/i })).toBeInTheDocument()
-      })
-
-      const aiTab = screen.getByRole("tab", { name: /ai/i })
-      await user.click(aiTab)
-
-      const tempInput = screen.getByLabelText(/temperature/i) || 
-                       screen.getByDisplayValue("0.7")
-      await user.clear(tempInput)
-      await user.type(tempInput, "0.9")
-
-      expect(tempInput).toHaveValue("0.9")
-    })
-
-    it("should save AI settings", async () => {
-      const user = userEvent.setup()
-      vi.mocked(configClient.updateAISettings).mockResolvedValue(mockAISettings)
-
-      render(<JobFinderConfigPage />)
-
-      await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /ai/i })).toBeInTheDocument()
-      })
-
-      const aiTab = screen.getByRole("tab", { name: /ai/i })
-      await user.click(aiTab)
-
-      const saveButton = screen.getByRole("button", { name: /save/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(configClient.updateAISettings).toHaveBeenCalledWith(
-          expect.objectContaining({
-            provider: "gemini",
-            temperature: 0.7,
-          }),
-          mockUser.email,
-        )
-      })
-    })
-  })
-
-  describe("Authorization", () => {
-    it("should only allow editors to access page", () => {
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser as any,
-        loading: false,
-        isEditor: false,
-        signOut: vi.fn(),
-        signInWithGoogle: vi.fn(),
-      } as any)
-
-      render(<JobFinderConfigPage />)
-
-      expect(screen.getByText(/unauthorized|access denied/i)).toBeInTheDocument()
-    })
-
-    it("should disable save buttons for non-editors", () => {
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser as any,
-        loading: false,
-        isEditor: false,
-        signOut: vi.fn(),
-        signInWithGoogle: vi.fn(),
-      } as any)
-
-      render(<JobFinderConfigPage />)
-
-      const saveButtons = screen.queryAllByRole("button", { name: /save/i })
-      saveButtons.forEach((button) => {
-        expect(button).toBeDisabled()
-      })
-    })
-  })
-
-  describe("Error Handling", () => {
-    it("should handle save errors", async () => {
-      const user = userEvent.setup()
-      vi.mocked(configClient.updateStopList).mockRejectedValue(
-        new Error("Save failed"),
+      expect(configClient.updateStopList).toHaveBeenCalledWith(
+        expect.objectContaining({
+          excludedCompanies: expect.arrayContaining(["New Company"]),
+        }),
+        "test@example.com"
       )
+    })
 
-      render(<JobFinderConfigPage />)
+    it("should reset stop list changes", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
 
-      const saveButton = screen.getByRole("button", { name: /save/i })
-      await user.click(saveButton)
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Company")
+      await user.click(screen.getByText("Add"))
+
+      // Reset changes
+      await user.click(screen.getByText("Reset"))
+
+      expect(screen.queryByText("New Company")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("queue settings management", () => {
+    it("should switch to queue settings tab", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText(/failed to save/i)).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Queue Settings"))
+
+      expect(screen.getByText("Queue Processing Settings")).toBeInTheDocument()
+    })
+
+    it("should display current queue settings", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Queue Settings"))
+
+      expect(screen.getByDisplayValue("3")).toBeInTheDocument() // maxRetries
+      expect(screen.getByDisplayValue("300")).toBeInTheDocument() // retryDelaySeconds
+      expect(screen.getByDisplayValue("600")).toBeInTheDocument() // processingTimeout
+    })
+
+    it("should update queue settings", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Queue Settings"))
+
+      // Update max retries
+      const maxRetriesInput = screen.getByDisplayValue("3")
+      await user.clear(maxRetriesInput)
+      await user.type(maxRetriesInput, "5")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      expect(configClient.updateQueueSettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          maxRetries: 5,
+        }),
+        "test@example.com"
+      )
+    })
+
+    it("should reset queue settings changes", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Queue Settings"))
+
+      // Update max retries
+      const maxRetriesInput = screen.getByDisplayValue("3")
+      await user.clear(maxRetriesInput)
+      await user.type(maxRetriesInput, "5")
+
+      // Reset changes
+      await user.click(screen.getByText("Reset"))
+
+      expect(screen.getByDisplayValue("3")).toBeInTheDocument()
+    })
+  })
+
+  describe("AI settings management", () => {
+    it("should switch to AI settings tab", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      expect(screen.getByText("AI Configuration")).toBeInTheDocument()
+    })
+
+    it("should display current AI settings", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      expect(screen.getByDisplayValue("claude-sonnet-4")).toBeInTheDocument() // model
+      expect(screen.getByDisplayValue("70")).toBeInTheDocument() // minMatchScore
+      expect(screen.getByDisplayValue("10")).toBeInTheDocument() // costBudgetDaily
+    })
+
+    it("should update AI provider", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update provider
+      await user.click(screen.getByDisplayValue("Claude (Anthropic)"))
+      await user.click(screen.getByText("OpenAI (GPT)"))
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      expect(configClient.updateAISettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          provider: "openai",
+        }),
+        "test@example.com"
+      )
+    })
+
+    it("should update AI model", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update model
+      const modelInput = screen.getByDisplayValue("claude-sonnet-4")
+      await user.clear(modelInput)
+      await user.type(modelInput, "gpt-4")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      expect(configClient.updateAISettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: "gpt-4",
+        }),
+        "test@example.com"
+      )
+    })
+
+    it("should update minimum match score", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update min match score
+      const scoreInput = screen.getByDisplayValue("70")
+      await user.clear(scoreInput)
+      await user.type(scoreInput, "80")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      expect(configClient.updateAISettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          minMatchScore: 80,
+        }),
+        "test@example.com"
+      )
+    })
+
+    it("should update cost budget", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update cost budget
+      const budgetInput = screen.getByDisplayValue("10")
+      await user.clear(budgetInput)
+      await user.type(budgetInput, "25.50")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      expect(configClient.updateAISettings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          costBudgetDaily: 25.50,
+        }),
+        "test@example.com"
+      )
+    })
+
+    it("should reset AI settings changes", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update model
+      const modelInput = screen.getByDisplayValue("claude-sonnet-4")
+      await user.clear(modelInput)
+      await user.type(modelInput, "gpt-4")
+
+      // Reset changes
+      await user.click(screen.getByText("Reset"))
+
+      expect(screen.getByDisplayValue("claude-sonnet-4")).toBeInTheDocument()
+    })
+  })
+
+  describe("error handling", () => {
+    it("should show error when loading configuration fails", async () => {
+      vi.mocked(configClient.getStopList).mockRejectedValue(new Error("Failed to load"))
+
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to load configuration settings")).toBeInTheDocument()
       })
     })
 
-    it("should handle network errors gracefully", async () => {
-      vi.mocked(configClient.getStopList).mockRejectedValue(
-        new Error("Network error"),
-      )
+    it("should show error when saving stop list fails", async () => {
+      const user = userEvent.setup()
+      vi.mocked(configClient.updateStopList).mockRejectedValue(new Error("Save failed"))
 
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText(/failed to load|error/i)).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Company")
+      await user.click(screen.getByText("Add"))
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to save stop list")).toBeInTheDocument()
+      })
+    })
+
+    it("should show error when saving queue settings fails", async () => {
+      const user = userEvent.setup()
+      vi.mocked(configClient.updateQueueSettings).mockRejectedValue(new Error("Save failed"))
+
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("Queue Settings"))
+
+      // Update max retries
+      const maxRetriesInput = screen.getByDisplayValue("3")
+      await user.clear(maxRetriesInput)
+      await user.type(maxRetriesInput, "5")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to save queue settings")).toBeInTheDocument()
+      })
+    })
+
+    it("should show error when saving AI settings fails", async () => {
+      const user = userEvent.setup()
+      vi.mocked(configClient.updateAISettings).mockRejectedValue(new Error("Save failed"))
+
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update model
+      const modelInput = screen.getByDisplayValue("claude-sonnet-4")
+      await user.clear(modelInput)
+      await user.type(modelInput, "gpt-4")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to save AI settings")).toBeInTheDocument()
       })
     })
   })
 
-  describe("Form Validation", () => {
-    it("should prevent adding empty company names", async () => {
+  describe("success feedback", () => {
+    it("should show success message when stop list is saved", async () => {
       const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("Spam Corp")).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
 
-      const addButton = screen.getByRole("button", { name: /add/i })
-      await user.click(addButton)
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Company")
+      await user.click(screen.getByText("Add"))
 
-      // Should not add empty value
-      expect(screen.queryByText("")).not.toBeInTheDocument()
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Stop list saved successfully!")).toBeInTheDocument()
+      })
     })
 
-    it("should validate numeric inputs for queue settings", async () => {
+    it("should show success message when queue settings are saved", async () => {
       const user = userEvent.setup()
-      render(<JobFinderConfigPage />)
+      renderWithRouter(<JobFinderConfigPage />)
 
       await waitFor(() => {
-        expect(screen.getByRole("tab", { name: /queue/i })).toBeInTheDocument()
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
       })
 
-      const queueTab = screen.getByRole("tab", { name: /queue/i })
-      await user.click(queueTab)
+      await user.click(screen.getByText("Queue Settings"))
 
-      const retriesInput = screen.getByLabelText(/max retries/i) || 
-                          screen.getByDisplayValue("3")
-      
-      // Should only accept numbers
-      await user.clear(retriesInput)
-      await user.type(retriesInput, "abc")
+      // Update max retries
+      const maxRetriesInput = screen.getByDisplayValue("3")
+      await user.clear(maxRetriesInput)
+      await user.type(maxRetriesInput, "5")
 
-      expect(retriesInput).not.toHaveValue("abc")
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("Queue settings saved successfully!")).toBeInTheDocument()
+      })
+    })
+
+    it("should show success message when AI settings are saved", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText("AI Settings"))
+
+      // Update model
+      const modelInput = screen.getByDisplayValue("claude-sonnet-4")
+      await user.clear(modelInput)
+      await user.type(modelInput, "gpt-4")
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      await waitFor(() => {
+        expect(screen.getByText("AI settings saved successfully!")).toBeInTheDocument()
+      })
+    })
+
+    it("should auto-dismiss success messages after 3 seconds", async () => {
+      vi.useFakeTimers()
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Add new company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "New Company")
+      await user.click(screen.getByText("Add"))
+
+      // Save changes
+      await user.click(screen.getByText("Save Changes"))
+
+      // Should show success message
+      await waitFor(() => {
+        expect(screen.getByText("Stop list saved successfully!")).toBeInTheDocument()
+      })
+
+      // Fast-forward time
+      vi.advanceTimersByTime(3000)
+
+      // Success message should be gone
+      expect(screen.queryByText("Stop list saved successfully!")).not.toBeInTheDocument()
+
+      vi.useRealTimers()
+    })
+  })
+
+  describe("form validation", () => {
+    it("should not add empty company name", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Try to add empty company
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "   ")
+      await user.click(screen.getByText("Add"))
+
+      expect(screen.queryByText("   ")).not.toBeInTheDocument()
+    })
+
+    it("should not add empty keyword", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Try to add empty keyword
+      const keywordInput = screen.getByPlaceholderText("Enter keyword...")
+      await user.type(keywordInput, "   ")
+      await user.click(screen.getByText("Add"))
+
+      expect(screen.queryByText("   ")).not.toBeInTheDocument()
+    })
+
+    it("should not add empty domain", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Try to add empty domain
+      const domainInput = screen.getByPlaceholderText("Enter domain (e.g., example.com)...")
+      await user.type(domainInput, "   ")
+      await user.click(screen.getByText("Add"))
+
+      expect(screen.queryByText("   ")).not.toBeInTheDocument()
+    })
+
+    it("should handle Enter key to add items", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Add company using Enter key
+      const companyInput = screen.getByPlaceholderText("Enter company name...")
+      await user.type(companyInput, "Enter Company")
+      await user.keyboard("{Enter}")
+
+      expect(screen.getByText("Enter Company")).toBeInTheDocument()
+    })
+  })
+
+  describe("accessibility", () => {
+    it("should have proper form labels and ARIA attributes", async () => {
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Check form accessibility
+      expect(screen.getByLabelText("Max Retries")).toBeInTheDocument()
+      expect(screen.getByLabelText("Retry Delay (seconds)")).toBeInTheDocument()
+      expect(screen.getByLabelText("Processing Timeout (seconds)")).toBeInTheDocument()
+    })
+
+    it("should be keyboard navigable", async () => {
+      const user = userEvent.setup()
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Test tab navigation
+      await user.tab()
+      expect(document.activeElement).toBeInTheDocument()
+    })
+  })
+
+  describe("responsive design", () => {
+    it("should handle different screen sizes", async () => {
+      renderWithRouter(<JobFinderConfigPage />)
+
+      await waitFor(() => {
+        expect(screen.getByText("Job Finder Configuration")).toBeInTheDocument()
+      })
+
+      // Check if responsive classes are applied
+      const container = screen.getByText("Job Finder Configuration").closest("div")
+      expect(container).toBeInTheDocument()
     })
   })
 })

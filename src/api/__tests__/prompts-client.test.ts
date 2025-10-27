@@ -11,7 +11,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { promptsClient, DEFAULT_PROMPTS } from "../prompts-client"
-import { getDoc, setDoc, Timestamp } from "firebase/firestore"
+import { getDoc, setDoc } from "firebase/firestore"
 
 // Mock Firebase
 vi.mock("firebase/firestore", () => ({

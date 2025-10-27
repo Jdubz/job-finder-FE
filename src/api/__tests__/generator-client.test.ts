@@ -1,239 +1,287 @@
 /**
- * Generator Client Tests
+ * Generator API Client Tests
  *
- * Tests for document generation API client including:
- * - Document generation requests
- * - Multi-step generation flow
- * - Error handling
- * - History retrieval
+ * Comprehensive tests for the Generator API Client functionality
+ * Rank 8 - HIGH: Backend communication
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { generatorClient } from "../generator-client"
 import type { GenerateDocumentRequest } from "../generator-client"
 
-// Mock fetch
+// Mock the base client
+vi.mock("../base-client", () => ({
+  BaseApiClient: vi.fn().mockImplementation(() => ({
+    post: vi.fn(),
+    get: vi.fn(),
+  })),
+}))
+
+// Mock fetch globally
 global.fetch = vi.fn()
 
-describe("Generator Client", () => {
+describe("GeneratorClient", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(fetch).mockReset()
   })
 
-  describe("generateDocument", () => {
-    const mockRequest: GenerateDocumentRequest = {
-      generateType: "resume",
-      job: {
-        role: "Software Engineer",
-        company: "Tech Corp",
-        jobDescriptionText: "Looking for a developer",
-      },
-    }
+  describe("startGeneration", () => {
+    it("should start generation with valid request", async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          requestId: "req-123",
+          nextStep: "analyze",
+        },
+      }
 
-    it("should send generate request with correct payload", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          documentUrl: "https://storage.example.com/resume.pdf",
-          documentId: "doc-123",
-        }),
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
-      const result = await generatorClient.generateDocument(mockRequest)
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+          jobDescriptionText: "We are looking for a software engineer...",
+        },
+      }
+
+      const result = await generatorClient.startGeneration(request)
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/generate"),
+        expect.stringContaining("/api/generator/start"),
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({
             "Content-Type": "application/json",
           }),
-          body: expect.stringContaining("resume"),
-        }),
+          body: JSON.stringify(request),
+        })
       )
 
-      expect(result.success).toBe(true)
-      expect(result.documentUrl).toBe("https://storage.example.com/resume.pdf")
+      expect(result).toEqual(mockResponse)
     })
 
-    it("should handle generateType = both", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          documentUrl: "https://storage.example.com/combined.pdf",
-        }),
+    it("should handle generation errors", async () => {
+      const mockError = {
+        success: false,
+        error: "Generation failed",
+        message: "Invalid request parameters",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        json: () => Promise.resolve(mockError),
       } as Response)
 
       const request: GenerateDocumentRequest = {
-        ...mockRequest,
-        generateType: "both",
+        generateType: "resume",
+        job: {
+          role: "",
+          company: "",
+        },
       }
 
-      const result = await generatorClient.generateDocument(request)
+      const result = await generatorClient.startGeneration(request)
 
-      expect(result.success).toBe(true)
-    })
-
-    it("should include provider preference", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      } as Response)
-
-      await generatorClient.generateDocument({
-        ...mockRequest,
-        provider: "gemini",
-      })
-
-      const callArgs = vi.mocked(fetch).mock.calls[0]
-      const body = JSON.parse(callArgs[1]?.body as string)
-      expect(body.provider).toBe("gemini")
-    })
-
-    it("should include job match ID when provided", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      } as Response)
-
-      await generatorClient.generateDocument({
-        ...mockRequest,
-        jobMatchId: "match-123",
-      })
-
-      const callArgs = vi.mocked(fetch).mock.calls[0]
-      const body = JSON.parse(callArgs[1]?.body as string)
-      expect(body.jobMatchId).toBe("match-123")
+      expect(result).toEqual(mockError)
     })
 
     it("should handle network errors", async () => {
-      vi.mocked(fetch).mockRejectedValueOnce(new Error("Network error"))
+      vi.mocked(fetch).mockRejectedValue(new Error("Network error"))
 
-      await expect(generatorClient.generateDocument(mockRequest)).rejects.toThrow()
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      await expect(generatorClient.startGeneration(request)).rejects.toThrow("Network error")
     })
 
-    it("should handle API errors", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: async () => ({ error: "Internal server error" }),
+    it("should handle different document types", async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          requestId: "req-123",
+          nextStep: "analyze",
+        },
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
-      await expect(generatorClient.generateDocument(mockRequest)).rejects.toThrow()
+      // Test resume generation
+      const resumeRequest: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      await generatorClient.startGeneration(resumeRequest)
+
+      // Test cover letter generation
+      const coverLetterRequest: GenerateDocumentRequest = {
+        generateType: "coverLetter",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+        date: "2024-01-15",
+      }
+
+      await generatorClient.startGeneration(coverLetterRequest)
+
+      // Test both generation
+      const bothRequest: GenerateDocumentRequest = {
+        generateType: "both",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      await generatorClient.startGeneration(bothRequest)
+
+      expect(fetch).toHaveBeenCalledTimes(3)
+    })
+
+    it("should include job match ID when provided", async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          requestId: "req-123",
+          nextStep: "analyze",
+        },
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      } as Response)
+
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+        jobMatchId: "match-123",
+      }
+
+      await generatorClient.startGeneration(request)
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/start"),
+        expect.objectContaining({
+          body: JSON.stringify(request),
+        })
+      )
     })
 
     it("should include preferences when provided", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      } as Response)
-
-      await generatorClient.generateDocument({
-        ...mockRequest,
-        preferences: {
-          style: "modern",
-          emphasize: ["leadership", "teamwork"],
-        },
-      })
-
-      const callArgs = vi.mocked(fetch).mock.calls[0]
-      const body = JSON.parse(callArgs[1]?.body as string)
-      expect(body.preferences.style).toBe("modern")
-      expect(body.preferences.emphasize).toContain("leadership")
-    })
-  })
-
-  describe("startGeneration", () => {
-    it("should initiate multi-step generation", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: {
-            requestId: "req-123",
-            status: "pending",
-            nextStep: "fetch_data",
-          },
+      const mockResponse = {
+        success: true,
+        data: {
           requestId: "req-123",
-        }),
+          nextStep: "analyze",
+        },
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
-      const result = await generatorClient.startGeneration({
+      const request: GenerateDocumentRequest = {
         generateType: "resume",
         job: {
-          role: "Engineer",
-          company: "Tech",
+          role: "Software Engineer",
+          company: "Tech Corp",
         },
-      })
+        preferences: {
+          style: "modern",
+          emphasize: ["React", "TypeScript"],
+        },
+      }
 
-      expect(result.success).toBe(true)
-      expect(result.requestId).toBe("req-123")
-      expect(result.data.nextStep).toBe("fetch_data")
-    })
+      await generatorClient.startGeneration(request)
 
-    it("should handle start generation errors", async () => {
-      vi.mocked(fetch).mockRejectedValueOnce(new Error("Failed to start"))
-
-      await expect(
-        generatorClient.startGeneration({
-          generateType: "resume",
-          job: { role: "Engineer", company: "Tech" },
-        }),
-      ).rejects.toThrow()
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/start"),
+        expect.objectContaining({
+          body: JSON.stringify(request),
+        })
+      )
     })
   })
 
   describe("executeStep", () => {
-    it("should execute a generation step", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+    it("should execute generation step", async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          status: "completed",
+          nextStep: null,
+          steps: [
+            { id: "analyze", name: "Analyzing", status: "completed" },
+            { id: "generate", name: "Generating", status: "completed" },
+          ],
+          resumeUrl: "https://storage.example.com/resume.pdf",
+        },
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          data: {
-            stepCompleted: "fetch_data",
-            nextStep: "generate_content",
-            status: "in_progress",
-          },
-        }),
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
-      const result = await generatorClient.executeStep("req-123", "fetch_data")
+      const result = await generatorClient.executeStep("req-123")
 
-      expect(result.success).toBe(true)
-      expect(result.data.stepCompleted).toBe("fetch_data")
-      expect(result.data.nextStep).toBe("generate_content")
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/execute"),
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          body: JSON.stringify({ requestId: "req-123" }),
+        })
+      )
+
+      expect(result).toEqual(mockResponse)
     })
 
     it("should handle step execution errors", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+      const mockError = {
+        success: false,
+        error: "Step execution failed",
+        message: "AI provider unavailable",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: false,
-        status: 400,
-        json: async () => ({ error: "Invalid step" }),
+        json: () => Promise.resolve(mockError),
       } as Response)
 
-      await expect(generatorClient.executeStep("req-123", "invalid_step")).rejects.toThrow()
+      const result = await generatorClient.executeStep("req-123")
+
+      expect(result).toEqual(mockError)
     })
 
-    it("should return URLs when generation completes", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          data: {
-            stepCompleted: "create_pdf",
-            status: "completed",
-            resumeUrl: "https://storage.example.com/resume.pdf",
-          },
-        }),
-      } as Response)
+    it("should handle network errors during step execution", async () => {
+      vi.mocked(fetch).mockRejectedValue(new Error("Network error"))
 
-      const result = await generatorClient.executeStep("req-123", "create_pdf")
-
-      expect(result.data.status).toBe("completed")
-      expect(result.data.resumeUrl).toBeDefined()
+      await expect(generatorClient.executeStep("req-123")).rejects.toThrow("Network error")
     })
   })
 
@@ -245,241 +293,294 @@ describe("Generator Client", () => {
           type: "resume",
           jobTitle: "Software Engineer",
           companyName: "Tech Corp",
-          documentUrl: "https://storage.example.com/resume1.pdf",
-          createdAt: new Date().toISOString(),
+          documentUrl: "https://storage.example.com/resume.pdf",
+          createdAt: "2024-01-15T10:00:00Z",
         },
         {
           id: "doc-2",
           type: "cover_letter",
-          jobTitle: "Developer",
-          companyName: "StartupCo",
-          documentUrl: "https://storage.example.com/cover1.pdf",
-          createdAt: new Date().toISOString(),
+          jobTitle: "Frontend Developer",
+          companyName: "Startup Inc",
+          documentUrl: "https://storage.example.com/cover-letter.pdf",
+          createdAt: "2024-01-14T15:30:00Z",
         },
       ]
 
-      vi.mocked(fetch).mockResolvedValueOnce({
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          documents: mockHistory,
-        }),
+        json: () => Promise.resolve(mockHistory),
       } as Response)
 
-      const result = await generatorClient.getHistory()
+      const result = await generatorClient.getHistory("user-123")
 
-      expect(result).toHaveLength(2)
-      expect(result[0].type).toBe("resume")
-      expect(result[1].type).toBe("cover_letter")
-    })
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/history"),
+        expect.objectContaining({
+          method: "GET",
+        })
+      )
 
-    it("should handle empty history", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          documents: [],
-        }),
-      } as Response)
-
-      const result = await generatorClient.getHistory()
-
-      expect(result).toEqual([])
+      expect(result).toEqual(mockHistory)
     })
 
     it("should handle history fetch errors", async () => {
-      vi.mocked(fetch).mockRejectedValueOnce(new Error("Network error"))
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        json: () => Promise.resolve({ error: "Failed to fetch history" }),
+      } as Response)
 
-      await expect(generatorClient.getHistory()).rejects.toThrow()
+      await expect(generatorClient.getHistory("user-123")).rejects.toThrow()
     })
   })
 
   describe("getUserDefaults", () => {
-    it("should fetch user default settings", async () => {
+    it("should fetch user defaults", async () => {
       const mockDefaults = {
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "555-0100",
-        location: "San Francisco, CA",
-        linkedin: "linkedin.com/in/johndoe",
-        github: "github.com/johndoe",
+        style: "modern",
+        emphasize: ["React", "TypeScript"],
+        preferences: {
+          includePhoto: true,
+          includeSummary: true,
+        },
       }
 
-      vi.mocked(fetch).mockResolvedValueOnce({
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          defaults: mockDefaults,
-        }),
+        json: () => Promise.resolve(mockDefaults),
       } as Response)
 
-      const result = await generatorClient.getUserDefaults()
+      const result = await generatorClient.getUserDefaults("user-123")
 
-      expect(result.name).toBe("John Doe")
-      expect(result.email).toBe("john@example.com")
-      expect(result.phone).toBe("555-0100")
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/defaults"),
+        expect.objectContaining({
+          method: "GET",
+        })
+      )
+
+      expect(result).toEqual(mockDefaults)
     })
 
-    it("should handle missing defaults", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          defaults: null,
-        }),
+    it("should handle defaults fetch errors", async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        json: () => Promise.resolve({ error: "Failed to fetch defaults" }),
       } as Response)
 
-      const result = await generatorClient.getUserDefaults()
-
-      expect(result).toBeNull()
+      await expect(generatorClient.getUserDefaults("user-123")).rejects.toThrow()
     })
   })
 
   describe("updateUserDefaults", () => {
-    it("should update user default settings", async () => {
-      const updates = {
-        name: "Jane Doe",
-        email: "jane@example.com",
-        location: "New York, NY",
+    it("should update user defaults", async () => {
+      const mockDefaults = {
+        style: "modern",
+        emphasize: ["React", "TypeScript"],
       }
 
-      vi.mocked(fetch).mockResolvedValueOnce({
+      const mockResponse = {
+        success: true,
+        message: "Defaults updated successfully",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          defaults: updates,
-        }),
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
-      const result = await generatorClient.updateUserDefaults(updates)
+      const result = await generatorClient.updateUserDefaults("user-123", mockDefaults)
 
-      expect(result.success).toBe(true)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/generator/defaults"),
+        expect.objectContaining({
+          method: "PUT",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          body: JSON.stringify(mockDefaults),
+        })
+      )
+
+      expect(result).toEqual(mockResponse)
     })
 
     it("should handle update errors", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+      const mockDefaults = {
+        style: "modern",
+        emphasize: ["React", "TypeScript"],
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: false,
-        status: 400,
-        json: async () => ({ error: "Invalid data" }),
+        json: () => Promise.resolve({ error: "Failed to update defaults" }),
       } as Response)
 
-      await expect(
-        generatorClient.updateUserDefaults({ name: "Test" }),
-      ).rejects.toThrow()
+      await expect(generatorClient.updateUserDefaults("user-123", mockDefaults)).rejects.toThrow()
     })
   })
 
   describe("deleteDocument", () => {
-    it("should delete a document", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+    it("should delete document", async () => {
+      const mockResponse = {
+        success: true,
+        message: "Document deleted successfully",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: true,
-        json: async () => ({
-          success: true,
-          message: "Document deleted",
-        }),
+        json: () => Promise.resolve(mockResponse),
       } as Response)
 
       const result = await generatorClient.deleteDocument("doc-123")
 
-      expect(result.success).toBe(true)
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/doc-123"),
+        expect.stringContaining("/api/generator/document"),
         expect.objectContaining({
           method: "DELETE",
-        }),
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          body: JSON.stringify({ documentId: "doc-123" }),
+        })
       )
+
+      expect(result).toEqual(mockResponse)
     })
 
     it("should handle delete errors", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+      vi.mocked(fetch).mockResolvedValue({
         ok: false,
-        status: 404,
-        json: async () => ({ error: "Document not found" }),
+        json: () => Promise.resolve({ error: "Failed to delete document" }),
       } as Response)
 
-      await expect(generatorClient.deleteDocument("invalid-id")).rejects.toThrow()
+      await expect(generatorClient.deleteDocument("doc-123")).rejects.toThrow()
     })
   })
 
-  describe("Request Validation", () => {
-    it("should require job role", async () => {
-      const invalidRequest = {
-        generateType: "resume" as const,
+  describe("error handling", () => {
+    it("should handle malformed JSON responses", async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: () => Promise.reject(new Error("Invalid JSON")),
+      } as Response)
+
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
         job: {
-          role: "",
+          role: "Software Engineer",
           company: "Tech Corp",
         },
       }
 
-      // Client should validate or API should reject
-      expect(invalidRequest.job.role).toBe("")
+      await expect(generatorClient.startGeneration(request)).rejects.toThrow("Invalid JSON")
     })
 
-    it("should require company name", async () => {
-      const invalidRequest = {
-        generateType: "resume" as const,
-        job: {
-          role: "Engineer",
-          company: "",
-        },
-      }
+    it("should handle timeout errors", async () => {
+      vi.mocked(fetch).mockRejectedValue(new Error("Request timeout"))
 
-      expect(invalidRequest.job.company).toBe("")
-    })
-
-    it("should accept optional job description", async () => {
       const request: GenerateDocumentRequest = {
         generateType: "resume",
         job: {
-          role: "Engineer",
-          company: "Tech",
-          jobDescriptionText: "Optional description",
+          role: "Software Engineer",
+          company: "Tech Corp",
         },
       }
 
-      expect(request.job.jobDescriptionText).toBeDefined()
+      await expect(generatorClient.startGeneration(request)).rejects.toThrow("Request timeout")
+    })
+
+    it("should handle 500 server errors", async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: () => Promise.resolve({ error: "Internal server error" }),
+      } as Response)
+
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      const result = await generatorClient.startGeneration(request)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe("Internal server error")
+    })
+
+    it("should handle 429 rate limit errors", async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        status: 429,
+        json: () => Promise.resolve({ error: "Rate limit exceeded" }),
+      } as Response)
+
+      const request: GenerateDocumentRequest = {
+        generateType: "resume",
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      const result = await generatorClient.startGeneration(request)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe("Rate limit exceeded")
     })
   })
 
-  describe("Response Handling", () => {
-    it("should parse success response correctly", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          success: true,
-          documentUrl: "https://storage.example.com/doc.pdf",
-          documentId: "doc-123",
-          generationId: "gen-456",
-        }),
+  describe("request validation", () => {
+    it("should validate required fields", async () => {
+      const invalidRequest = {
+        generateType: "resume",
+        job: {
+          role: "",
+          company: "",
+        },
+      } as GenerateDocumentRequest
+
+      const mockError = {
+        success: false,
+        error: "Validation failed",
+        message: "Job role and company are required",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
+        ok: false,
+        json: () => Promise.resolve(mockError),
       } as Response)
 
-      const result = await generatorClient.generateDocument({
-        generateType: "resume",
-        job: { role: "Engineer", company: "Tech" },
-      })
+      const result = await generatorClient.startGeneration(invalidRequest)
 
-      expect(result.success).toBe(true)
-      expect(result.documentUrl).toBeDefined()
-      expect(result.documentId).toBeDefined()
-      expect(result.generationId).toBeDefined()
+      expect(result).toEqual(mockError)
     })
 
-    it("should parse error response correctly", async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
+    it("should validate document type", async () => {
+      const invalidRequest = {
+        generateType: "invalid" as any,
+        job: {
+          role: "Software Engineer",
+          company: "Tech Corp",
+        },
+      }
+
+      const mockError = {
+        success: false,
+        error: "Validation failed",
+        message: "Invalid document type",
+      }
+
+      vi.mocked(fetch).mockResolvedValue({
         ok: false,
-        status: 400,
-        json: async () => ({
-          success: false,
-          error: "Invalid request",
-        }),
+        json: () => Promise.resolve(mockError),
       } as Response)
 
-      await expect(
-        generatorClient.generateDocument({
-          generateType: "resume",
-          job: { role: "Engineer", company: "Tech" },
-        }),
-      ).rejects.toThrow()
+      const result = await generatorClient.startGeneration(invalidRequest)
+
+      expect(result).toEqual(mockError)
     })
   })
 })

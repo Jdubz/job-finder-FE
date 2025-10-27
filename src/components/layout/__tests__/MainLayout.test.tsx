@@ -17,9 +17,7 @@ vi.mock("../Navigation", () => ({
 // Test component to render inside the layout
 const TestPage = () => <div data-testid="test-page">Test Page Content</div>
 
-// DISABLED: React.act compatibility issue with React 19
-// TODO: Re-enable once @testing-library/react is updated for React 19
-describe.skip("MainLayout", () => {
+describe("MainLayout", () => {
   const renderWithRouter = (component: React.ReactElement) => {
     return render(
       <BrowserRouter>

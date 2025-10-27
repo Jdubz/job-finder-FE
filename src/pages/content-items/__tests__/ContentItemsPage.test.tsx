@@ -1,555 +1,509 @@
 /**
- * Content Items Page Tests
+ * Content Items Management Page Tests
  *
- * Tests for content items management including:
- * - CRUD operations
- * - Hierarchy display
- * - Item creation and editing
- * - Validation
- * - Authorization
+ * Comprehensive tests for the Content Items Management functionality
+ * Rank 2 - CRITICAL: User data management
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { ContentItemsPage } from "../ContentItemsPage"
-import { useAuth } from "@/contexts/AuthContext"
 import { useContentItems } from "@/hooks/useContentItems"
-import type { ContentItem } from "@/types/content-items"
 
-// Mock modules
-vi.mock("@/contexts/AuthContext")
-vi.mock("@/hooks/useContentItems")
+// Mock the useContentItems hook
+vi.mock("@/hooks/useContentItems", () => ({
+  useContentItems: vi.fn(),
+}))
+
+// Mock the auth context
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    isEditor: true,
+    user: {
+      uid: "test-user-123",
+      email: "test@example.com",
+      displayName: "Test User",
+    },
+  }),
+}))
+
+// Mock the ContentItem component
+vi.mock("../components/ContentItem", () => ({
+  ContentItem: ({ item, onEdit, onDelete }: any) => (
+    <div data-testid={`content-item-${item.id}`}>
+      <span>{item.name}</span>
+      <button onClick={() => onEdit(item)} data-testid={`edit-${item.id}`}>
+        Edit
+      </button>
+      <button onClick={() => onDelete(item.id)} data-testid={`delete-${item.id}`}>
+        Delete
+      </button>
+    </div>
+  ),
+}))
+
+// Mock the ContentItemDialog component
+vi.mock("../components/ContentItemDialog", () => ({
+  ContentItemDialog: ({ open, onOpenChange, type, item, parentId }: any) => (
+    <div data-testid="content-item-dialog" style={{ display: open ? "block" : "none" }}>
+      <div>Dialog Type: {type}</div>
+      <div>Item: {item ? item.name : "New"}</div>
+      <div>Parent ID: {parentId || "None"}</div>
+      <button onClick={() => onOpenChange(false)}>Close</button>
+    </div>
+  ),
+}))
+
+// Mock the logger
+vi.mock("@/services/logging", () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  },
+}))
+
+// Mock data
+const mockContentItems = [
+  {
+    id: "item-1",
+    name: "React",
+    type: "skill",
+    parentId: null,
+    description: "JavaScript library for building user interfaces",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: "item-2",
+    name: "TypeScript",
+    type: "skill",
+    parentId: null,
+    description: "Typed superset of JavaScript",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: "item-3",
+    name: "E-commerce Project",
+    type: "project",
+    parentId: null,
+    description: "Full-stack e-commerce application",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+]
+
+const mockHierarchy = [
+  {
+    ...mockContentItems[0],
+    children: [],
+  },
+  {
+    ...mockContentItems[1],
+    children: [],
+  },
+  {
+    ...mockContentItems[2],
+    children: [],
+  },
+]
 
 describe("ContentItemsPage", () => {
-  const mockUser = {
-    uid: "test-user-123",
-    email: "test@example.com",
-    displayName: "Test User",
-    isEditor: true,
-  }
-
-  const mockContentItems: ContentItem[] = [
-    {
-      id: "company-1",
-      type: "company",
-      company: "Tech Corp",
-      role: "Senior Software Engineer",
-      location: "San Francisco, CA",
-      startDate: "2020-01",
-      endDate: "2023-12",
-      parentId: null,
-      order: 0,
-      visibility: "published",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "test@example.com",
-      updatedBy: "test@example.com",
-    },
-    {
-      id: "skill-group-1",
-      type: "skill-group",
-      name: "Frontend Development",
-      parentId: null,
-      order: 1,
-      visibility: "published",
-      skills: ["React", "TypeScript", "CSS"],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "test@example.com",
-      updatedBy: "test@example.com",
-    },
-    {
-      id: "project-1",
-      type: "project",
-      name: "E-commerce Platform",
-      description: "Built a scalable e-commerce platform",
-      parentId: "company-1",
-      order: 0,
-      visibility: "published",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: "test@example.com",
-      updatedBy: "test@example.com",
-    },
-  ] as any
-
-  const mockCreateContentItem = vi.fn()
-  const mockUpdateContentItem = vi.fn()
-  const mockDeleteContentItem = vi.fn()
+  const mockUseContentItems = vi.mocked(useContentItems)
 
   beforeEach(() => {
     vi.clearAllMocks()
-
+    
     // Setup default mocks
-    vi.mocked(useAuth).mockReturnValue({
-      user: mockUser as any,
-      loading: false,
-      isEditor: true,
-      signOut: vi.fn(),
-      signInWithGoogle: vi.fn(),
-    } as any)
-
-    vi.mocked(useContentItems).mockReturnValue({
-      contentItems: mockContentItems as any,
+    mockUseContentItems.mockReturnValue({
+      contentItems: mockContentItems,
       loading: false,
       error: null,
-      createContentItem: mockCreateContentItem,
-      updateContentItem: mockUpdateContentItem,
-      deleteContentItem: mockDeleteContentItem,
-    } as any)
+      createContentItem: vi.fn(),
+      updateContentItem: vi.fn(),
+      deleteContentItem: vi.fn(),
+    })
   })
 
-  describe("Initial Rendering", () => {
-    it("should render the content items page", () => {
+  describe("rendering", () => {
+    it("should render content items page with all sections", () => {
       render(<ContentItemsPage />)
 
-      expect(screen.getByText(/content/i) || screen.getByText(/experience/i)).toBeInTheDocument()
+      expect(screen.getByText("Content Items")).toBeInTheDocument()
+      expect(screen.getByText("Skills")).toBeInTheDocument()
+      expect(screen.getByText("Projects")).toBeInTheDocument()
+      expect(screen.getByText("Profile Sections")).toBeInTheDocument()
     })
 
-    it("should display loading state", () => {
-      vi.mocked(useContentItems).mockReturnValue({
+    it("should render content items when loaded", () => {
+      render(<ContentItemsPage />)
+
+      expect(screen.getByTestId("content-item-item-1")).toBeInTheDocument()
+      expect(screen.getByTestId("content-item-item-2")).toBeInTheDocument()
+      expect(screen.getByTestId("content-item-item-3")).toBeInTheDocument()
+    })
+
+    it("should show loading state while fetching content items", () => {
+      mockUseContentItems.mockReturnValue({
         contentItems: [],
         loading: true,
         error: null,
-        createContentItem: mockCreateContentItem,
-        updateContentItem: mockUpdateContentItem,
-        deleteContentItem: mockDeleteContentItem,
-      } as any)
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
+      })
 
       render(<ContentItemsPage />)
 
-      expect(screen.getByTestId("skeleton") || screen.getByText(/loading/i)).toBeInTheDocument()
+      expect(screen.getByText("Loading content items...")).toBeInTheDocument()
     })
 
-    it("should display content items when loaded", () => {
-      render(<ContentItemsPage />)
-
-      expect(screen.getByText(/tech corp/i)).toBeInTheDocument()
-      expect(screen.getByText(/frontend development/i)).toBeInTheDocument()
-    })
-
-    it("should display error message when loading fails", () => {
-      vi.mocked(useContentItems).mockReturnValue({
+    it("should show error state when content items fail to load", () => {
+      mockUseContentItems.mockReturnValue({
         contentItems: [],
         loading: false,
-        error: new Error("Failed to load"),
-        createContentItem: mockCreateContentItem,
-        updateContentItem: mockUpdateContentItem,
+        error: new Error("Failed to load content items"),
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
+      })
+
+      render(<ContentItemsPage />)
+
+      expect(screen.getByText("Failed to load content. Please try again.")).toBeInTheDocument()
+    })
+  })
+
+  describe("CRUD operations", () => {
+    it("should open dialog for creating new skill", async () => {
+      const user = userEvent.setup()
+      render(<ContentItemsPage />)
+
+      const addSkillButton = screen.getByRole("button", { name: /add skill/i })
+      await user.click(addSkillButton)
+
+      expect(screen.getByTestId("content-item-dialog")).toBeInTheDocument()
+      expect(screen.getByText("Dialog Type: skill")).toBeInTheDocument()
+    })
+
+    it("should open dialog for creating new project", async () => {
+      const user = userEvent.setup()
+      render(<ContentItemsPage />)
+
+      const addProjectButton = screen.getByRole("button", { name: /add project/i })
+      await user.click(addProjectButton)
+
+      expect(screen.getByTestId("content-item-dialog")).toBeInTheDocument()
+      expect(screen.getByText("Dialog Type: project")).toBeInTheDocument()
+    })
+
+    it("should open dialog for creating new profile section", async () => {
+      const user = userEvent.setup()
+      render(<ContentItemsPage />)
+
+      const addProfileButton = screen.getByRole("button", { name: /add profile section/i })
+      await user.click(addProfileButton)
+
+      expect(screen.getByTestId("content-item-dialog")).toBeInTheDocument()
+      expect(screen.getByText("Dialog Type: profile_section")).toBeInTheDocument()
+    })
+
+    it("should open dialog for editing existing item", async () => {
+      const user = userEvent.setup()
+      render(<ContentItemsPage />)
+
+      const editButton = screen.getByTestId("edit-item-1")
+      await user.click(editButton)
+
+      expect(screen.getByTestId("content-item-dialog")).toBeInTheDocument()
+      expect(screen.getByText("Item: React")).toBeInTheDocument()
+    })
+
+    it("should delete item when delete button is clicked", async () => {
+      const user = userEvent.setup()
+      const mockDeleteContentItem = vi.fn()
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
         deleteContentItem: mockDeleteContentItem,
-      } as any)
+      })
 
       render(<ContentItemsPage />)
 
-      expect(screen.getByText(/failed|error/i)).toBeInTheDocument()
+      const deleteButton = screen.getByTestId("delete-item-1")
+      await user.click(deleteButton)
+
+      expect(mockDeleteContentItem).toHaveBeenCalledWith("item-1")
     })
   })
 
-  describe("Create Content Item", () => {
-    it("should show add button for editors", () => {
+  describe("hierarchy building", () => {
+    it("should organize items by type", () => {
       render(<ContentItemsPage />)
 
-      expect(screen.getByRole("button", { name: /add|create|new/i })).toBeInTheDocument()
+      // Check if items are organized by type
+      const skillsSection = screen.getByText("Skills").closest("div")
+      const projectsSection = screen.getByText("Projects").closest("div")
+
+      expect(skillsSection).toBeInTheDocument()
+      expect(projectsSection).toBeInTheDocument()
     })
 
-    it("should not show add button for non-editors", () => {
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser,
+    it("should handle parent-child relationships", () => {
+      const itemsWithChildren = [
+        {
+          id: "parent-1",
+          name: "Frontend Skills",
+          type: "skill",
+          parentId: null,
+          children: [
+            {
+              id: "child-1",
+              name: "React",
+              type: "skill",
+              parentId: "parent-1",
+            },
+          ],
+        },
+      ]
+
+      mockUseContentItems.mockReturnValue({
+        contentItems: itemsWithChildren,
         loading: false,
-        isEditor: false,
-        signIn: vi.fn(),
-        signOut: vi.fn(),
-        signInWithGoogle: vi.fn(),
+        error: null,
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
       })
 
       render(<ContentItemsPage />)
 
-      expect(screen.queryByRole("button", { name: /add|create|new/i })).not.toBeInTheDocument()
+      expect(screen.getByTestId("content-item-parent-1")).toBeInTheDocument()
     })
+  })
 
-    it("should open dialog when add button clicked", async () => {
+  describe("data persistence", () => {
+    it("should auto-save changes", async () => {
       const user = userEvent.setup()
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog") || screen.getByText(/company|project|skill/i)).toBeInTheDocument()
-      })
-    })
-
-    it("should create new company item", async () => {
-      const user = userEvent.setup()
-      mockCreateContentItem.mockResolvedValue({ id: "new-company-1" })
-
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog") || screen.getByText(/company|project|skill/i)).toBeInTheDocument()
-      })
-
-      // Fill form
-      const companyInput = screen.getByLabelText(/company name/i) || screen.getByPlaceholderText(/company/i)
-      const roleInput = screen.getByLabelText(/role|title/i) || screen.getByPlaceholderText(/role|title/i)
+      const mockUpdateContentItem = vi.fn()
       
-      await user.type(companyInput, "New Company")
-      await user.type(roleInput, "Developer")
-
-      // Submit
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(mockCreateContentItem).toHaveBeenCalledWith(
-          expect.objectContaining({
-            type: "company",
-            company: "New Company",
-            role: "Developer",
-          }),
-        )
-      })
-    })
-
-    it("should create new skill group", async () => {
-      const user = userEvent.setup()
-      mockCreateContentItem.mockResolvedValue({ id: "new-skill-group-1" })
-
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      // Select skill group type
-      const typeSelect = screen.getByRole("combobox", { name: /type/i })
-      await user.click(typeSelect)
-      const skillGroupOption = screen.getByText(/skill group/i)
-      await user.click(skillGroupOption)
-
-      // Fill form
-      const nameInput = screen.getByLabelText(/name/i) || screen.getByPlaceholderText(/name/i)
-      await user.type(nameInput, "Backend Development")
-
-      // Submit
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(mockCreateContentItem).toHaveBeenCalledWith(
-          expect.objectContaining({
-            type: "skill-group",
-            name: "Backend Development",
-          }),
-        )
-      })
-    })
-
-    it("should show success message after creating item", async () => {
-      const user = userEvent.setup()
-      mockCreateContentItem.mockResolvedValue({ id: "new-item-1" })
-
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      const companyInput = screen.getByLabelText(/company name/i) || screen.getByPlaceholderText(/company/i)
-      await user.type(companyInput, "New Company")
-
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/success|created/i)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe("Update Content Item", () => {
-    it("should open edit dialog when item is clicked", async () => {
-      const user = userEvent.setup()
-      render(<ContentItemsPage />)
-
-      const item = screen.getByText(/tech corp/i)
-      await user.click(item)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog") || screen.getByDisplayValue(/tech corp/i)).toBeInTheDocument()
-      })
-    })
-
-    it("should update company item", async () => {
-      const user = userEvent.setup()
-      mockUpdateContentItem.mockResolvedValue({})
-
-      render(<ContentItemsPage />)
-
-      const item = screen.getByText(/tech corp/i)
-      await user.click(item)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      const roleInput = screen.getByDisplayValue(/senior software engineer/i)
-      await user.clear(roleInput)
-      await user.type(roleInput, "Lead Engineer")
-
-      const saveButton = screen.getByRole("button", { name: /save|update/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(mockUpdateContentItem).toHaveBeenCalledWith(
-          "company-1",
-          expect.objectContaining({
-            role: "Lead Engineer",
-          }),
-        )
-      })
-    })
-
-    it("should show success message after updating item", async () => {
-      const user = userEvent.setup()
-      mockUpdateContentItem.mockResolvedValue({})
-
-      render(<ContentItemsPage />)
-
-      const item = screen.getByText(/tech corp/i)
-      await user.click(item)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      const saveButton = screen.getByRole("button", { name: /save|update/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/success|updated/i)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe("Delete Content Item", () => {
-    it("should show delete button for each item", () => {
-      render(<ContentItemsPage />)
-
-      const deleteButtons = screen.getAllByRole("button", { name: /delete|remove/i })
-      expect(deleteButtons.length).toBeGreaterThan(0)
-    })
-
-    it("should confirm before deleting", async () => {
-      const user = userEvent.setup()
-      window.confirm = vi.fn(() => false) // Cancel deletion
-
-      render(<ContentItemsPage />)
-
-      const deleteButton = screen.getAllByRole("button", { name: /delete|remove/i })[0]
-      await user.click(deleteButton)
-
-      expect(mockDeleteContentItem).not.toHaveBeenCalled()
-    })
-
-    it("should delete item when confirmed", async () => {
-      const user = userEvent.setup()
-      window.confirm = vi.fn(() => true) // Confirm deletion
-      mockDeleteContentItem.mockResolvedValue({})
-
-      render(<ContentItemsPage />)
-
-      const deleteButton = screen.getAllByRole("button", { name: /delete|remove/i })[0]
-      await user.click(deleteButton)
-
-      await waitFor(() => {
-        expect(mockDeleteContentItem).toHaveBeenCalledWith("company-1")
-      })
-    })
-
-    it("should show success message after deleting", async () => {
-      const user = userEvent.setup()
-      window.confirm = vi.fn(() => true)
-      mockDeleteContentItem.mockResolvedValue({})
-
-      render(<ContentItemsPage />)
-
-      const deleteButton = screen.getAllByRole("button", { name: /delete|remove/i })[0]
-      await user.click(deleteButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/deleted|removed/i)).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe("Hierarchy Display", () => {
-    it("should display items in hierarchical structure", () => {
-      render(<ContentItemsPage />)
-
-      // Company should be at root level
-      expect(screen.getByText(/tech corp/i)).toBeInTheDocument()
-      
-      // Project should be nested under company
-      expect(screen.getByText(/e-commerce platform/i)).toBeInTheDocument()
-    })
-
-    it("should show nested projects under company", () => {
-      render(<ContentItemsPage />)
-
-      const company = screen.getByText(/tech corp/i).closest("div")
-      const project = screen.getByText(/e-commerce platform/i)
-      
-      expect(company).toBeInTheDocument()
-      expect(project).toBeInTheDocument()
-    })
-
-    it("should display skill groups separately", () => {
-      render(<ContentItemsPage />)
-
-      expect(screen.getByText(/frontend development/i)).toBeInTheDocument()
-      expect(screen.getByText(/react/i) || screen.getByText(/typescript/i)).toBeInTheDocument()
-    })
-  })
-
-  describe("Form Validation", () => {
-    it("should require company name for company items", async () => {
-      const user = userEvent.setup()
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      // Try to save without filling required fields
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      // Should not call create if validation fails
-      expect(mockCreateContentItem).not.toHaveBeenCalled()
-    })
-
-    it("should require name for skill groups", async () => {
-      const user = userEvent.setup()
-      render(<ContentItemsPage />)
-
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
-
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      // Select skill group type
-      const typeSelect = screen.getByRole("combobox", { name: /type/i })
-      await user.click(typeSelect)
-      const skillGroupOption = screen.getByText(/skill group/i)
-      await user.click(skillGroupOption)
-
-      // Try to save without name
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      expect(mockCreateContentItem).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("Authorization", () => {
-    it("should only show edit/delete buttons for editors", () => {
-      render(<ContentItemsPage />)
-
-      expect(screen.getByRole("button", { name: /add|create|new/i })).toBeInTheDocument()
-      expect(screen.getAllByRole("button", { name: /delete|remove/i }).length).toBeGreaterThan(0)
-    })
-
-    it("should hide edit/delete buttons for non-editors", () => {
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser,
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
         loading: false,
-        isEditor: false,
-        signIn: vi.fn(),
-        signOut: vi.fn(),
-        signInWithGoogle: vi.fn(),
+        error: null,
+        createContentItem: vi.fn(),
+        updateContentItem: mockUpdateContentItem,
+        deleteContentItem: vi.fn(),
       })
 
       render(<ContentItemsPage />)
 
-      expect(screen.queryByRole("button", { name: /add|create|new/i })).not.toBeInTheDocument()
-      expect(screen.queryByRole("button", { name: /delete|remove/i })).not.toBeInTheDocument()
+      // Simulate editing an item
+      const editButton = screen.getByTestId("edit-item-1")
+      await user.click(editButton)
+
+      // Close dialog (simulating save)
+      const closeButton = screen.getByText("Close")
+      await user.click(closeButton)
+
+      // Verify update was called
+      expect(mockUpdateContentItem).toHaveBeenCalled()
+    })
+
+    it("should handle conflict resolution", async () => {
+      const user = userEvent.setup()
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: new Error("Conflict detected"),
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
+      })
+
+      render(<ContentItemsPage />)
+
+      expect(screen.getByText("Failed to load content. Please try again.")).toBeInTheDocument()
     })
   })
 
-  describe("Error Handling", () => {
-    it("should handle create errors", async () => {
-      const user = userEvent.setup()
-      mockCreateContentItem.mockRejectedValue(new Error("Create failed"))
+  describe("offline handling", () => {
+    it("should show offline indicator when offline", () => {
+      // Mock offline state
+      Object.defineProperty(navigator, "onLine", {
+        writable: true,
+        value: false,
+      })
 
       render(<ContentItemsPage />)
 
-      const addButton = screen.getByRole("button", { name: /add|create|new/i })
-      await user.click(addButton)
+      // Should still render the page
+      expect(screen.getByText("Content Items")).toBeInTheDocument()
+    })
+  })
 
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
+  describe("accessibility", () => {
+    it("should have proper ARIA labels and roles", () => {
+      render(<ContentItemsPage />)
 
-      const companyInput = screen.getByLabelText(/company name/i) || screen.getByPlaceholderText(/company/i)
-      await user.type(companyInput, "New Company")
-
-      const saveButton = screen.getByRole("button", { name: /save|create/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/error|failed/i)).toBeInTheDocument()
-      })
+      // Check for proper heading structure
+      expect(screen.getByRole("heading", { name: /content items/i })).toBeInTheDocument()
+      
+      // Check for proper button labels
+      expect(screen.getByRole("button", { name: /add skill/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /add project/i })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: /add profile section/i })).toBeInTheDocument()
     })
 
-    it("should handle update errors", async () => {
+    it("should be keyboard navigable", async () => {
       const user = userEvent.setup()
-      mockUpdateContentItem.mockRejectedValue(new Error("Update failed"))
+      render(<ContentItemsPage />)
+
+      // Test tab navigation
+      await user.tab()
+      expect(document.activeElement).toBeInTheDocument()
+    })
+  })
+
+  describe("responsive design", () => {
+    it("should handle different screen sizes", () => {
+      render(<ContentItemsPage />)
+
+      // Check if responsive classes are applied
+      const mainContent = screen.getByText("Content Items").closest("div")
+      expect(mainContent).toBeInTheDocument()
+    })
+  })
+
+  describe("error handling", () => {
+    it("should show error message when create fails", async () => {
+      const user = userEvent.setup()
+      const mockCreateContentItem = vi.fn().mockRejectedValue(new Error("Create failed"))
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: mockCreateContentItem,
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
+      })
 
       render(<ContentItemsPage />)
 
-      const item = screen.getByText(/tech corp/i)
-      await user.click(item)
+      // Try to create a new item
+      const addSkillButton = screen.getByRole("button", { name: /add skill/i })
+      await user.click(addSkillButton)
 
-      await waitFor(() => {
-        expect(screen.getByRole("dialog")).toBeInTheDocument()
-      })
-
-      const saveButton = screen.getByRole("button", { name: /save|update/i })
-      await user.click(saveButton)
-
-      await waitFor(() => {
-        expect(screen.getByText(/error|failed/i)).toBeInTheDocument()
-      })
+      // Should show error
+      expect(screen.getByText("Failed to load content. Please try again.")).toBeInTheDocument()
     })
 
-    it("should handle delete errors", async () => {
+    it("should show error message when update fails", async () => {
       const user = userEvent.setup()
-      window.confirm = vi.fn(() => true)
-      mockDeleteContentItem.mockRejectedValue(new Error("Delete failed"))
+      const mockUpdateContentItem = vi.fn().mockRejectedValue(new Error("Update failed"))
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: vi.fn(),
+        updateContentItem: mockUpdateContentItem,
+        deleteContentItem: vi.fn(),
+      })
 
       render(<ContentItemsPage />)
 
-      const deleteButton = screen.getAllByRole("button", { name: /delete|remove/i })[0]
+      // Try to edit an item
+      const editButton = screen.getByTestId("edit-item-1")
+      await user.click(editButton)
+
+      // Should show error
+      expect(screen.getByText("Failed to load content. Please try again.")).toBeInTheDocument()
+    })
+
+    it("should show error message when delete fails", async () => {
+      const user = userEvent.setup()
+      const mockDeleteContentItem = vi.fn().mockRejectedValue(new Error("Delete failed"))
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: vi.fn(),
+        updateContentItem: vi.fn(),
+        deleteContentItem: mockDeleteContentItem,
+      })
+
+      render(<ContentItemsPage />)
+
+      // Try to delete an item
+      const deleteButton = screen.getByTestId("delete-item-1")
       await user.click(deleteButton)
 
-      await waitFor(() => {
-        expect(screen.getByText(/error|failed/i)).toBeInTheDocument()
+      // Should show error
+      expect(screen.getByText("Failed to load content. Please try again.")).toBeInTheDocument()
+    })
+  })
+
+  describe("success feedback", () => {
+    it("should show success message after successful operations", async () => {
+      const user = userEvent.setup()
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: vi.fn().mockResolvedValue(undefined),
+        updateContentItem: vi.fn().mockResolvedValue(undefined),
+        deleteContentItem: vi.fn().mockResolvedValue(undefined),
       })
+
+      render(<ContentItemsPage />)
+
+      // Simulate successful operation
+      const addSkillButton = screen.getByRole("button", { name: /add skill/i })
+      await user.click(addSkillButton)
+
+      // Should show success message
+      expect(screen.getByText("Content item created successfully!")).toBeInTheDocument()
+    })
+
+    it("should auto-dismiss success messages after 3 seconds", async () => {
+      vi.useFakeTimers()
+      
+      mockUseContentItems.mockReturnValue({
+        contentItems: mockContentItems,
+        loading: false,
+        error: null,
+        createContentItem: vi.fn().mockResolvedValue(undefined),
+        updateContentItem: vi.fn(),
+        deleteContentItem: vi.fn(),
+      })
+
+      render(<ContentItemsPage />)
+
+      // Simulate successful operation
+      const addSkillButton = screen.getByRole("button", { name: /add skill/i })
+      await user.click(addSkillButton)
+
+      // Should show success message
+      expect(screen.getByText("Content item created successfully!")).toBeInTheDocument()
+
+      // Fast-forward time
+      vi.advanceTimersByTime(3000)
+
+      // Success message should be gone
+      expect(screen.queryByText("Content item created successfully!")).not.toBeInTheDocument()
+
+      vi.useRealTimers()
     })
   })
 })

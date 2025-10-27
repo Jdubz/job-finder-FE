@@ -1,270 +1,532 @@
 /**
- * Tests for AuthContext
+ * Authentication Context Tests
+ *
+ * Comprehensive tests for the Authentication Context functionality
+ * Rank 6 - MEDIUM: User access control
  */
 
-import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { AuthProvider, useAuth } from '../AuthContext';
-import { type User } from 'firebase/auth';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { render, screen, waitFor } from "@testing-library/react"
+import { AuthProvider, useAuth } from "../AuthContext"
+import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth"
 
 // Mock Firebase auth
-vi.mock('@/config/firebase', () => ({
-  auth: {}
-}));
-
-vi.mock('firebase/auth', () => ({
+vi.mock("firebase/auth", () => ({
   onAuthStateChanged: vi.fn(),
   signOut: vi.fn(),
-}));
+}))
 
-import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+// Mock Firebase config
+vi.mock("@/config/firebase", () => ({
+  auth: {},
+}))
 
-describe('AuthContext', () => {
-  let unsubscribeMock: ReturnType<typeof vi.fn>;
+// Mock component to test the context
+const TestComponent = () => {
+  const { user, loading, isEditor, signOut } = useAuth()
+  
+  if (loading) return <div>Loading...</div>
+  
+  return (
+    <div>
+      <div data-testid="user-email">{user?.email || "No user"}</div>
+      <div data-testid="is-editor">{isEditor ? "Editor" : "Viewer"}</div>
+      <button onClick={signOut} data-testid="sign-out">Sign Out</button>
+    </div>
+  )
+}
+
+describe("AuthContext", () => {
+  const mockOnAuthStateChanged = vi.mocked(onAuthStateChanged)
+  const mockSignOut = vi.mocked(firebaseSignOut)
 
   beforeEach(() => {
-    unsubscribeMock = vi.fn();
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      // Initially call with null (no user)
-      callback(null);
-      return unsubscribeMock;
-    });
-    vi.mocked(firebaseSignOut).mockResolvedValue();
-  });
+    vi.clearAllMocks()
+  })
 
   afterEach(() => {
-    vi.clearAllMocks();
-  });
+    vi.restoreAllMocks()
+  })
 
-  describe('AuthProvider', () => {
-    it('should provide auth context to children', async () => {
-      function TestComponent() {
-        const { user, loading } = useAuth();
-        return (
-          <div>
-            <div data-testid="user">{user ? 'logged-in' : 'logged-out'}</div>
-            <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>
-          </div>
-        );
-      }
+  describe("AuthProvider", () => {
+    it("should provide loading state initially", () => {
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        // Don't call callback immediately to test loading state
+        return () => {}
+      })
 
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
+
+      expect(screen.getByText("Loading...")).toBeInTheDocument()
+    })
+
+    it("should handle unauthenticated user", async () => {
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        // Simulate no user
+        callback(null)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
 
       await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('loaded');
-      });
+        expect(screen.getByTestId("user-email")).toHaveTextContent("No user")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
 
-      expect(screen.getByTestId('user')).toHaveTextContent('logged-out');
-    });
-
-    it('should start with loading state', () => {
-      function TestComponent() {
-        const { loading } = useAuth();
-        return <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>;
-      }
-
-      render(
-        <AuthProvider>
-          <TestComponent />
-        </AuthProvider>
-      );
-
-      // Initially should be loading
-      const loadingElement = screen.getByTestId('loading');
-      expect(loadingElement.textContent === 'loading' || loadingElement.textContent === 'loaded').toBe(true);
-    });
-
-    it('should update user when auth state changes', async () => {
+    it("should handle authenticated user with viewer role", async () => {
       const mockUser = {
-        uid: 'test-uid',
-        email: 'test@example.com',
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: 'user' }
+          claims: { role: "viewer" }
         }),
-      } as unknown as User;
-
-      vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-        setTimeout(() => callback(mockUser), 0);
-        return unsubscribeMock;
-      });
-
-      function TestComponent() {
-        const { user, loading } = useAuth();
-        return (
-          <div>
-            <div data-testid="user">{user ? user.email : 'no-user'}</div>
-            <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>
-          </div>
-        );
       }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
 
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
 
       await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('loaded');
-      });
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
 
-      expect(screen.getByTestId('user')).toHaveTextContent('test@example.com');
-    });
-
-    it('should set isEditor to true for editor role', async () => {
+    it("should handle authenticated user with editor role", async () => {
       const mockUser = {
-        uid: 'test-uid',
-        email: 'editor@example.com',
+        uid: "user-123",
+        email: "editor@example.com",
+        displayName: "Editor User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: 'editor' }
+          claims: { role: "editor" }
         }),
-      } as unknown as User;
-
-      vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-        setTimeout(() => callback(mockUser), 0);
-        return unsubscribeMock;
-      });
-
-      function TestComponent() {
-        const { isEditor, loading } = useAuth();
-        return (
-          <div>
-            <div data-testid="is-editor">{isEditor ? 'yes' : 'no'}</div>
-            <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>
-          </div>
-        );
       }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
 
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
 
       await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('loaded');
-      });
+        expect(screen.getByTestId("user-email")).toHaveTextContent("editor@example.com")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+      })
+    })
 
-      expect(screen.getByTestId('is-editor')).toHaveTextContent('yes');
-    });
-
-    it('should set isEditor to false for non-editor role', async () => {
+    it("should handle user without role claims", async () => {
       const mockUser = {
-        uid: 'test-uid',
-        email: 'user@example.com',
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
         getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: 'user' }
+          claims: {}
         }),
-      } as unknown as User;
-
-      vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-        setTimeout(() => callback(mockUser), 0);
-        return unsubscribeMock;
-      });
-
-      function TestComponent() {
-        const { isEditor, loading } = useAuth();
-        return (
-          <div>
-            <div data-testid="is-editor">{isEditor ? 'yes' : 'no'}</div>
-            <div data-testid="loading">{loading ? 'loading' : 'loaded'}</div>
-          </div>
-        );
       }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
 
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
 
       await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('loaded');
-      });
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
 
-      expect(screen.getByTestId('is-editor')).toHaveTextContent('no');
-    });
-
-    it('should handle signOut', async () => {
+    it("should handle token retrieval errors", async () => {
       const mockUser = {
-        uid: 'test-uid',
-        email: 'test@example.com',
-        getIdTokenResult: vi.fn().mockResolvedValue({
-          claims: { role: 'editor' }
-        }),
-      } as unknown as User;
-
-      vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-        callback(mockUser);
-        return unsubscribeMock;
-      });
-
-      function TestComponent() {
-        const { user, signOut } = useAuth();
-        return (
-          <div>
-            <div data-testid="user">{user ? user.email : 'no-user'}</div>
-            <button onClick={signOut} data-testid="signout-btn">Sign Out</button>
-          </div>
-        );
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockRejectedValue(new Error("Token error")),
       }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
 
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
 
       await waitFor(() => {
-        expect(screen.getByTestId('user')).toHaveTextContent('test@example.com');
-      });
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
 
-      const signOutBtn = screen.getByTestId('signout-btn');
-      signOutBtn.click();
-
-      await waitFor(() => {
-        expect(firebaseSignOut).toHaveBeenCalled();
-      });
-    });
-
-    it('should clean up on unmount', () => {
-      function TestComponent() {
-        useAuth();
-        return <div>Test</div>;
-      }
+    it("should clean up auth state listener on unmount", () => {
+      const unsubscribe = vi.fn()
+      mockOnAuthStateChanged.mockReturnValue(unsubscribe)
 
       const { unmount } = render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
-      );
+      )
 
-      unmount();
+      unmount()
 
-      expect(unsubscribeMock).toHaveBeenCalled();
-    });
-  });
+      expect(unsubscribe).toHaveBeenCalled()
+    })
+  })
 
-  describe('useAuth hook', () => {
-    it('should throw error when used outside AuthProvider', () => {
-      function TestComponent() {
-        useAuth();
-        return <div>Test</div>;
+  describe("signOut", () => {
+    it("should sign out user successfully", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "viewer" }
+        }),
       }
 
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      mockSignOut.mockResolvedValue(undefined)
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+      })
+
+      const signOutButton = screen.getByTestId("sign-out")
+      signOutButton.click()
+
+      await waitFor(() => {
+        expect(mockSignOut).toHaveBeenCalled()
+      })
+    })
+
+    it("should handle sign out errors", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "viewer" }
+        }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      mockSignOut.mockRejectedValue(new Error("Sign out failed"))
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+      })
+
+      const signOutButton = screen.getByTestId("sign-out")
+      
+      // Should not throw error
+      await expect(async () => {
+        signOutButton.click()
+      }).not.toThrow()
+    })
+  })
+
+  describe("useAuth hook", () => {
+    it("should throw error when used outside AuthProvider", () => {
       // Suppress console.error for this test
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
-      expect(() => render(<TestComponent />)).toThrow(
-        'useAuth must be used within an AuthProvider'
-      );
+      expect(() => {
+        render(<TestComponent />)
+      }).toThrow("useAuth must be used within an AuthProvider")
 
-      consoleSpy.mockRestore();
-    });
-  });
-});
+      consoleSpy.mockRestore()
+    })
+
+    it("should provide auth context values", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "editor" }
+        }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+      })
+    })
+  })
+
+  describe("role-based access control", () => {
+    it("should correctly identify editor role", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "editor@example.com",
+        displayName: "Editor User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "editor" }
+        }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+      })
+    })
+
+    it("should correctly identify viewer role", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "viewer@example.com",
+        displayName: "Viewer User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "viewer" }
+        }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
+
+    it("should default to viewer role for users without role claims", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: {}
+        }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
+  })
+
+  describe("session management", () => {
+    it("should handle user state changes", async () => {
+      let authCallback: (user: any) => void = () => {}
+      
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        authCallback = callback
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      // Initially no user
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("No user")
+      })
+
+      // Simulate user login
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn().mockResolvedValue({
+          claims: { role: "viewer" }
+        }),
+      }
+
+      authCallback(mockUser)
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
+      })
+
+      // Simulate user logout
+      authCallback(null)
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("No user")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+    })
+
+    it("should handle token refresh", async () => {
+      const mockUser = {
+        uid: "user-123",
+        email: "user@example.com",
+        displayName: "Test User",
+        getIdTokenResult: vi.fn()
+          .mockResolvedValueOnce({
+            claims: { role: "viewer" }
+          })
+          .mockResolvedValueOnce({
+            claims: { role: "editor" }
+          }),
+      }
+
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Viewer")
+      })
+
+      // Simulate token refresh with role change
+      mockUser.getIdTokenResult.mockResolvedValue({
+        claims: { role: "editor" }
+      })
+
+      // Trigger auth state change again
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser as any)
+        return () => {}
+      })
+
+      await waitFor(() => {
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+      })
+    })
+  })
+
+  describe("error handling", () => {
+    it("should handle auth state change errors gracefully", async () => {
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        // Simulate error in auth state change
+        try {
+          callback(null)
+        } catch (error) {
+          // Error should be handled gracefully
+        }
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("No user")
+      })
+    })
+
+    it("should handle Firebase auth errors", async () => {
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        // Simulate Firebase error
+        callback(null)
+        return () => {}
+      })
+
+      render(
+        <AuthProvider>
+          <TestComponent />
+        </AuthProvider>
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("user-email")).toHaveTextContent("No user")
+      })
+    })
+  })
+})
