@@ -19,8 +19,8 @@ const isStaging = import.meta.env.MODE === "staging"
  *
  * Development: Uses Firebase emulators with static-sites-257923 project
  * Staging/Production: Uses static-sites-257923 Firebase project
- *   - Staging functions: manageGenerator-staging, manageContentItems-staging, etc.
- *   - Production functions: manageGenerator, manageContentItems, etc. (no suffix)
+ *   - Staging functions: manageGenerator-staging, manageJobQueue-staging
+ *   - Production functions: manageGenerator, manageJobQueue (no suffix)
  */
 const getBaseUrl = (): string => {
   if (isDevelopment) {
@@ -67,9 +67,6 @@ export const api = {
   functions: {
     // Document generation
     manageGenerator: `${BASE_URL}/manageGenerator${FUNCTION_SUFFIX}`,
-
-    // Content management
-    manageContentItems: `${BASE_URL}/manageContentItems${FUNCTION_SUFFIX}`,
 
     // Job queue management
     manageJobQueue: `${BASE_URL}/manageJobQueue${FUNCTION_SUFFIX}`,
