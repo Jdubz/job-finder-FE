@@ -38,9 +38,12 @@ export default defineConfig({
     video: "retain-on-failure",
 
     /* Timeout settings for faster failure detection */
-    actionTimeout: 10000,
-    navigationTimeout: 15000,
+    actionTimeout: 5000,
+    navigationTimeout: 10000,
   },
+
+  /* Global test timeout */
+  timeout: 30000,
 
   /* Configure projects for major browsers */
   projects: [
