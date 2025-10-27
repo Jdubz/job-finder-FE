@@ -8,15 +8,14 @@ import { useCallback } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useFirestore } from "@/contexts/FirestoreContext"
 import { useFirestoreCollection } from "./useFirestoreCollection"
-import type { ContentItemDocument } from "@jsdubzw/job-finder-shared-types"
-import type { DocumentWithId } from "@/services/firestore/types"
+import type { ContentItemDocument, DocumentWithId } from "@/services/firestore/types"
 
 interface UseContentItemsResult {
   contentItems: DocumentWithId<ContentItemDocument>[]
   loading: boolean
   error: Error | null
   createContentItem: (
-    data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+    data: Omit<ContentItemDocument, "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
   ) => Promise<string>
   updateContentItem: (id: string, data: Partial<ContentItemDocument>) => Promise<void>
   deleteContentItem: (id: string) => Promise<void>
@@ -51,13 +50,13 @@ export function useContentItems(): UseContentItemsResult {
    */
   const createContentItem = useCallback(
     async (
-      data: Omit<ContentItemDocument, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
+      data: Omit<ContentItemDocument, "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">
     ) => {
       if (!user?.uid) {
         throw new Error("User must be authenticated to create content items")
       }
 
-      const itemData: Omit<ContentItemDocument, "createdAt" | "updatedAt"> & { userId: string } = {
+      const itemData: Omit<ContentItemDocument, "id" | "createdAt" | "updatedAt"> = {
         ...data,
         userId: user.uid, // For querying/filtering (matches existing indexes)
         createdBy: user.uid, // For audit trail

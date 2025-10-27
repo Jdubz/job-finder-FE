@@ -3,7 +3,10 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "vite/client"],
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
-  "include": ["src", "tests", "src/test"]
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/**/*", "tests/**/*", "src/**/*"],
+  "exclude": []
 }

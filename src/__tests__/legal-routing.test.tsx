@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 import { router } from '../router'
 import { vi } from 'vitest'
