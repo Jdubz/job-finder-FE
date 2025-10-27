@@ -68,30 +68,42 @@ vi.mock("@/services/logging", () => ({
 const mockContentItems = [
   {
     id: "item-1",
-    name: "React",
-    type: "skill",
+    type: "skill-group",
+    category: "Frontend",
+    skills: ["React", "Vue"],
     parentId: null,
-    description: "JavaScript library for building user interfaces",
+    order: 0,
+    visibility: "published" as const,
     createdAt: new Date(),
     updatedAt: new Date(),
+    createdBy: "test-user-123",
+    updatedBy: "test-user-123",
   },
   {
     id: "item-2",
-    name: "TypeScript",
-    type: "skill",
+    type: "skill-group",
+    category: "Backend",
+    skills: ["Node.js", "Python"],
     parentId: null,
-    description: "Typed superset of JavaScript",
+    order: 1,
+    visibility: "published" as const,
     createdAt: new Date(),
     updatedAt: new Date(),
+    createdBy: "test-user-123",
+    updatedBy: "test-user-123",
   },
   {
     id: "item-3",
-    name: "E-commerce Project",
     type: "project",
-    parentId: null,
+    name: "E-commerce Project",
     description: "Full-stack e-commerce application",
+    parentId: null,
+    order: 2,
+    visibility: "published" as const,
     createdAt: new Date(),
     updatedAt: new Date(),
+    createdBy: "test-user-123",
+    updatedBy: "test-user-123",
   },
 ]
 
@@ -124,6 +136,7 @@ describe("ContentItemsPage", () => {
       createContentItem: vi.fn(),
       updateContentItem: vi.fn(),
       deleteContentItem: vi.fn(),
+      refetch: vi.fn(),
     })
   })
 
@@ -153,6 +166,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -168,6 +182,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)

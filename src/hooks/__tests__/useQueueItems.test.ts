@@ -280,13 +280,13 @@ describe("useQueueItems Hook", () => {
 
       await result.current.updateQueueItem("queue-1", {
         status: "failed",
-        error_message: "Generation failed",
+        error_details: "Generation failed",
       })
 
       expect(mockUpdateDocument).toHaveBeenCalledWith(
         "job-queue",
         "queue-1",
-        { status: "failed", error_message: "Generation failed" }
+        { status: "failed", error_details: "Generation failed" }
       )
     })
 

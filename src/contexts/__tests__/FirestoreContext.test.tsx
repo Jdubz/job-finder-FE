@@ -91,7 +91,7 @@ describe('FirestoreContext', () => {
       const mockData = [{ id: '1', name: 'Test' }];
 
       vi.mocked(firestoreService.subscribeToCollection).mockImplementation(
-        (collection, onData, onError) => {
+        (_collection, onData, _onError) => {
           setTimeout(() => onData(mockData), 0);
           return unsubscribeMock;
         }
@@ -131,7 +131,7 @@ describe('FirestoreContext', () => {
       const onErrorMock = vi.fn();
 
       vi.mocked(firestoreService.subscribeToCollection).mockImplementation(
-        (collection, onData, onError) => {
+        (_collection, _onData, onError) => {
           setTimeout(() => onError(error), 0);
           return vi.fn();
         }
@@ -170,7 +170,7 @@ describe('FirestoreContext', () => {
       const mockDoc = { id: '1', name: 'Test Document' };
 
       vi.mocked(firestoreService.subscribeToDocument).mockImplementation(
-        (collection, docId, onData, onError) => {
+        (_collection, _docId, onData, _onError) => {
           setTimeout(() => onData(mockDoc), 0);
           return unsubscribeMock;
         }
@@ -213,7 +213,7 @@ describe('FirestoreContext', () => {
       let callCount = 0;
 
       vi.mocked(firestoreService.subscribeToCollection).mockImplementation(
-        (collection, onData, onError) => {
+        (_collection, onData, _onError) => {
           callCount++;
           setTimeout(() => onData(mockData), 0);
           return vi.fn();
@@ -221,7 +221,7 @@ describe('FirestoreContext', () => {
       );
 
       function TestComponent() {
-        const { subscribeToCollection, getCachedData } = useFirestore();
+        const { subscribeToCollection } = useFirestore();
         const [data, setData] = React.useState<any[]>([]);
 
         React.useEffect(() => {

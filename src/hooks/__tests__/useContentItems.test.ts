@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { renderHook, waitFor } from "@testing-library/react"
+import { renderHook } from "@testing-library/react"
 import { useContentItems } from "../useContentItems"
 import { useAuth } from "@/contexts/AuthContext"
 import { useFirestore } from "@/contexts/FirestoreContext"
@@ -169,8 +169,11 @@ describe("useContentItems", () => {
         company: "New Corp",
         role: "Developer",
         startDate: "2024-01",
+        endDate: "present",
+        location: "Remote",
         parentId: null,
         order: 2,
+        visibility: "published" as const,
       }
 
       const itemId = await result.current.createContentItem(newItem)
@@ -203,8 +206,13 @@ describe("useContentItems", () => {
         result.current.createContentItem({
           type: "company" as const,
           company: "Test",
+          role: "Test Role",
+          startDate: "2023-01",
+          endDate: "present",
+          location: "Remote",
           parentId: null,
           order: 0,
+          visibility: "published" as const,
         }),
       ).rejects.toThrow("User must be authenticated")
     })
@@ -216,10 +224,11 @@ describe("useContentItems", () => {
 
       await result.current.createContentItem({
         type: "skill-group" as const,
-        name: "Backend",
+        category: "Backend",
         skills: ["Node.js", "Python"],
         parentId: null,
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
@@ -241,8 +250,13 @@ describe("useContentItems", () => {
         result.current.createContentItem({
           type: "company" as const,
           company: "Test",
+          role: "Test Role",
+          startDate: "2023-01",
+          endDate: "present",
+          location: "Remote",
           parentId: null,
           order: 0,
+          visibility: "published" as const,
         }),
       ).rejects.toThrow("Creation failed")
     })
@@ -425,6 +439,7 @@ describe("useContentItems", () => {
         description: "Built a site",
         parentId: "company-1",
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
@@ -442,10 +457,11 @@ describe("useContentItems", () => {
 
       await result.current.createContentItem({
         type: "skill-group",
-        name: "Frontend",
+        category: "Frontend",
         skills: ["React", "Vue"],
         parentId: null,
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
@@ -456,23 +472,24 @@ describe("useContentItems", () => {
       )
     })
 
-    it("should support education items", async () => {
+    it("should support text section items", async () => {
       mockFirestoreService.createDocument.mockResolvedValue("id")
 
       const { result } = renderHook(() => useContentItems())
 
       await result.current.createContentItem({
-        type: "education",
-        institution: "University",
-        degree: "BS Computer Science",
+        type: "text-section",
+        heading: "Education",
+        content: "BS Computer Science from University",
         parentId: null,
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
         "content-items",
         expect.objectContaining({
-          type: "education",
+          type: "text-section",
         }),
       )
     })
@@ -487,8 +504,10 @@ describe("useContentItems", () => {
       await result.current.createContentItem({
         type: "project",
         name: "Nested Project",
+        description: "A nested project",
         parentId: "company-1",
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
@@ -507,8 +526,13 @@ describe("useContentItems", () => {
       await result.current.createContentItem({
         type: "company",
         company: "Root Company",
+        role: "Software Engineer",
+        startDate: "2023-01",
+        endDate: "present",
+        location: "Remote",
         parentId: null,
         order: 0,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
@@ -527,8 +551,13 @@ describe("useContentItems", () => {
       await result.current.createContentItem({
         type: "company",
         company: "Ordered Company",
+        role: "Software Engineer",
+        startDate: "2023-01",
+        endDate: "present",
+        location: "Remote",
         parentId: null,
         order: 5,
+        visibility: "published" as const,
       })
 
       expect(mockFirestoreService.createDocument).toHaveBeenCalledWith(
