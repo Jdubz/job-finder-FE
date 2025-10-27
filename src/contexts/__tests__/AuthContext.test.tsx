@@ -50,10 +50,10 @@ describe("AuthContext", () => {
 
   describe("AuthProvider", () => {
     it("should provide loading state initially", () => {
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        // Don't call callback immediately to test loading state
-        return () => {}
-      })
+              mockOnAuthStateChanged.mockImplementation((_auth, _callback) => {
+                // Don't call callback immediately to test loading state
+                return () => {}
+              })
 
       render(
         <AuthProvider>
@@ -65,11 +65,13 @@ describe("AuthContext", () => {
     })
 
     it("should handle unauthenticated user", async () => {
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        // Simulate no user
-        callback(null)
-        return () => {}
-      })
+              mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+                // Simulate no user
+                if (typeof callback === 'function') {
+                  callback(null)
+                }
+                return () => {}
+              })
 
       render(
         <AuthProvider>
@@ -93,8 +95,10 @@ describe("AuthContext", () => {
         }),
       }
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any)
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        if (typeof callback === 'function') {
+          callback(mockUser as any)
+        }
         return () => {}
       })
 

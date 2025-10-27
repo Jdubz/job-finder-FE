@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { ContentItemsPage } from "../ContentItemsPage"
 import { useContentItems } from "@/hooks/useContentItems"
@@ -95,7 +95,7 @@ const mockContentItems = [
   },
 ]
 
-const mockHierarchy = [
+    const _mockHierarchy = [
   {
     ...mockContentItems[0],
     children: [],
