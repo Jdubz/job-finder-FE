@@ -49,13 +49,6 @@ vi.mock("@/components/GenerationProgress", () => ({
   ),
 }))
 
-// Mock the DocumentHistoryList component
-vi.mock("./components/DocumentHistoryList", () => ({
-  DocumentHistoryList: ({ refreshTrigger }: { refreshTrigger: number }) => (
-    <div data-testid="document-history-list">Document History (refresh: {refreshTrigger})</div>
-  ),
-}))
-
 // Helper function to render with router
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>)

@@ -20,7 +20,6 @@ describe("Routes Configuration", () => {
     })
 
     it("contains editor-only routes", () => {
-      expect(ROUTES.DOCUMENT_HISTORY).toBe("/document-history")
       expect(ROUTES.JOB_APPLICATIONS).toBe("/job-applications")
       expect(ROUTES.JOB_FINDER).toBe("/job-finder")
       expect(ROUTES.QUEUE_MANAGEMENT).toBe("/queue-management")
@@ -66,7 +65,6 @@ describe("Routes Configuration", () => {
     })
 
     it("does not include editor-only routes", () => {
-      expect(PUBLIC_ROUTES).not.toContain(ROUTES.DOCUMENT_HISTORY)
       expect(PUBLIC_ROUTES).not.toContain(ROUTES.JOB_APPLICATIONS)
       expect(PUBLIC_ROUTES).not.toContain(ROUTES.JOB_FINDER)
       expect(PUBLIC_ROUTES).not.toContain(ROUTES.QUEUE_MANAGEMENT)

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 
 export function JobFinderConfigPage() {
-  const { isEditor, user } = useAuth()
+  const { isOwner, user } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -209,7 +209,7 @@ export function JobFinderConfigPage() {
   const hasQueueChanges = JSON.stringify(queueSettings) !== JSON.stringify(originalQueueSettings)
   const hasAIChanges = JSON.stringify(aiSettings) !== JSON.stringify(originalAISettings)
 
-  if (!isEditor) {
+  if (!isOwner) {
     return (
       <div className="container mx-auto p-6">
         <Alert variant="destructive">

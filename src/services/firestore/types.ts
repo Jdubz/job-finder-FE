@@ -128,6 +128,7 @@ export interface CacheEntry<T> {
   data: DocumentWithId<T>[]
   timestamp: number
   unsubscribe: UnsubscribeFn
+  subscriberCount?: number
 }
 
 /**
@@ -137,4 +138,5 @@ export interface DocumentCacheEntry<T> {
   data: DocumentWithId<T> | null
   timestamp: number
   unsubscribe: UnsubscribeFn
+  subscriberCount?: number
 }

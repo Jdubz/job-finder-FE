@@ -57,7 +57,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
   const documentCache = useRef<Map<string, DocumentCacheEntry<unknown>>>(new Map())
 
   /**
-   * Subscribe to a collection with caching
+   * Subscribe to a collection with caching and reference counting
    */
   const subscribeToCollection = useCallback(
     <K extends keyof CollectionTypeMap>(
@@ -73,12 +73,28 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       // Check if we already have an active subscription
       const cached = collectionCache.current.get(key)
       if (cached) {
+        // Increment subscriber count
+        cached.subscriberCount = (cached.subscriberCount || 1) + 1
+        
         // Return cached data immediately
         onData(cached.data as DocumentWithId<CollectionTypeMap[K]>[])
 
-        // Return a no-op unsubscribe since we're sharing the subscription
+        // Return a reference-counted unsubscribe
         return () => {
-          // Don't actually unsubscribe - let the cache manage it
+          const entry = collectionCache.current.get(key)
+          if (entry) {
+            entry.subscriberCount = (entry.subscriberCount || 1) - 1
+            
+            // Only unsubscribe when no more subscribers
+            if (entry.subscriberCount <= 0) {
+              try {
+                entry.unsubscribe()
+              } catch (e) {
+                console.warn(`Error unsubscribing from ${key}:`, e)
+              }
+              collectionCache.current.delete(key)
+            }
+          }
         }
       }
 
@@ -100,19 +116,29 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
         constraints
       )
 
-      // Store in cache
+      // Store in cache with subscriber count
       collectionCache.current.set(key, {
         data: [],
         timestamp: Date.now(),
         unsubscribe,
+        subscriberCount: 1,
       })
 
       // Return unsubscribe function that cleans up cache
       return () => {
         const entry = collectionCache.current.get(key)
         if (entry) {
-          entry.unsubscribe()
-          collectionCache.current.delete(key)
+          entry.subscriberCount = (entry.subscriberCount || 1) - 1
+          
+          // Only unsubscribe when no more subscribers
+          if (entry.subscriberCount <= 0) {
+            try {
+              entry.unsubscribe()
+            } catch (e) {
+              console.warn(`Error unsubscribing from ${key}:`, e)
+            }
+            collectionCache.current.delete(key)
+          }
         }
       }
     },
@@ -120,7 +146,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
   )
 
   /**
-   * Subscribe to a document with caching
+   * Subscribe to a document with caching and reference counting
    */
   const subscribeToDocument = useCallback(
     <K extends keyof CollectionTypeMap>(
@@ -136,12 +162,28 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       // Check if we already have an active subscription
       const cached = documentCache.current.get(key)
       if (cached) {
+        // Increment subscriber count
+        cached.subscriberCount = (cached.subscriberCount || 1) + 1
+        
         // Return cached data immediately
         onData(cached.data as DocumentWithId<CollectionTypeMap[K]> | null)
 
-        // Return a no-op unsubscribe since we're sharing the subscription
+        // Return a reference-counted unsubscribe
         return () => {
-          // Don't actually unsubscribe - let the cache manage it
+          const entry = documentCache.current.get(key)
+          if (entry) {
+            entry.subscriberCount = (entry.subscriberCount || 1) - 1
+            
+            // Only unsubscribe when no more subscribers
+            if (entry.subscriberCount <= 0) {
+              try {
+                entry.unsubscribe()
+              } catch (e) {
+                console.warn(`Error unsubscribing from ${key}:`, e)
+              }
+              documentCache.current.delete(key)
+            }
+          }
         }
       }
 
@@ -163,19 +205,29 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
         onError
       )
 
-      // Store in cache
+      // Store in cache with subscriber count
       documentCache.current.set(key, {
         data: null,
         timestamp: Date.now(),
         unsubscribe,
+        subscriberCount: 1,
       })
 
       // Return unsubscribe function that cleans up cache
       return () => {
         const entry = documentCache.current.get(key)
         if (entry) {
-          entry.unsubscribe()
-          documentCache.current.delete(key)
+          entry.subscriberCount = (entry.subscriberCount || 1) - 1
+          
+          // Only unsubscribe when no more subscribers
+          if (entry.subscriberCount <= 0) {
+            try {
+              entry.unsubscribe()
+            } catch (e) {
+              console.warn(`Error unsubscribing from ${key}:`, e)
+            }
+            documentCache.current.delete(key)
+          }
         }
       }
     },

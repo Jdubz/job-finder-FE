@@ -226,7 +226,6 @@ vi.mock("@/types/generator", () => ({
   StartGenerationResponse: {},
   ExecuteStepResponse: {},
   GenerationStep: {},
-  DocumentHistoryItem: {},
   UserDefaults: {},
 }))
 

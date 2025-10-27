@@ -3,15 +3,15 @@ import { useAuth } from "@/contexts/AuthContext"
 import { ROUTES } from "@/types/routes"
 
 interface ProtectedRouteProps {
-  requireEditor?: boolean
+  requireOwner?: boolean
   redirectTo?: string
 }
 
 export function ProtectedRoute({
-  requireEditor = false,
+  requireOwner = false,
   redirectTo = ROUTES.HOME,
 }: ProtectedRouteProps) {
-  const { user, loading, isEditor } = useAuth()
+  const { user, loading, isOwner } = useAuth()
 
   if (loading) {
     return (
@@ -26,7 +26,7 @@ export function ProtectedRoute({
     return <Navigate to={redirectTo} replace />
   }
 
-  if (requireEditor && !isEditor) {
+  if (requireOwner && !isOwner) {
     return <Navigate to={ROUTES.UNAUTHORIZED} replace />
   }
 

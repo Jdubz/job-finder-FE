@@ -22,7 +22,7 @@ import { logger } from "@/services/logging"
 import { toDate } from "@/utils/dateFormat"
 
 export function JobApplicationsPage() {
-  const { user, isEditor } = useAuth()
+  const { user, isOwner } = useAuth()
   const navigate = useNavigate()
   const [matches, setMatches] = useState<JobMatch[]>([])
   const [filteredMatches, setFilteredMatches] = useState<JobMatch[]>([])
@@ -55,7 +55,6 @@ export function JobApplicationsPage() {
 
     // All authenticated users see all matches (no userId filtering)
     const unsubscribe = jobMatchesClient.subscribeToMatches(
-      null, // No user filtering - show all matches
       (updatedMatches) => {
         logger.info(
           "database",
@@ -150,7 +149,7 @@ export function JobApplicationsPage() {
     })
   }
 
-  if (!isEditor) {
+  if (!isOwner) {
     return (
       <div className="space-y-6">
         <div>

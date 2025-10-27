@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 
 export function SettingsPage() {
-  const { user, isEditor } = useAuth()
+  const { user, isOwner } = useAuth()
   const {
     personalInfo,
     loading: isLoading,
@@ -204,7 +204,7 @@ export function SettingsPage() {
             <div>
               <Label className="text-sm text-gray-600">Role</Label>
               <div>
-                {isEditor ? (
+                {isOwner ? (
                   <Badge variant="default" className="bg-blue-500">
                     <Shield className="h-3 w-3 mr-1" />
                     Editor

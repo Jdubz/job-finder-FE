@@ -246,9 +246,12 @@ export class FirestoreService {
     const q =
       queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
+    let hasError = false
+    
     return onSnapshot(
       q,
       (snapshot) => {
+        hasError = false // Reset error flag on successful snapshot
         const documents = snapshot.docs.map((doc) => {
           const data = convertTimestamps(doc.data())
           return {
@@ -260,7 +263,19 @@ export class FirestoreService {
         onData(documents)
       },
       (error) => {
-        onError(error as Error)
+        // Only call error handler once to prevent infinite loops
+        if (!hasError) {
+          hasError = true
+          console.error(`Firestore subscription error in ${collectionName}:`, error)
+          
+          // Provide empty array on permission errors to prevent crashes
+          if (error.code === 'permission-denied') {
+            console.warn(`Permission denied for ${collectionName}, providing empty data`)
+            onData([])
+          } else {
+            onError(error as Error)
+          }
+        }
       }
     )
   }
@@ -275,10 +290,13 @@ export class FirestoreService {
     onError: ErrorCallback
   ): UnsubscribeFn {
     const docRef = doc(this.db, collectionName, documentId)
+    
+    let hasError = false
 
     return onSnapshot(
       docRef,
       (docSnap) => {
+        hasError = false // Reset error flag on successful snapshot
         if (!docSnap.exists()) {
           onData(null)
           return
@@ -291,7 +309,19 @@ export class FirestoreService {
         } as DocumentWithId<CollectionTypeMap[K]>)
       },
       (error) => {
-        onError(error as Error)
+        // Only call error handler once to prevent infinite loops
+        if (!hasError) {
+          hasError = true
+          console.error(`Firestore document subscription error for ${collectionName}/${documentId}:`, error)
+          
+          // Provide null on permission errors to prevent crashes
+          if (error.code === 'permission-denied') {
+            console.warn(`Permission denied for ${collectionName}/${documentId}, providing null`)
+            onData(null)
+          } else {
+            onError(error as Error)
+          }
+        }
       }
     )
   }

@@ -61,10 +61,6 @@ vi.mock("../pages/job-finder-config/JobFinderConfigPage", () => ({
   JobFinderConfigPage: () => <div data-testid="job-finder-config-page">Job Finder Config Page</div>,
 }))
 
-vi.mock("../pages/document-history/DocumentHistoryPage", () => ({
-  DocumentHistoryPage: () => <div data-testid="document-history-page">Document History Page</div>,
-}))
-
 vi.mock("../pages/auth/UnauthorizedPage", () => ({
   UnauthorizedPage: () => <div data-testid="unauthorized-page">Unauthorized Page</div>,
 }))

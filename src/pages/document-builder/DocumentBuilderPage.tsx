@@ -21,11 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, FileText, Sparkles, Download } from "lucide-react"
-import { DocumentHistoryList } from "./components/DocumentHistoryList"
 import { GenerationProgress } from "@/components/GenerationProgress"
 
 // Helper function to normalize job match data from different sources
@@ -62,7 +60,6 @@ export function DocumentBuilderPage() {
   const [loading, setLoading] = useState(false)
   const [loadingMatches, setLoadingMatches] = useState(true)
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
-  const [refreshHistory, setRefreshHistory] = useState(0)
 
   // Multi-step generation state
   const [generationSteps, setGenerationSteps] = useState<GenerationStep[]>([])
@@ -77,12 +74,12 @@ export function DocumentBuilderPage() {
 
   // Load job matches
   useEffect(() => {
-    if (!user?.uid) return
+    if (!user) return
 
     const loadMatches = async () => {
       try {
         setLoadingMatches(true)
-        const matches = await jobMatchesClient.getMatches(user.uid, {
+        const matches = await jobMatchesClient.getMatches({
           minScore: 70, // Only show good matches
           limit: 50,
         })
@@ -95,7 +92,7 @@ export function DocumentBuilderPage() {
     }
 
     loadMatches()
-  }, [user?.uid])
+  }, [user])
 
   // Pre-fill form if job match is passed via navigation state
   useEffect(() => {
@@ -274,19 +271,7 @@ export function DocumentBuilderPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="generate" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="generate">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Generate New
-          </TabsTrigger>
-          <TabsTrigger value="history">
-            <FileText className="w-4 h-4 mr-2" />
-            Document History
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="generate" className="space-y-4">
+      <div className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Generate Document</CardTitle>
@@ -473,12 +458,7 @@ export function DocumentBuilderPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <DocumentHistoryList refreshTrigger={refreshHistory} />
-        </TabsContent>
-      </Tabs>
+      </div>
 
       {/* Generation Progress - Positioned at bottom of page */}
       {generationSteps.length > 0 && (

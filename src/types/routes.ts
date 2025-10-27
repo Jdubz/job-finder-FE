@@ -6,7 +6,6 @@ export const ROUTES = {
   AI_PROMPTS: "/ai-prompts",
   SETTINGS: "/settings",
   // Editor-only routes
-  DOCUMENT_HISTORY: "/document-history",
   JOB_APPLICATIONS: "/job-applications",
   JOB_FINDER: "/job-finder",
   QUEUE_MANAGEMENT: "/queue-management",
@@ -26,7 +25,6 @@ export type RoutePath = (typeof ROUTES)[RouteKey]
 
 // Editor-only routes that require authentication
 export const EDITOR_ROUTES: RoutePath[] = [
-  ROUTES.DOCUMENT_HISTORY,
   ROUTES.JOB_APPLICATIONS,
   ROUTES.JOB_FINDER,
   ROUTES.QUEUE_MANAGEMENT,
