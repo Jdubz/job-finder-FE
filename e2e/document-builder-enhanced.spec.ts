@@ -12,12 +12,14 @@ import { test, expect } from '@playwright/test'
 test.describe('Document Builder Enhanced @critical', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/document-builder')
-    // Wait for page to load
-    await page.waitForLoadState('networkidle')
+    // Wait for page to load with shorter timeout
+    await page.waitForLoadState('domcontentloaded')
+    // Wait for the main heading to be visible
+    await page.waitForSelector('h1:has-text("Document Builder")', { timeout: 5000 })
   })
 
   test('should load document builder page successfully', async ({ page }) => {
-    await expect(page).toHaveTitle(/document builder/i)
+    await expect(page).toHaveTitle(/Document Builder/i, { timeout: 5000 })
     await expect(page.locator('body')).toBeVisible()
   })
 

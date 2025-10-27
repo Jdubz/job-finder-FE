@@ -70,6 +70,11 @@ export function DocumentBuilderPage() {
   const [resumeUrl, setResumeUrl] = useState<string | null>(null)
   const [coverLetterUrl, setCoverLetterUrl] = useState<string | null>(null)
 
+  // Set page title
+  useEffect(() => {
+    document.title = "Document Builder - Job Finder"
+  }, [])
+
   // Load job matches
   useEffect(() => {
     if (!user?.uid) return
