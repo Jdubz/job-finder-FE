@@ -247,6 +247,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: mockDeleteContentItem,
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -274,17 +275,16 @@ describe("ContentItemsPage", () => {
       const itemsWithChildren = [
         {
           id: "parent-1",
-          name: "Frontend Skills",
-          type: "skill",
+          type: "skill-group" as const,
+          category: "Frontend Skills",
+          skills: ["React", "Vue"],
           parentId: null,
-          children: [
-            {
-              id: "child-1",
-              name: "React",
-              type: "skill",
-              parentId: "parent-1",
-            },
-          ],
+          order: 0,
+          visibility: "published" as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: "test-user-123",
+          updatedBy: "test-user-123",
         },
       ]
 
@@ -295,6 +295,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -315,6 +316,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: mockUpdateContentItem,
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -332,7 +334,7 @@ describe("ContentItemsPage", () => {
     })
 
     it("should handle conflict resolution", async () => {
-      const _user = userEvent.setup()
+      // const _user = userEvent.setup()
       
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
@@ -341,6 +343,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -409,6 +412,7 @@ describe("ContentItemsPage", () => {
         createContentItem: mockCreateContentItem,
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -432,6 +436,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: mockUpdateContentItem,
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -455,6 +460,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn(),
         updateContentItem: vi.fn(),
         deleteContentItem: mockDeleteContentItem,
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -479,6 +485,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn().mockResolvedValue(undefined),
         updateContentItem: vi.fn().mockResolvedValue(undefined),
         deleteContentItem: vi.fn().mockResolvedValue(undefined),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)
@@ -493,6 +500,7 @@ describe("ContentItemsPage", () => {
 
     it("should auto-dismiss success messages after 3 seconds", async () => {
       vi.useFakeTimers()
+      const user = userEvent.setup()
       
       mockUseContentItems.mockReturnValue({
         contentItems: mockContentItems,
@@ -501,6 +509,7 @@ describe("ContentItemsPage", () => {
         createContentItem: vi.fn().mockResolvedValue(undefined),
         updateContentItem: vi.fn(),
         deleteContentItem: vi.fn(),
+        refetch: vi.fn(),
       })
 
       render(<ContentItemsPage />)

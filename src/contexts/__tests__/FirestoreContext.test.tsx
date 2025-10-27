@@ -222,7 +222,7 @@ describe('FirestoreContext', () => {
 
       function TestComponent() {
         const { subscribeToCollection } = useFirestore();
-        const [data, setData] = React.useState<any[]>([]);
+        const [_data, setData] = React.useState<any[]>([]);
 
         React.useEffect(() => {
           // Subscribe twice with same cache key
