@@ -22,8 +22,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (firebaseUser) {
         // Check if user is the owner (single-owner architecture)
+        // Require email verification to prevent unauthorized access
         const ownerEmail = import.meta.env.VITE_OWNER_EMAIL
-        setIsOwner(firebaseUser.email === ownerEmail)
+        setIsOwner(firebaseUser.email === ownerEmail && firebaseUser.emailVerified)
       } else {
         setIsOwner(false)
       }

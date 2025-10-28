@@ -271,10 +271,10 @@ export class FirestoreService {
           hasError = true
           console.error(`Firestore subscription error in ${collectionName}:`, error)
           
-          // Provide empty array on permission errors to prevent crashes
+          // Surface permission-denied errors to avoid masking authorization issues
           if (error.code === 'permission-denied') {
-            console.warn(`Permission denied for ${collectionName}, providing empty data`)
-            onData([])
+            console.warn(`Permission denied for ${collectionName}`)
+            onError(error as Error)
           } else {
             onError(error as Error)
           }
@@ -326,10 +326,10 @@ export class FirestoreService {
           hasError = true
           console.error(`Firestore document subscription error for ${collectionName}/${documentId}:`, error)
           
-          // Provide null on permission errors to prevent crashes
+          // Surface permission errors to avoid masking authorization issues
           if (error.code === 'permission-denied') {
-            console.warn(`Permission denied for ${collectionName}/${documentId}, providing null`)
-            onData(null)
+            console.warn(`Permission denied for ${collectionName}/${documentId}`)
+            onError(error as Error)
           } else {
             onError(error as Error)
           }

@@ -74,7 +74,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       const cached = collectionCache.current.get(key)
       if (cached) {
         // Increment subscriber count
-        cached.subscriberCount = (cached.subscriberCount || 1) + 1
+        cached.subscriberCount = (cached.subscriberCount || 0) + 1
         
         // Return cached data immediately
         onData(cached.data as DocumentWithId<CollectionTypeMap[K]>[])
@@ -83,7 +83,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
         return () => {
           const entry = collectionCache.current.get(key)
           if (entry) {
-            entry.subscriberCount = (entry.subscriberCount || 1) - 1
+            entry.subscriberCount = (entry.subscriberCount || 0) - 1
             
             // Only unsubscribe when no more subscribers
             if (entry.subscriberCount <= 0) {
@@ -163,7 +163,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       const cached = documentCache.current.get(key)
       if (cached) {
         // Increment subscriber count
-        cached.subscriberCount = (cached.subscriberCount || 1) + 1
+        cached.subscriberCount = (cached.subscriberCount || 0) + 1
         
         // Return cached data immediately
         onData(cached.data as DocumentWithId<CollectionTypeMap[K]> | null)
@@ -172,7 +172,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
         return () => {
           const entry = documentCache.current.get(key)
           if (entry) {
-            entry.subscriberCount = (entry.subscriberCount || 1) - 1
+            entry.subscriberCount = (entry.subscriberCount || 0) - 1
             
             // Only unsubscribe when no more subscribers
             if (entry.subscriberCount <= 0) {
@@ -217,7 +217,7 @@ export function FirestoreProvider({ children }: FirestoreProviderProps) {
       return () => {
         const entry = documentCache.current.get(key)
         if (entry) {
-          entry.subscriberCount = (entry.subscriberCount || 1) - 1
+          entry.subscriberCount = (entry.subscriberCount || 0) - 1
           
           // Only unsubscribe when no more subscribers
           if (entry.subscriberCount <= 0) {
