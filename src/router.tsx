@@ -48,11 +48,6 @@ const JobFinderConfigPage = lazy(() =>
     default: m.JobFinderConfigPage,
   }))
 )
-const DocumentHistoryPage = lazy(() =>
-  import("@/pages/document-history/DocumentHistoryPage").then((m) => ({
-    default: m.DocumentHistoryPage,
-  }))
-)
 const UnauthorizedPage = lazy(() =>
   import("@/pages/auth/UnauthorizedPage").then((m) => ({ default: m.UnauthorizedPage }))
 )
@@ -165,7 +160,7 @@ export const router = createBrowserRouter([
 
       // Editor-only protected routes (require editor role)
       {
-        element: <ProtectedRoute requireEditor />,
+        element: <ProtectedRoute requireOwner />,
         children: [
           {
             path: ROUTES.AI_PROMPTS,
@@ -204,14 +199,6 @@ export const router = createBrowserRouter([
             element: (
               <LazyPage>
                 <JobFinderConfigPage />
-              </LazyPage>
-            ),
-          },
-          {
-            path: ROUTES.DOCUMENT_HISTORY,
-            element: (
-              <LazyPage>
-                <DocumentHistoryPage />
               </LazyPage>
             ),
           },

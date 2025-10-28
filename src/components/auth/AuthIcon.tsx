@@ -8,7 +8,7 @@ interface AuthIconProps {
 }
 
 export function AuthIcon({ onClick, className }: AuthIconProps) {
-  const { user, isEditor, loading } = useAuth()
+  const { user, isOwner, loading } = useAuth()
 
   if (loading) {
     return (
@@ -35,10 +35,10 @@ export function AuthIcon({ onClick, className }: AuthIconProps) {
       }
     }
 
-    if (isEditor) {
+    if (isOwner) {
       return {
         icon: <Edit className="w-4 h-4" />,
-        label: "Signed in as Editor - Click for account options",
+        label: "Signed in as Owner - Click for account options",
         bgColor: "bg-primary hover:bg-primary/90",
         iconColor: "text-primary-foreground",
       }

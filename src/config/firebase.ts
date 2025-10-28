@@ -1,6 +1,12 @@
 import { initializeApp, type FirebaseApp } from "firebase/app"
 import { getAuth, type Auth, connectAuthEmulator } from "firebase/auth"
-import { getFirestore, type Firestore, connectFirestoreEmulator } from "firebase/firestore"
+import {
+  type Firestore,
+  connectFirestoreEmulator,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore"
 import { logger } from "@/services/logging"
 
 const firebaseConfig = {
@@ -16,9 +22,16 @@ const firebaseConfig = {
 export const app: FirebaseApp = initializeApp(firebaseConfig)
 export const auth: Auth = getAuth(app)
 
-// Initialize Firestore with database ID if specified
-const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID
-export const db: Firestore = databaseId ? getFirestore(app, databaseId) : getFirestore(app)
+// Initialize Firestore with database ID and modern persistence
+const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID || "portfolio"
+
+// Use modern cache API instead of deprecated enableMultiTabIndexedDbPersistence
+export const db: Firestore = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+  }),
+  ...(databaseId !== "(default)" && { databaseId }),
+})
 
 // Connect to Firebase emulators in development/test environments
 if (import.meta.env.VITE_USE_EMULATORS === "true") {

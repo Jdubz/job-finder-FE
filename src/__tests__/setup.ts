@@ -5,8 +5,32 @@
  */
 
 import { vi, beforeEach, afterEach } from "vitest"
+
+// MUST BE FIRST: Polyfill React.act before any other imports
+// React 19 compatibility - @testing-library/react expects act from react-dom/test-utils
+const actPolyfill = async (callback: () => void | Promise<void>) => {
+  const result = callback()
+  if (result && typeof result === "object" && "then" in result) {
+    await result
+  }
+  await new Promise((resolve) => setTimeout(resolve, 0))
+}
+
+// Mock react-dom/test-utils BEFORE importing anything else
+vi.mock("react-dom/test-utils", () => ({
+  act: actPolyfill,
+}))
+
+// Now safe to import other modules
 import "@testing-library/jest-dom"
 import { setupTestCleanup, logMemoryUsage } from "./test-cleanup"
+
+// Export act globally for React Testing Library (React 19 compatibility)
+interface GlobalWithReactAct {
+  IS_REACT_ACT_ENVIRONMENT: boolean
+}
+
+;(globalThis as unknown as GlobalWithReactAct).IS_REACT_ACT_ENVIRONMENT = true
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
@@ -134,16 +158,6 @@ vi.mock("react-router-dom", async () => {
   }
 })
 
-// Mock React hooks
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react")
-  return {
-    ...actual,
-    useCallback: (fn: unknown) => fn as () => unknown,
-    useMemo: (fn: unknown) => (fn as () => unknown)(),
-  }
-})
-
 // Mock date formatting
 vi.mock("@/utils/date", () => ({
   formatDate: vi.fn((date: Date) => date.toLocaleDateString()),
@@ -226,7 +240,6 @@ vi.mock("@/types/generator", () => ({
   StartGenerationResponse: {},
   ExecuteStepResponse: {},
   GenerationStep: {},
-  DocumentHistoryItem: {},
   UserDefaults: {},
 }))
 

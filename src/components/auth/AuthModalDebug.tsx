@@ -20,7 +20,7 @@ interface AuthModalProps {
 }
 
 export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
-  const { user, isEditor, signOut } = useAuth()
+  const { user, isOwner, signOut } = useAuth()
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [debugInfo, setDebugInfo] = useState<string[]>([])
@@ -254,12 +254,12 @@ export function AuthModalDebug({ open, onOpenChange }: AuthModalProps) {
                   <p className="font-medium mb-1">Signed in as:</p>
                   <p className="text-muted-foreground">{user.email}</p>
                   <p className="text-muted-foreground mt-2">
-                    Role: <span className="font-medium">{isEditor ? "Editor" : "Viewer"}</span>
+                    Role: <span className="font-medium">{isOwner ? "Owner" : "Viewer"}</span>
                   </p>
                 </div>
               </div>
 
-              {!isEditor && (
+              {!isOwner && (
                 <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
                   <Info className="w-4 h-4 inline mr-1" />
                   You have viewer access. Contact an administrator for editor permissions.

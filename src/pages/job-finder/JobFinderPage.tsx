@@ -10,7 +10,7 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 import { QueueStatusTable } from "./components/QueueStatusTable"
 
 export function JobFinderPage() {
-  const { user, isEditor } = useAuth()
+  const { user, isOwner } = useAuth()
   const { submitJob: submitJobToQueue } = useQueueItems()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +50,7 @@ export function JobFinderPage() {
     }
   }
 
-  if (!isEditor) {
+  if (!isOwner) {
     return (
       <div className="space-y-6">
         <div>

@@ -10,7 +10,7 @@ import { Loader2, Save, RotateCcw, Eye } from "lucide-react"
 import { promptsClient, type PromptConfig, DEFAULT_PROMPTS } from "@/api"
 
 export function AIPromptsPage() {
-  const { isEditor, user } = useAuth()
+  const { isOwner, user } = useAuth()
   const [prompts, setPrompts] = useState<PromptConfig>(DEFAULT_PROMPTS)
   const [originalPrompts, setOriginalPrompts] = useState<PromptConfig>(DEFAULT_PROMPTS)
   const [isLoading, setIsLoading] = useState(false)
@@ -126,7 +126,7 @@ export function AIPromptsPage() {
 
   const hasChanges = JSON.stringify(prompts) !== JSON.stringify(originalPrompts)
 
-  if (!isEditor) {
+  if (!isOwner) {
     return (
       <div className="container mx-auto p-6">
         <Alert variant="destructive">

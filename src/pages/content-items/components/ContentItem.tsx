@@ -14,7 +14,7 @@ import { GenericContentEdit } from "./content-types/GenericContentEdit"
 
 interface ContentItemProps {
   item: ContentItemType
-  isEditor: boolean
+  isOwner: boolean
   onUpdate: (id: string, data: UpdateContentItemData) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onAddChild?: (parentId: string, childType: string) => void
@@ -27,7 +27,7 @@ interface ContentItemProps {
  */
 export const ContentItem: React.FC<ContentItemProps> = ({
   item,
-  isEditor,
+  isOwner,
   onUpdate,
   onDelete,
   onAddChild,
@@ -139,7 +139,7 @@ export const ContentItem: React.FC<ContentItemProps> = ({
         {children && <div className="mt-6 space-y-4">{children}</div>}
 
         {/* Editor Actions */}
-        {isEditor && (
+        {isOwner && (
           <div className="flex gap-2 pt-4 border-t">
             <Button type="button" onClick={() => setIsEditing(true)} variant="outline" size="sm">
               Edit

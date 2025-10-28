@@ -39,7 +39,6 @@ const jobFinderLinks: NavLink[] = [
   { to: ROUTES.JOB_FINDER, label: "Job Finder", icon: Briefcase },
   { to: ROUTES.JOB_APPLICATIONS, label: "Job Applications", icon: FileText },
   { to: ROUTES.QUEUE_MANAGEMENT, label: "Queue Management", icon: ListChecks },
-  { to: ROUTES.DOCUMENT_HISTORY, label: "Document History", icon: FolderOpen },
 ]
 
 const systemLinks: NavLink[] = [
@@ -47,7 +46,7 @@ const systemLinks: NavLink[] = [
 ]
 
 export function Navigation() {
-  const { isEditor } = useAuth()
+  const { isOwner } = useAuth()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -106,8 +105,8 @@ export function Navigation() {
                       ))}
                     </div>
 
-                    {/* Editor Tools */}
-                    {isEditor && (
+                    {/* Owner Tools */}
+                    {isOwner && (
                       <>
                         <Separator />
 

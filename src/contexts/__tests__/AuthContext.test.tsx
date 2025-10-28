@@ -23,14 +23,14 @@ vi.mock("@/config/firebase", () => ({
 
 // Mock component to test the context
 const TestComponent = () => {
-  const { user, loading, isEditor, signOut } = useAuth()
+  const { user, loading, isOwner, signOut } = useAuth()
 
   if (loading) return <div>Loading...</div>
 
   return (
     <div>
       <div data-testid="user-email">{user?.email || "No user"}</div>
-      <div data-testid="is-editor">{isEditor ? "Editor" : "Viewer"}</div>
+      <div data-testid="is-editor">{isOwner ? "Owner" : "Viewer"}</div>
       <button onClick={signOut} data-testid="sign-out">
         Sign Out
       </button>
@@ -147,7 +147,7 @@ describe("AuthContext", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("user-email")).toHaveTextContent("editor@example.com")
-        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Owner")
       })
     })
 
@@ -346,7 +346,7 @@ describe("AuthContext", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("user-email")).toHaveTextContent("user@example.com")
-        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Owner")
       })
     })
   })
@@ -378,7 +378,7 @@ describe("AuthContext", () => {
       )
 
       await waitFor(() => {
-        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Owner")
       })
     })
 
@@ -538,7 +538,7 @@ describe("AuthContext", () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByTestId("is-editor")).toHaveTextContent("Editor")
+        expect(screen.getByTestId("is-editor")).toHaveTextContent("Owner")
       })
     })
   })

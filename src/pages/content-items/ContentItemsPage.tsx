@@ -17,7 +17,7 @@ import { ContentItemDialog } from "./components/ContentItemDialog"
 import { logger } from "@/services/logging"
 
 export function ContentItemsPage() {
-  const { isEditor } = useAuth()
+  const { isOwner } = useAuth()
 
   const {
     contentItems,
@@ -427,7 +427,7 @@ export function ContentItemsPage() {
       <ContentItem
         key={`${item.id}-${depth}`}
         item={item}
-        isEditor={isEditor}
+        isOwner={isOwner}
         onUpdate={handleUpdateItem}
         onDelete={handleDeleteItem}
         onAddChild={handleAddChild}
@@ -463,7 +463,7 @@ export function ContentItemsPage() {
               Manage your professional experience and portfolio
             </p>
           </div>
-          {isEditor && (
+          {isOwner && (
             <Button onClick={handleCreateNew}>
               <Plus className="mr-2 h-4 w-4" />
               Add Content
@@ -472,7 +472,7 @@ export function ContentItemsPage() {
         </div>
 
         {/* Actions */}
-        {isEditor && (
+        {isOwner && (
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExportItems}>
               <Download className="mr-2 h-4 w-4" />
@@ -514,11 +514,11 @@ export function ContentItemsPage() {
           <div className="mx-auto max-w-md space-y-3">
             <h3 className="text-lg font-medium">No content yet</h3>
             <p className="text-sm text-muted-foreground">
-              {isEditor
+              {isOwner
                 ? "Add your professional experience to showcase your career history and accomplishments."
                 : "Check back later for content details."}
             </p>
-            {isEditor && (
+            {isOwner && (
               <Button onClick={handleCreateNew} className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Your First Content

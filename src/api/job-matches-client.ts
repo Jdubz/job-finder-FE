@@ -26,7 +26,6 @@ export interface JobMatchFilters {
   minScore?: number
   maxScore?: number
   companyName?: string
-  userId?: string
   limit?: number
 }
 
@@ -49,13 +48,11 @@ export class JobMatchesClient {
   }
 
   /**
-   * Get all job matches for the current user
+   * Get all job matches
+   * Single-owner system - all matches are visible
    */
-  async getMatches(userId: string, filters?: JobMatchFilters): Promise<JobMatch[]> {
+  async getMatches(filters?: JobMatchFilters): Promise<JobMatch[]> {
     let q: Query = collection(db, this.collectionName)
-
-    // Filter by user ID
-    q = query(q, where("submittedBy", "==", userId))
 
     // Apply filters
     if (filters?.minScore !== undefined) {
@@ -96,19 +93,14 @@ export class JobMatchesClient {
 
   /**
    * Subscribe to real-time updates for job matches
+   * Single-owner system - all matches are visible
    */
   subscribeToMatches(
-    userId: string | null,
     callback: (matches: JobMatch[]) => void,
     filters?: JobMatchFilters,
     onError?: (error: Error) => void
   ): Unsubscribe {
     let q: Query = collection(db, this.collectionName)
-
-    // Filter by user ID (if provided - omit for editors to see all)
-    if (userId) {
-      q = query(q, where("submittedBy", "==", userId))
-    }
 
     // Apply filters
     if (filters?.minScore !== undefined) {
@@ -145,16 +137,17 @@ export class JobMatchesClient {
   }
 
   /**
-   * Get match statistics for user
+   * Get match statistics
+   * Single-owner system - gets stats for all matches
    */
-  async getMatchStats(userId: string): Promise<{
+  async getMatchStats(): Promise<{
     total: number
     highPriority: number
     mediumPriority: number
     lowPriority: number
     averageScore: number
   }> {
-    const matches = await this.getMatches(userId)
+    const matches = await this.getMatches()
 
     const stats = {
       total: matches.length,

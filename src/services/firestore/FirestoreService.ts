@@ -246,9 +246,14 @@ export class FirestoreService {
     const q =
       queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
-    return onSnapshot(
+    let hasError = false
+    let unsubscribed = false
+
+    const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
+        if (unsubscribed) return
+        hasError = false // Reset error flag on successful snapshot
         const documents = snapshot.docs.map((doc) => {
           const data = convertTimestamps(doc.data())
           return {
@@ -260,9 +265,28 @@ export class FirestoreService {
         onData(documents)
       },
       (error) => {
-        onError(error as Error)
+        if (unsubscribed) return
+        // Only call error handler once to prevent infinite loops
+        if (!hasError) {
+          hasError = true
+          console.error(`Firestore subscription error in ${collectionName}:`, error)
+
+          // Surface permission-denied errors to avoid masking authorization issues
+          if (error.code === "permission-denied") {
+            console.warn(`Permission denied for ${collectionName}`)
+            onError(error as Error)
+          } else {
+            onError(error as Error)
+          }
+        }
       }
     )
+
+    // Return wrapped unsubscribe to prevent callbacks after unsubscribe
+    return () => {
+      unsubscribed = true
+      unsubscribe()
+    }
   }
 
   /**
@@ -276,9 +300,14 @@ export class FirestoreService {
   ): UnsubscribeFn {
     const docRef = doc(this.db, collectionName, documentId)
 
-    return onSnapshot(
+    let hasError = false
+    let unsubscribed = false
+
+    const unsubscribe = onSnapshot(
       docRef,
       (docSnap) => {
+        if (unsubscribed) return
+        hasError = false // Reset error flag on successful snapshot
         if (!docSnap.exists()) {
           onData(null)
           return
@@ -291,9 +320,31 @@ export class FirestoreService {
         } as DocumentWithId<CollectionTypeMap[K]>)
       },
       (error) => {
-        onError(error as Error)
+        if (unsubscribed) return
+        // Only call error handler once to prevent infinite loops
+        if (!hasError) {
+          hasError = true
+          console.error(
+            `Firestore document subscription error for ${collectionName}/${documentId}:`,
+            error
+          )
+
+          // Surface permission errors to avoid masking authorization issues
+          if (error.code === "permission-denied") {
+            console.warn(`Permission denied for ${collectionName}/${documentId}`)
+            onError(error as Error)
+          } else {
+            onError(error as Error)
+          }
+        }
       }
     )
+
+    // Return wrapped unsubscribe to prevent callbacks after unsubscribe
+    return () => {
+      unsubscribed = true
+      unsubscribe()
+    }
   }
 }
 

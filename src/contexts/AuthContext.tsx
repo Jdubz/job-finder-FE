@@ -5,7 +5,7 @@ import { auth } from "@/config/firebase"
 interface AuthContextType {
   user: User | null
   loading: boolean
-  isEditor: boolean
+  isOwner: boolean
   signOut: () => Promise<void>
 }
 
@@ -14,18 +14,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isEditor, setIsEditor] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
 
       if (firebaseUser) {
-        // Get custom claims to check editor role
-        const tokenResult = await firebaseUser.getIdTokenResult()
-        setIsEditor(tokenResult.claims.role === "editor")
+        // Check if user is the owner (single-owner architecture)
+        // Require email verification to prevent unauthorized access
+        const ownerEmail = import.meta.env.VITE_OWNER_EMAIL
+        setIsOwner(firebaseUser.email === ownerEmail && firebaseUser.emailVerified)
       } else {
-        setIsEditor(false)
+        setIsOwner(false)
       }
 
       setLoading(false)
@@ -37,13 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     await firebaseSignOut(auth)
     setUser(null)
-    setIsEditor(false)
+    setIsOwner(false)
   }
 
   const value = {
     user,
     loading,
-    isEditor,
+    isOwner,
     signOut,
   }
 

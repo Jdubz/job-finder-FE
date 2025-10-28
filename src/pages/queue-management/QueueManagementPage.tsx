@@ -30,7 +30,7 @@ interface QueueFiltersType {
 }
 
 export function QueueManagementPage() {
-  const { user, isEditor } = useAuth()
+  const { user, isOwner } = useAuth()
 
   // Use the queue items hook (will show all items since editors can see all)
   const { queueItems, loading, error, updateQueueItem } = useQueueItems({ limit: 1000 })
@@ -241,7 +241,7 @@ export function QueueManagementPage() {
     )
   }
 
-  if (!isEditor) {
+  if (!isOwner) {
     return (
       <div className="space-y-6">
         <div>
