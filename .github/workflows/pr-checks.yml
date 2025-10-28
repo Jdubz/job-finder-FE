@@ -3,15 +3,19 @@ name: PR Checks
 on:
   pull_request:
     branches:
-      - staging
       - main
 
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
+
+env:
+  NODE_VERSION: '20'
 
 jobs:
-  test:
+  quality-checks:
+    name: Quality Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -21,17 +25,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run TypeScript type checking
-        run: npx tsc --noEmit
-
       - name: Run linting
         run: npm run lint
+
+      - name: Run type checking
+        run: npm run type-check
 
       - name: Check code formatting
         run: npm run format:check
@@ -41,7 +45,7 @@ jobs:
         env:
           CI: true
 
-      - name: Build application
+      - name: Build verification
         run: npm run build
         env:
           VITE_FIREBASE_API_KEY: "demo-api-key"
@@ -50,20 +54,30 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: "demo-project.appspot.com"
           VITE_FIREBASE_MESSAGING_SENDER_ID: "123456789"
           VITE_FIREBASE_APP_ID: "1:123456789:web:abcdef"
+          VITE_FIRESTORE_DATABASE_ID: "portfolio"
           VITE_API_BASE_URL: "http://localhost:5001"
 
-      - name: Comment PR with build size
+      - name: Comment PR with results
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
+        if: always()
         with:
           script: |
             const { execSync } = require('child_process');
             const fs = require('fs');
-            const distSize = execSync('du -sh dist').toString().split('\t')[0];
+            
+            let distSize = 'N/A';
+            try {
+              distSize = execSync('du -sh dist 2>/dev/null').toString().split('\t')[0];
+            } catch (e) {
+              console.log('Could not get dist size');
+            }
 
-            github.rest.issues.createComment({
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ Build successful!\n\n📦 Bundle size: ${distSize}`
+              body: `${emoji} **PR Checks ${status}**\n\n📦 Bundle size: ${distSize}\n\n*Merge when checks pass*`
             });
