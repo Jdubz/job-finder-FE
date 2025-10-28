@@ -6,7 +6,6 @@ import { ROUTES } from "@/types/routes"
 import { LazyPage } from "@/components/common/LazyPage"
 
 // Lazy load pages for code splitting
-const HomePage = lazy(() => import("@/pages/HomePage").then((m) => ({ default: m.HomePage })))
 const HowItWorksPage = lazy(() =>
   import("@/pages/how-it-works/HowItWorksPage").then((m) => ({
     default: m.HowItWorksPage,
@@ -72,14 +71,6 @@ export const router = createBrowserRouter([
       // Public routes
       {
         path: ROUTES.HOME,
-        element: (
-          <LazyPage>
-            <HomePage />
-          </LazyPage>
-        ),
-      },
-      {
-        path: ROUTES.HOW_IT_WORKS,
         element: (
           <LazyPage>
             <HowItWorksPage />

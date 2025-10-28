@@ -23,15 +23,32 @@ export const app: FirebaseApp = initializeApp(firebaseConfig)
 export const auth: Auth = getAuth(app)
 
 // Initialize Firestore with database ID and modern persistence
-const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID || "portfolio"
+const databaseId = import.meta.env.VITE_FIRESTORE_DATABASE_ID
+
+// Log configuration for debugging
+console.log("🔥 Firebase Firestore Configuration:")
+console.log("  - MODE:", import.meta.env.MODE)
+console.log("  - DATABASE_ID env var:", import.meta.env.VITE_FIRESTORE_DATABASE_ID)
+console.log("  - Using database ID:", databaseId || "(default)")
+
+// CRITICAL: Must have databaseId set, or it defaults to (default) which doesn't exist
+if (!databaseId || databaseId === "(default)") {
+  const errorMsg = `CRITICAL ERROR: VITE_FIRESTORE_DATABASE_ID is not set or is "(default)"! This will cause 400 errors.`
+  console.error(errorMsg)
+  throw new Error(errorMsg)
+}
 
 // Use modern cache API instead of deprecated enableMultiTabIndexedDbPersistence
-export const db: Firestore = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-  ...(databaseId !== "(default)" && { databaseId }),
-})
+// Firebase SDK requires databaseId in format: `projects/{project}/databases/{database}`
+export const db: Firestore = initializeFirestore(
+  app,
+  {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  },
+  databaseId
+)
 
 // Connect to Firebase emulators in development/test environments
 if (import.meta.env.VITE_USE_EMULATORS === "true") {

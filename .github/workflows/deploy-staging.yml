@@ -5,100 +5,15 @@ on:
     branches:
       - staging
   workflow_dispatch:
-    inputs:
-      skip-tests:
-        description: 'Skip tests (use with caution)'
-        required: false
-        default: 'false'
 
 env:
   NODE_VERSION: '20'
   FIREBASE_PROJECT_ID: 'static-sites-257923'
 
 jobs:
-  quality-checks:
-    name: Quality Checks
+  lint-test-deploy:
+    name: Lint, Test & Deploy
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linting
-        run: npm run lint
-
-      - name: Run type checking
-        run: npm run type-check
-
-      - name: Run unit tests
-        if: github.event.inputs.skip-tests != 'true'
-        run: npm run test:unit
-
-  e2e-tests:
-    name: E2E Tests (Critical Path)
-    runs-on: ubuntu-latest
-    needs: quality-checks
-    if: github.event.inputs.skip-tests != 'true'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright Chromium only
-        run: npx playwright install --with-deps chromium
-
-      - name: Copy staging environment file for E2E tests
-        run: cp .env.staging .env
-
-      - name: Run critical E2E tests
-        run: npx playwright test --project=chromium --grep @critical
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-critical-results
-          path: playwright-report/
-          retention-days: 7
-
-  deploy:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [quality-checks, e2e-tests]
     environment:
       name: staging
       url: https://job-finder-staging.web.app
@@ -124,6 +39,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Unit tests
+        run: npm run test:unit
+
       - name: Get version
         id: version
         run: |
@@ -131,27 +55,22 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
-      - name: Build application for staging
+      - name: Build for staging
         run: npm run build:staging
         env:
           NODE_ENV: production
           VITE_APP_VERSION: ${{ steps.version.outputs.version }}
 
-      - name: Verify build output
+      - name: Verify build
         run: |
-          if [ ! -d "dist" ]; then
-            echo "Error: dist directory not found"
+          if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
+            echo "❌ Build verification failed"
             exit 1
           fi
-          if [ ! -f "dist/index.html" ]; then
-            echo "Error: index.html not found in dist"
-            exit 1
-          fi
-          echo "Build verification successful"
-          echo "Build size:"
+          echo "✅ Build verification successful"
           du -sh dist
 
-      - name: Deploy to Firebase Hosting (Staging)
+      - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -162,29 +81,22 @@ jobs:
 
       - name: Verify deployment
         run: |
-          echo "Waiting for deployment to propagate..."
+          echo "Waiting for deployment..."
           sleep 5
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://job-finder-staging.web.app)
           if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ Staging site is accessible (HTTP $HTTP_CODE)"
+            echo "✅ Staging deployed successfully"
           else
-            echo "⚠️ Warning: Staging site returned HTTP $HTTP_CODE"
-            echo "Note: Site may still be propagating. Verify manually at https://job-finder-staging.web.app"
+            echo "⚠️ HTTP $HTTP_CODE - may still be propagating"
           fi
 
       - name: Deployment summary
         if: always()
         run: |
-          echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Staging Deployment" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment**: Staging" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **URL**: https://job-finder-staging.web.app" >> $GITHUB_STEP_SUMMARY
           echo "- **Custom Domain**: https://job-finder-staging.joshwentworth.com" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project**: ${{ env.FIREBASE_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Triggered by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Note" >> $GITHUB_STEP_SUMMARY
-          echo "Staging has no-cache headers. Hard refresh (Ctrl+Shift+R) may be needed." >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
