@@ -109,47 +109,61 @@ export class FirestoreService {
 
   /**
    * Get a single document by ID
+   * Returns null if document doesn't exist or on error
    */
   async getDocument<K extends keyof CollectionTypeMap>(
     collectionName: K,
     documentId: string
   ): Promise<DocumentWithId<CollectionTypeMap[K]> | null> {
-    const docRef = doc(this.db, collectionName, documentId)
-    const docSnap = await getDoc(docRef)
+    try {
+      const docRef = doc(this.db, collectionName, documentId)
+      const docSnap = await getDoc(docRef)
 
-    if (!docSnap.exists()) {
+      if (!docSnap.exists()) {
+        return null
+      }
+
+      const data = convertTimestamps(docSnap.data())
+      return {
+        id: docSnap.id,
+        ...data,
+      } as DocumentWithId<CollectionTypeMap[K]>
+    } catch (error) {
+      console.error(`Error getting document from ${String(collectionName)}/${documentId}:`, error)
+      // Return null instead of throwing to prevent UI crashes
       return null
     }
-
-    const data = convertTimestamps(docSnap.data())
-    return {
-      id: docSnap.id,
-      ...data,
-    } as DocumentWithId<CollectionTypeMap[K]>
   }
 
   /**
    * Get multiple documents with optional query constraints
+   * Returns empty array on error to prevent UI crashes
    */
   async getDocuments<K extends keyof CollectionTypeMap>(
     collectionName: K,
     constraints?: QueryConstraints
   ): Promise<DocumentWithId<CollectionTypeMap[K]>[]> {
-    const collectionRef = collection(this.db, collectionName)
-    const queryConstraints = buildQueryConstraints(constraints)
+    try {
+      const collectionRef = collection(this.db, collectionName)
+      const queryConstraints = buildQueryConstraints(constraints)
 
-    const q =
-      queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
+      const q =
+        queryConstraints.length > 0 ? query(collectionRef, ...queryConstraints) : collectionRef
 
-    const querySnapshot = await getDocs(q)
+      const querySnapshot = await getDocs(q)
 
-    return querySnapshot.docs.map((doc) => {
-      const data = convertTimestamps(doc.data())
-      return {
-        id: doc.id,
-        ...data,
-      } as DocumentWithId<CollectionTypeMap[K]>
-    })
+      return querySnapshot.docs.map((doc) => {
+        const data = convertTimestamps(doc.data())
+        return {
+          id: doc.id,
+          ...data,
+        } as DocumentWithId<CollectionTypeMap[K]>
+      })
+    } catch (error) {
+      console.error(`Error getting documents from ${String(collectionName)}:`, error)
+      // Return empty array instead of throwing to prevent UI crashes
+      return []
+    }
   }
 
   /**

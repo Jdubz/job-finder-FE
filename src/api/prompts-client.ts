@@ -92,17 +92,25 @@ export class PromptsClient {
 
   /**
    * Convert Firestore timestamps to Dates
+   * Returns data safely even if conversion fails
    */
   private convertTimestamps(data: Record<string, unknown>): PromptConfig {
-    const converted = { ...data }
-    if (converted.updatedAt instanceof Timestamp) {
-      converted.updatedAt = converted.updatedAt.toDate()
+    try {
+      const converted = { ...data }
+      if (converted.updatedAt instanceof Timestamp) {
+        converted.updatedAt = converted.updatedAt.toDate()
+      }
+      return converted as unknown as PromptConfig
+    } catch (error) {
+      console.error('Error converting timestamps:', error)
+      // Return data as-is if conversion fails
+      return data as unknown as PromptConfig
     }
-    return converted as unknown as PromptConfig
   }
 
   /**
    * Get AI prompts configuration
+   * Returns defaults on any error to prevent UI crashes
    */
   async getPrompts(): Promise<PromptConfig> {
     try {
@@ -116,8 +124,10 @@ export class PromptsClient {
 
       return this.convertTimestamps(docSnap.data())
     } catch (error) {
-      console.error("Error fetching prompts:", error)
-      throw new Error("Failed to load AI prompts")
+      // Log error but return defaults instead of throwing
+      // This prevents UI crashes and infinite error loops
+      console.error("Error fetching prompts, using defaults:", error)
+      return DEFAULT_PROMPTS
     }
   }
 

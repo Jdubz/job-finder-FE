@@ -22,24 +22,43 @@ export function AIPromptsPage() {
 
   // Load prompts from Firestore on mount
   useEffect(() => {
-    loadPrompts()
-  }, [])
+    let mounted = true
 
-  const loadPrompts = async () => {
-    setIsLoading(true)
-    setError(null)
+    const loadPrompts = async () => {
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      const loadedPrompts = await promptsClient.getPrompts()
-      setPrompts(loadedPrompts)
-      setOriginalPrompts(loadedPrompts)
-    } catch (err) {
-      setError("Failed to load AI prompts")
-      console.error("Error loading prompts:", err)
-    } finally {
-      setIsLoading(false)
+      try {
+        const loadedPrompts = await promptsClient.getPrompts()
+        
+        // Only update state if component is still mounted
+        if (mounted) {
+          setPrompts(loadedPrompts)
+          setOriginalPrompts(loadedPrompts)
+        }
+      } catch (err) {
+        // Graceful error handling - don't crash the UI
+        if (mounted) {
+          setError("Unable to load prompts. Using defaults.")
+          console.error("Error loading prompts:", err)
+          // Set defaults on error
+          setPrompts(DEFAULT_PROMPTS)
+          setOriginalPrompts(DEFAULT_PROMPTS)
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
     }
-  }
+
+    loadPrompts()
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      mounted = false
+    }
+  }, []) // Empty dependency array - only run once on mount
 
   const handleSave = async () => {
     if (!user?.email) {

@@ -14,14 +14,32 @@ import { promptsClient, DEFAULT_PROMPTS } from "../prompts-client"
 import { getDoc, setDoc } from "firebase/firestore"
 
 // Mock Firebase
-vi.mock("firebase/firestore", () => ({
-  doc: vi.fn(),
-  getDoc: vi.fn(),
-  setDoc: vi.fn(),
-  Timestamp: {
-    fromDate: (date: Date) => ({ seconds: date.getTime() / 1000, nanoseconds: 0 }),
-  },
-}))
+vi.mock("firebase/firestore", () => {
+  class MockTimestamp {
+    seconds: number
+    nanoseconds: number
+    
+    constructor(seconds: number, nanoseconds: number) {
+      this.seconds = seconds
+      this.nanoseconds = nanoseconds
+    }
+    
+    toDate() {
+      return new Date(this.seconds * 1000)
+    }
+    
+    static fromDate(date: Date) {
+      return new MockTimestamp(date.getTime() / 1000, 0)
+    }
+  }
+  
+  return {
+    doc: vi.fn(),
+    getDoc: vi.fn(),
+    setDoc: vi.fn(),
+    Timestamp: MockTimestamp,
+  }
+})
 
 vi.mock("@/config/firebase", () => ({
   db: {},
@@ -91,10 +109,28 @@ describe("Prompts Client", () => {
       expect(prompts.updatedBy).toBe("admin@example.com")
     })
 
-    it("should handle fetch errors", async () => {
+    it("should return defaults on fetch errors without crashing UI", async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       vi.mocked(getDoc).mockRejectedValue(new Error("Network error"))
 
-      await expect(promptsClient.getPrompts()).rejects.toThrow("Failed to load AI prompts")
+      // Should NOT throw - must return defaults to prevent UI crash
+      const prompts = await promptsClient.getPrompts()
+      
+      expect(prompts).toEqual(DEFAULT_PROMPTS)
+      expect(consoleErrorSpy).toHaveBeenCalled()
+      consoleErrorSpy.mockRestore()
+    })
+
+    it("should return defaults on permission errors without crashing UI", async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      vi.mocked(getDoc).mockRejectedValue(new Error("Missing or insufficient permissions"))
+
+      // Should NOT throw - must return defaults to prevent UI crash
+      const prompts = await promptsClient.getPrompts()
+      
+      expect(prompts).toEqual(DEFAULT_PROMPTS)
+      expect(consoleErrorSpy).toHaveBeenCalled()
+      consoleErrorSpy.mockRestore()
     })
 
     it("should query correct Firestore path", async () => {
@@ -419,21 +455,25 @@ describe("Prompts Client", () => {
   })
 
   describe("Error Handling", () => {
-    it("should handle malformed Firestore data", async () => {
+    it("should return defaults on malformed Firestore data", async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
         data: () => ({
           resumeGeneration: "test",
-          // Missing other required fields
+          // Missing other required fields - this is malformed
         }),
       } as any)
 
+      // Should return defaults on any error, including malformed data
       const prompts = await promptsClient.getPrompts()
 
-      expect(prompts.resumeGeneration).toBe("test")
+      // New behavior: returns defaults on error instead of partial data
+      expect(prompts).toEqual(DEFAULT_PROMPTS)
+      consoleErrorSpy.mockRestore()
     })
 
-    it("should handle null updatedAt", async () => {
+    it("should handle null updatedAt gracefully", async () => {
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
         data: () => ({
@@ -444,7 +484,7 @@ describe("Prompts Client", () => {
 
       const prompts = await promptsClient.getPrompts()
 
-      expect(prompts.updatedAt).toBeNull()
+      expect(prompts.updatedAt).toBeUndefined()
     })
   })
 
@@ -460,11 +500,21 @@ describe("Prompts Client", () => {
       vi.mocked(setDoc).mockResolvedValue(undefined)
       await promptsClient.savePrompts(customPrompts, mockUserEmail)
 
+      // Mock successful load with all required data and proper Timestamp
+      const mockTimestamp = {
+        toDate: () => new Date(),
+        seconds: Date.now() / 1000,
+        nanoseconds: 0,
+      }
+      
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
         data: () => ({
-          ...customPrompts,
-          updatedAt: new Date(),
+          resumeGeneration: customPrompts.resumeGeneration,
+          coverLetterGeneration: customPrompts.coverLetterGeneration,
+          jobScraping: customPrompts.jobScraping,
+          jobMatching: customPrompts.jobMatching,
+          updatedAt: mockTimestamp,
           updatedBy: mockUserEmail,
         }),
       } as any)
@@ -472,6 +522,9 @@ describe("Prompts Client", () => {
       const loaded = await promptsClient.getPrompts()
 
       expect(loaded.resumeGeneration).toBe(customPrompts.resumeGeneration)
+      expect(loaded.coverLetterGeneration).toBe(customPrompts.coverLetterGeneration)
+      expect(loaded.jobScraping).toBe(customPrompts.jobScraping)
+      expect(loaded.jobMatching).toBe(customPrompts.jobMatching)
       expect(loaded.updatedBy).toBe(mockUserEmail)
     })
 
