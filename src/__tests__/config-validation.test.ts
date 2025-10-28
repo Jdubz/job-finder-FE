@@ -171,8 +171,8 @@ describe("Environment Configuration Validation", () => {
       console.log("AUTH_DOMAIN:", envVars.VITE_FIREBASE_AUTH_DOMAIN)
       console.log("===================================\n")
 
-      // Always pass, this is just for logging
-      expect(true).toBe(true)
+      // Verify we have a valid mode
+      expect(envVars.MODE).toBeDefined()
     })
   })
 })
@@ -188,7 +188,8 @@ describe("Deployment Checklist Validation", () => {
       console.log("   - Mode:", mode)
     }
 
-    expect(true).toBe(true)
+    // Verify mode is a valid value
+    expect(["test", "development", "staging", "production"]).toContain(mode)
   })
 
   it("should have correct build command for production", () => {
@@ -201,6 +202,7 @@ describe("Deployment Checklist Validation", () => {
       console.log("   - Mode:", mode)
     }
 
-    expect(true).toBe(true)
+    // Verify mode is a valid value
+    expect(["test", "development", "staging", "production"]).toContain(mode)
   })
 })
