@@ -71,6 +71,7 @@ export function useQueueItems(options: UseQueueItemsOptions = {}): UseQueueItems
         company_name: companyName || "",
         company_id: null,
         source: "user_submission",
+        submitted_by: null,
         retry_count: 0,
         max_retries: 3, // Default from BE
         created_at: now,
