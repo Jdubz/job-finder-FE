@@ -102,26 +102,18 @@ describe("Environment Configuration Validation", () => {
     it("should use the correct Firebase project", () => {
       const mode = envVars.MODE
 
-      // Skip in test mode (uses demo project)
-      if (mode === "test") {
-        expect(true).toBe(true)
-        return
+      if (mode !== "test") {
+        expect(envVars.VITE_FIREBASE_PROJECT_ID).toBe("static-sites-257923")
       }
-
-      expect(envVars.VITE_FIREBASE_PROJECT_ID).toBe("static-sites-257923")
     })
 
     it("should have matching auth domain", () => {
       const mode = envVars.MODE
       const authDomain = envVars.VITE_FIREBASE_AUTH_DOMAIN
 
-      // Skip in test mode (uses localhost)
-      if (mode === "test") {
-        expect(true).toBe(true)
-        return
+      if (mode !== "test") {
+        expect(authDomain, "Auth domain should match the project").toContain("static-sites-257923")
       }
-
-      expect(authDomain, "Auth domain should match the project").toContain("static-sites-257923")
     })
   })
 
