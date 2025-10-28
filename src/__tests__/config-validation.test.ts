@@ -1,9 +1,9 @@
 /**
  * Configuration Validation Tests
- * 
+ *
  * These tests verify that all environment-specific configurations are correct.
  * They prevent deployment of misconfigured builds by catching issues at build time.
- * 
+ *
  * This test file is critical for preventing the common issue where staging
  * builds are deployed with wrong database configurations.
  */
@@ -30,10 +30,19 @@ describe("Environment Configuration Validation", () => {
   describe("Required Environment Variables", () => {
     it("should have all required Firebase config variables defined", () => {
       expect(envVars.VITE_FIREBASE_API_KEY, "VITE_FIREBASE_API_KEY is required").toBeDefined()
-      expect(envVars.VITE_FIREBASE_AUTH_DOMAIN, "VITE_FIREBASE_AUTH_DOMAIN is required").toBeDefined()
+      expect(
+        envVars.VITE_FIREBASE_AUTH_DOMAIN,
+        "VITE_FIREBASE_AUTH_DOMAIN is required"
+      ).toBeDefined()
       expect(envVars.VITE_FIREBASE_PROJECT_ID, "VITE_FIREBASE_PROJECT_ID is required").toBeDefined()
-      expect(envVars.VITE_FIREBASE_STORAGE_BUCKET, "VITE_FIREBASE_STORAGE_BUCKET is required").toBeDefined()
-      expect(envVars.VITE_FIREBASE_MESSAGING_SENDER_ID, "VITE_FIREBASE_MESSAGING_SENDER_ID is required").toBeDefined()
+      expect(
+        envVars.VITE_FIREBASE_STORAGE_BUCKET,
+        "VITE_FIREBASE_STORAGE_BUCKET is required"
+      ).toBeDefined()
+      expect(
+        envVars.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        "VITE_FIREBASE_MESSAGING_SENDER_ID is required"
+      ).toBeDefined()
       expect(envVars.VITE_FIREBASE_APP_ID, "VITE_FIREBASE_APP_ID is required").toBeDefined()
     })
 
@@ -63,10 +72,7 @@ describe("Environment Configuration Validation", () => {
         "❌ CRITICAL: Database ID cannot be '(default)'. Use 'portfolio-staging' or 'portfolio'."
       ).not.toBe("(default)")
 
-      expect(
-        databaseId,
-        "❌ CRITICAL: Database ID cannot be empty string."
-      ).not.toBe("")
+      expect(databaseId, "❌ CRITICAL: Database ID cannot be empty string.").not.toBe("")
     })
 
     it("should use correct database for staging builds", () => {
@@ -74,10 +80,9 @@ describe("Environment Configuration Validation", () => {
       const databaseId = envVars.VITE_FIRESTORE_DATABASE_ID
 
       if (mode === "staging") {
-        expect(
-          databaseId,
-          "❌ STAGING BUILD ERROR: Must use 'portfolio-staging' database"
-        ).toBe("portfolio-staging")
+        expect(databaseId, "❌ STAGING BUILD ERROR: Must use 'portfolio-staging' database").toBe(
+          "portfolio-staging"
+        )
       }
     })
 
@@ -86,10 +91,9 @@ describe("Environment Configuration Validation", () => {
       const databaseId = envVars.VITE_FIRESTORE_DATABASE_ID
 
       if (mode === "production") {
-        expect(
-          databaseId,
-          "❌ PRODUCTION BUILD ERROR: Must use 'portfolio' database"
-        ).toBe("portfolio")
+        expect(databaseId, "❌ PRODUCTION BUILD ERROR: Must use 'portfolio' database").toBe(
+          "portfolio"
+        )
       }
     })
   })
@@ -97,30 +101,27 @@ describe("Environment Configuration Validation", () => {
   describe("Project Configuration", () => {
     it("should use the correct Firebase project", () => {
       const mode = envVars.MODE
-      
+
       // Skip in test mode (uses demo project)
       if (mode === "test") {
         expect(true).toBe(true)
         return
       }
-      
+
       expect(envVars.VITE_FIREBASE_PROJECT_ID).toBe("static-sites-257923")
     })
 
     it("should have matching auth domain", () => {
       const mode = envVars.MODE
       const authDomain = envVars.VITE_FIREBASE_AUTH_DOMAIN
-      
+
       // Skip in test mode (uses localhost)
       if (mode === "test") {
         expect(true).toBe(true)
         return
       }
-      
-      expect(
-        authDomain,
-        "Auth domain should match the project"
-      ).toContain("static-sites-257923")
+
+      expect(authDomain, "Auth domain should match the project").toContain("static-sites-257923")
     })
   })
 
@@ -179,27 +180,27 @@ describe("Environment Configuration Validation", () => {
 describe("Deployment Checklist Validation", () => {
   it("should have correct build command for staging", () => {
     const mode = import.meta.env.MODE
-    
+
     if (mode === "staging") {
       console.log("\n✅ Staging Build Checklist:")
       console.log("   - Build command should be: npm run build:staging")
       console.log("   - Database: portfolio-staging")
       console.log("   - Mode:", mode)
     }
-    
+
     expect(true).toBe(true)
   })
 
   it("should have correct build command for production", () => {
     const mode = import.meta.env.MODE
-    
+
     if (mode === "production") {
       console.log("\n✅ Production Build Checklist:")
       console.log("   - Build command should be: npm run build:production")
       console.log("   - Database: portfolio")
       console.log("   - Mode:", mode)
     }
-    
+
     expect(true).toBe(true)
   })
 })
