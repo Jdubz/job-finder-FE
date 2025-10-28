@@ -7,8 +7,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { db } from "@/config/firebase"
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore"
+import { contentItemsClient } from "@/api"
 import type {
   ContentItem,
   ContentItemType,
@@ -90,32 +89,28 @@ export function ContentItemDialogV2({
       const baseData = {
         type,
         visibility,
-        updatedAt: serverTimestamp(),
-        updatedBy: user.uid,
       }
 
       if (item) {
-        // Update existing item
+        // Update existing item using client
         const updateData = {
           ...baseData,
           ...formData,
         }
 
-        await updateDoc(doc(db, "content-items", item.id), updateData)
+        await contentItemsClient.updateContentItem(item.id, user.uid, updateData as any)
 
         await logger.info("database", "completed", `Updated content item: ${item.id}`, {
           details: { itemType: type, itemId: item.id },
         })
       } else {
-        // Create new item
+        // Create new item using client
         const createData = {
           ...baseData,
           ...formData,
-          createdAt: serverTimestamp(),
-          createdBy: user.uid,
-        } as Record<string, unknown>
+        }
 
-        await addDoc(collection(db, "content-items"), createData)
+        await contentItemsClient.createContentItem(user.uid, createData as any)
 
         await logger.info("database", "completed", `Created content item: ${type}`, {
           details: { itemType: type },
