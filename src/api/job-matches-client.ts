@@ -2,24 +2,11 @@
  * Job Matches API Client
  *
  * Handles querying job matches from Firestore.
- * Uses Firestore SDK directly for real-time updates.
+ * Uses FirestoreService for consistent data access.
  */
 
-import { db } from "@/config/firebase"
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-  getDoc,
-  doc,
-  onSnapshot,
-  type Query,
-  type Unsubscribe,
-  Timestamp,
-} from "firebase/firestore"
+import { firestoreService } from "@/services/firestore"
+import type { QueryConstraints, UnsubscribeFn } from "@/services/firestore/types"
 import type { JobMatch } from "@jsdubzw/job-finder-shared-types"
 
 export interface JobMatchFilters {
@@ -30,21 +17,48 @@ export interface JobMatchFilters {
 }
 
 export class JobMatchesClient {
-  private collectionName = "job-matches"
+  private collectionName = "job-matches" as const
 
   /**
-   * Convert Firestore document to JobMatch
+   * Build query constraints from filters
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private convertDoc(docData: any): JobMatch {
-    return {
-      ...docData,
-      id: docData.id,
-      analyzedAt:
-        docData.analyzedAt instanceof Timestamp ? docData.analyzedAt.toDate() : docData.analyzedAt,
-      createdAt:
-        docData.createdAt instanceof Timestamp ? docData.createdAt.toDate() : docData.createdAt,
-    } as JobMatch
+  private buildConstraints(filters?: JobMatchFilters): QueryConstraints {
+    const constraints: QueryConstraints = {
+      where: [],
+      orderBy: [],
+    }
+
+    // Apply score filters
+    if (filters?.minScore !== undefined) {
+      constraints.where!.push({
+        field: "matchScore",
+        operator: ">=",
+        value: filters.minScore,
+      })
+    }
+    if (filters?.maxScore !== undefined) {
+      constraints.where!.push({
+        field: "matchScore",
+        operator: "<=",
+        value: filters.maxScore,
+      })
+    }
+
+    // Apply company filter
+    if (filters?.companyName) {
+      constraints.where!.push({
+        field: "companyName",
+        operator: "==",
+        value: filters.companyName,
+      })
+    }
+
+    // Apply limit
+    if (filters?.limit) {
+      constraints.limit = filters.limit
+    }
+
+    return constraints
   }
 
   /**
@@ -52,43 +66,22 @@ export class JobMatchesClient {
    * Single-owner system - all matches are visible
    */
   async getMatches(filters?: JobMatchFilters): Promise<JobMatch[]> {
-    let q: Query = collection(db, this.collectionName)
+    const constraints = this.buildConstraints(filters)
 
-    // Apply filters
-    if (filters?.minScore !== undefined) {
-      q = query(q, where("matchScore", ">=", filters.minScore))
-    }
-    if (filters?.maxScore !== undefined) {
-      q = query(q, where("matchScore", "<=", filters.maxScore))
-    }
-    if (filters?.companyName) {
-      q = query(q, where("companyName", "==", filters.companyName))
-    }
+    // Order by match score (highest first) for getMatches
+    constraints.orderBy = [{ field: "matchScore", direction: "desc" }]
 
-    // Order by match score (highest first)
-    q = query(q, orderBy("matchScore", "desc"))
-
-    // Apply limit
-    if (filters?.limit) {
-      q = query(q, limit(filters.limit))
-    }
-
-    const snapshot = await getDocs(q)
-    return snapshot.docs.map((doc) => this.convertDoc({ id: doc.id, ...doc.data() }))
+    return (await firestoreService.getDocuments(
+      this.collectionName,
+      constraints
+    )) as unknown as JobMatch[]
   }
 
   /**
    * Get a specific job match by ID
    */
   async getMatch(matchId: string): Promise<JobMatch | null> {
-    const docRef = doc(db, this.collectionName, matchId)
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return null
-    }
-
-    return this.convertDoc({ id: docSnap.id, ...docSnap.data() })
+    return (await firestoreService.getDocument(this.collectionName, matchId)) as JobMatch | null
   }
 
   /**
@@ -99,40 +92,17 @@ export class JobMatchesClient {
     callback: (matches: JobMatch[]) => void,
     filters?: JobMatchFilters,
     onError?: (error: Error) => void
-  ): Unsubscribe {
-    let q: Query = collection(db, this.collectionName)
+  ): UnsubscribeFn {
+    const constraints = this.buildConstraints(filters)
 
-    // Apply filters
-    if (filters?.minScore !== undefined) {
-      q = query(q, where("matchScore", ">=", filters.minScore))
-    }
-    if (filters?.maxScore !== undefined) {
-      q = query(q, where("matchScore", "<=", filters.maxScore))
-    }
-    if (filters?.companyName) {
-      q = query(q, where("companyName", "==", filters.companyName))
-    }
+    // Order by creation time (newest first) for subscriptions
+    constraints.orderBy = [{ field: "createdAt", direction: "desc" }]
 
-    // Order by creation time (newest first)
-    q = query(q, orderBy("createdAt", "desc"))
-
-    // Apply limit
-    if (filters?.limit) {
-      q = query(q, limit(filters.limit))
-    }
-
-    return onSnapshot(
-      q,
-      (snapshot) => {
-        const matches = snapshot.docs.map((doc) => this.convertDoc({ id: doc.id, ...doc.data() }))
-        callback(matches)
-      },
-      (error) => {
-        console.error("Error fetching job matches:", error)
-        if (onError) {
-          onError(error as Error)
-        }
-      }
+    return firestoreService.subscribeToCollection(
+      this.collectionName,
+      (matches) => callback(matches as unknown as JobMatch[]),
+      onError || ((error) => console.error("Error fetching job matches:", error)),
+      constraints
     )
   }
 
