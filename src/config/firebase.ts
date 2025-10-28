@@ -38,13 +38,17 @@ if (!databaseId || databaseId === "(default)") {
   throw new Error(errorMsg)
 }
 
-// Use modern cache API instead of deprecated enableMultiTabIndexedDbPersistence  
+// Use modern cache API instead of deprecated enableMultiTabIndexedDbPersistence
 // Firebase SDK requires databaseId in format: `projects/{project}/databases/{database}`
-export const db: Firestore = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-}, databaseId)
+export const db: Firestore = initializeFirestore(
+  app,
+  {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  },
+  databaseId
+)
 
 // Connect to Firebase emulators in development/test environments
 if (import.meta.env.VITE_USE_EMULATORS === "true") {
