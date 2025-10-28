@@ -5,8 +5,8 @@
  * Manages prompt templates for resume generation, cover letters, job scraping, and matching.
  */
 
-import { db } from "@/config/firebase"
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore"
+import { firestoreService } from "@/services/firestore"
+import { createUpdateMetadata } from "@/services/firestore/utils"
 
 export interface PromptConfig {
   resumeGeneration: string
@@ -87,48 +87,18 @@ Provide:
 }
 
 export class PromptsClient {
-  private collectionName = "job-finder-config"
+  private collectionName = "job-finder-config" as const
   private documentId = "ai-prompts"
-
-  /**
-   * Convert Firestore timestamps to Dates
-   * Returns data safely even if conversion fails
-   */
-  private convertTimestamps(data: Record<string, unknown>): PromptConfig {
-    try {
-      const converted = { ...data }
-      if (converted.updatedAt instanceof Timestamp) {
-        converted.updatedAt = converted.updatedAt.toDate()
-      }
-      return converted as unknown as PromptConfig
-    } catch (error) {
-      console.error("Error converting timestamps:", error)
-      // Return data as-is if conversion fails
-      return data as unknown as PromptConfig
-    }
-  }
 
   /**
    * Get AI prompts configuration
    * Returns defaults on any error to prevent UI crashes
    */
   async getPrompts(): Promise<PromptConfig> {
-    try {
-      const docRef = doc(db, this.collectionName, this.documentId)
-      const docSnap = await getDoc(docRef)
+    const result = await firestoreService.getDocument(this.collectionName, this.documentId)
 
-      if (!docSnap.exists()) {
-        // Return defaults if no custom prompts exist
-        return DEFAULT_PROMPTS
-      }
-
-      return this.convertTimestamps(docSnap.data())
-    } catch (error) {
-      // Log error but return defaults instead of throwing
-      // This prevents UI crashes and infinite error loops
-      console.error("Error fetching prompts, using defaults:", error)
-      return DEFAULT_PROMPTS
-    }
+    // Return defaults if document doesn't exist or on error
+    return (result as PromptConfig) ?? DEFAULT_PROMPTS
   }
 
   /**
@@ -139,15 +109,10 @@ export class PromptsClient {
     userEmail: string
   ): Promise<void> {
     try {
-      const docRef = doc(db, this.collectionName, this.documentId)
-
-      const data = {
+      await firestoreService.setDocument(this.collectionName, this.documentId, {
         ...prompts,
-        updatedAt: new Date(),
-        updatedBy: userEmail,
-      }
-
-      await setDoc(docRef, data)
+        ...createUpdateMetadata(userEmail),
+      } as any)
     } catch (error) {
       console.error("Error saving prompts:", error)
       throw new Error("Failed to save AI prompts")

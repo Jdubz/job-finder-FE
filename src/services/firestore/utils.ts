@@ -25,7 +25,13 @@ export function convertTimestamps<T>(data: Record<string, unknown>): T {
     const value = result[key]
 
     // Check if value is a Timestamp (either real or has toDate method)
-    if (value instanceof Timestamp || (value && typeof value === "object" && "toDate" in value && typeof (value as any).toDate === "function")) {
+    if (
+      value instanceof Timestamp ||
+      (value &&
+        typeof value === "object" &&
+        "toDate" in value &&
+        typeof (value as any).toDate === "function")
+    ) {
       // Convert Timestamp to Date
       result[key] = (value as Timestamp).toDate()
     } else if (value && typeof value === "object" && !Array.isArray(value)) {
