@@ -112,7 +112,7 @@ export class PromptsClient {
       await firestoreService.setDocument(this.collectionName, this.documentId, {
         ...prompts,
         ...createUpdateMetadata(userEmail),
-      } as any)
+      })
     } catch (error) {
       console.error("Error saving prompts:", error)
       throw new Error("Failed to save AI prompts")

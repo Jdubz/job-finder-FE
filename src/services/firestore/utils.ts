@@ -30,7 +30,7 @@ export function convertTimestamps<T>(data: Record<string, unknown>): T {
       (value &&
         typeof value === "object" &&
         "toDate" in value &&
-        typeof (value as any).toDate === "function")
+        typeof (value as { toDate?: unknown }).toDate === "function")
     ) {
       // Convert Timestamp to Date
       result[key] = (value as Timestamp).toDate()
