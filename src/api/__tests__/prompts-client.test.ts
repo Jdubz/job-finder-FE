@@ -18,21 +18,21 @@ vi.mock("firebase/firestore", () => {
   class MockTimestamp {
     seconds: number
     nanoseconds: number
-    
+
     constructor(seconds: number, nanoseconds: number) {
       this.seconds = seconds
       this.nanoseconds = nanoseconds
     }
-    
+
     toDate() {
       return new Date(this.seconds * 1000)
     }
-    
+
     static fromDate(date: Date) {
       return new MockTimestamp(date.getTime() / 1000, 0)
     }
   }
-  
+
   return {
     doc: vi.fn(),
     getDoc: vi.fn(),
@@ -110,24 +110,24 @@ describe("Prompts Client", () => {
     })
 
     it("should return defaults on fetch errors without crashing UI", async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       vi.mocked(getDoc).mockRejectedValue(new Error("Network error"))
 
       // Should NOT throw - must return defaults to prevent UI crash
       const prompts = await promptsClient.getPrompts()
-      
+
       expect(prompts).toEqual(DEFAULT_PROMPTS)
       expect(consoleErrorSpy).toHaveBeenCalled()
       consoleErrorSpy.mockRestore()
     })
 
     it("should return defaults on permission errors without crashing UI", async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       vi.mocked(getDoc).mockRejectedValue(new Error("Missing or insufficient permissions"))
 
       // Should NOT throw - must return defaults to prevent UI crash
       const prompts = await promptsClient.getPrompts()
-      
+
       expect(prompts).toEqual(DEFAULT_PROMPTS)
       expect(consoleErrorSpy).toHaveBeenCalled()
       consoleErrorSpy.mockRestore()
@@ -456,7 +456,7 @@ describe("Prompts Client", () => {
 
   describe("Error Handling", () => {
     it("should return defaults on malformed Firestore data", async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
         data: () => ({
@@ -506,7 +506,7 @@ describe("Prompts Client", () => {
         seconds: Date.now() / 1000,
         nanoseconds: 0,
       }
-      
+
       vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
         data: () => ({

@@ -102,7 +102,7 @@ export class PromptsClient {
       }
       return converted as unknown as PromptConfig
     } catch (error) {
-      console.error('Error converting timestamps:', error)
+      console.error("Error converting timestamps:", error)
       // Return data as-is if conversion fails
       return data as unknown as PromptConfig
     }

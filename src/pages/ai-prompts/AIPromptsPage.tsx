@@ -30,7 +30,7 @@ export function AIPromptsPage() {
 
       try {
         const loadedPrompts = await promptsClient.getPrompts()
-        
+
         // Only update state if component is still mounted
         if (mounted) {
           setPrompts(loadedPrompts)
