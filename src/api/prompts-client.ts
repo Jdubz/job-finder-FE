@@ -98,7 +98,7 @@ export class PromptsClient {
     const result = await firestoreService.getDocument(this.collectionName, this.documentId)
 
     // Return defaults if document doesn't exist or on error
-    return (result as PromptConfig) ?? DEFAULT_PROMPTS
+    return (result as unknown as PromptConfig) ?? DEFAULT_PROMPTS
   }
 
   /**

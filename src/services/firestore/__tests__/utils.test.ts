@@ -19,7 +19,7 @@ describe("Firestore Utils", () => {
         toDate: () => new Date("2024-01-01"),
       } as Timestamp
 
-      const result = convertTimestamps({ updatedAt: mockTimestamp })
+      const result = convertTimestamps<{ updatedAt: Date }>({ updatedAt: mockTimestamp })
 
       expect(result.updatedAt).toBeInstanceOf(Date)
       expect(result.updatedAt).toEqual(new Date("2024-01-01"))
@@ -30,7 +30,7 @@ describe("Firestore Utils", () => {
         toDate: () => new Date("2024-01-01"),
       } as Timestamp
 
-      const result = convertTimestamps({
+      const result = convertTimestamps<{ nested: { timestamp: Date } }>({
         nested: {
           timestamp: mockTimestamp,
         },
@@ -44,7 +44,7 @@ describe("Firestore Utils", () => {
         toDate: () => new Date("2024-01-01"),
       } as Timestamp
 
-      const result = convertTimestamps({
+      const result = convertTimestamps<{ items: Array<{ timestamp: Date }> }>({
         items: [{ timestamp: mockTimestamp }],
       })
 
@@ -52,7 +52,12 @@ describe("Firestore Utils", () => {
     })
 
     it("should handle non-Timestamp values", () => {
-      const result = convertTimestamps({
+      const result = convertTimestamps<{
+        string: string
+        number: number
+        boolean: boolean
+        null: null
+      }>({
         string: "test",
         number: 123,
         boolean: true,
