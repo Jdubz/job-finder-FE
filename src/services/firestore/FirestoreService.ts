@@ -248,7 +248,7 @@ export class FirestoreService {
 
     let hasError = false
     let unsubscribed = false
-    
+
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -270,9 +270,9 @@ export class FirestoreService {
         if (!hasError) {
           hasError = true
           console.error(`Firestore subscription error in ${collectionName}:`, error)
-          
+
           // Surface permission-denied errors to avoid masking authorization issues
-          if (error.code === 'permission-denied') {
+          if (error.code === "permission-denied") {
             console.warn(`Permission denied for ${collectionName}`)
             onError(error as Error)
           } else {
@@ -281,7 +281,7 @@ export class FirestoreService {
         }
       }
     )
-    
+
     // Return wrapped unsubscribe to prevent callbacks after unsubscribe
     return () => {
       unsubscribed = true
@@ -299,7 +299,7 @@ export class FirestoreService {
     onError: ErrorCallback
   ): UnsubscribeFn {
     const docRef = doc(this.db, collectionName, documentId)
-    
+
     let hasError = false
     let unsubscribed = false
 
@@ -324,10 +324,13 @@ export class FirestoreService {
         // Only call error handler once to prevent infinite loops
         if (!hasError) {
           hasError = true
-          console.error(`Firestore document subscription error for ${collectionName}/${documentId}:`, error)
-          
+          console.error(
+            `Firestore document subscription error for ${collectionName}/${documentId}:`,
+            error
+          )
+
           // Surface permission errors to avoid masking authorization issues
-          if (error.code === 'permission-denied') {
+          if (error.code === "permission-denied") {
             console.warn(`Permission denied for ${collectionName}/${documentId}`)
             onError(error as Error)
           } else {
@@ -336,7 +339,7 @@ export class FirestoreService {
         }
       }
     )
-    
+
     // Return wrapped unsubscribe to prevent callbacks after unsubscribe
     return () => {
       unsubscribed = true

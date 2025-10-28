@@ -272,192 +272,192 @@ export function DocumentBuilderPage() {
       </div>
 
       <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generate Document</CardTitle>
-              <CardDescription>Create a customized resume or cover letter using AI</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {alert && (
-                <Alert variant={alert.type === "error" ? "destructive" : "default"}>
-                  <AlertDescription>{alert.message}</AlertDescription>
-                </Alert>
-              )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Generate Document</CardTitle>
+            <CardDescription>Create a customized resume or cover letter using AI</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {alert && (
+              <Alert variant={alert.type === "error" ? "destructive" : "default"}>
+                <AlertDescription>{alert.message}</AlertDescription>
+              </Alert>
+            )}
 
-              {/* Document Type Selection */}
-              <div className="space-y-2">
-                <Label>Document Type</Label>
-                <Select
-                  value={documentType}
-                  onValueChange={(value: "resume" | "cover_letter" | "both") =>
-                    setDocumentType(value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="resume">Resume</SelectItem>
-                    <SelectItem value="cover_letter">Cover Letter</SelectItem>
-                    <SelectItem value="both">Both Resume & Cover Letter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Document Type Selection */}
+            <div className="space-y-2">
+              <Label>Document Type</Label>
+              <Select
+                value={documentType}
+                onValueChange={(value: "resume" | "cover_letter" | "both") =>
+                  setDocumentType(value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="resume">Resume</SelectItem>
+                  <SelectItem value="cover_letter">Cover Letter</SelectItem>
+                  <SelectItem value="both">Both Resume & Cover Letter</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              {/* Job Selection */}
-              <div className="space-y-2">
-                <Label>Select Job Match (Optional)</Label>
-                <Select value={selectedJobMatchId} onValueChange={setSelectedJobMatchId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a job match or enter manually" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingMatches ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        Loading matches...
+            {/* Job Selection */}
+            <div className="space-y-2">
+              <Label>Select Job Match (Optional)</Label>
+              <Select value={selectedJobMatchId} onValueChange={setSelectedJobMatchId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job match or enter manually" />
+                </SelectTrigger>
+                <SelectContent>
+                  {loadingMatches ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      Loading matches...
+                    </div>
+                  ) : jobMatches.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      <div className="space-y-2">
+                        <p>No job matches found.</p>
+                        <p className="text-xs">
+                          You can still generate documents by entering job details manually below.
+                        </p>
                       </div>
-                    ) : jobMatches.length === 0 ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        <div className="space-y-2">
-                          <p>No job matches found.</p>
-                          <p className="text-xs">
-                            You can still generate documents by entering job details manually below.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      jobMatches.map((match) => {
-                        const normalized = normalizeJobMatch(match)
-                        return (
-                          <SelectItem key={match.id} value={match.id || ""}>
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex flex-col items-start">
-                                <span className="font-medium">{normalized.jobTitle}</span>
-                                <span className="text-sm text-muted-foreground">
-                                  {normalized.companyName} • {normalized.location}
-                                </span>
-                              </div>
-                              <Badge variant="secondary" className="ml-2">
-                                {normalized.matchScore}%
-                              </Badge>
-                            </div>
-                          </SelectItem>
-                        )
-                      })
-                    )}
-                  </SelectContent>
-                </Select>
-                {selectedMatch && (
-                  <p className="text-sm text-muted-foreground">
-                    Match Score: {normalizeJobMatch(selectedMatch).matchScore}% • Analyzed{" "}
-                    {normalizeJobMatch(selectedMatch).analyzedAt
-                      ? new Date(normalizeJobMatch(selectedMatch).analyzedAt).toLocaleDateString()
-                      : "Recently"}
-                  </p>
-                )}
-                {jobMatches.length === 0 && !loadingMatches && (
-                  <p className="text-sm text-muted-foreground">
-                    💡 Tip: Use the Job Finder to analyze job postings and get AI-powered match
-                    scores.
-                  </p>
-                )}
-              </div>
-
-              {/* Job Details */}
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="font-semibold">Job Details</h3>
-
-                <div className="space-y-2">
-                  <Label htmlFor="job-title">
-                    Job Title <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="job-title"
-                    value={customJobTitle}
-                    onChange={(e) => setCustomJobTitle(e.target.value)}
-                    placeholder="e.g., Senior Software Engineer"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="company-name">
-                    Company Name <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="company-name"
-                    value={customCompanyName}
-                    onChange={(e) => setCustomCompanyName(e.target.value)}
-                    placeholder="e.g., Acme Corp"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="job-description">Job Description (Optional)</Label>
-                  <Textarea
-                    id="job-description"
-                    value={customJobDescription}
-                    onChange={(e) => setCustomJobDescription(e.target.value)}
-                    placeholder="Paste the job description here for better customization..."
-                    rows={6}
-                  />
-                </div>
-              </div>
-
-              {/* Customization */}
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="font-semibold">Customization (Optional)</h3>
-
-                <div className="space-y-2">
-                  <Label htmlFor="target-summary">Professional Summary Override</Label>
-                  <Textarea
-                    id="target-summary"
-                    value={targetSummary}
-                    onChange={(e) => setTargetSummary(e.target.value)}
-                    placeholder="Customize your professional summary for this role..."
-                    rows={4}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Leave blank to use AI-generated summary based on job description
-                  </p>
-                </div>
-              </div>
-
-              {/* Generate Button */}
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedJobMatchId("")
-                    setCustomJobTitle("")
-                    setCustomCompanyName("")
-                    setCustomJobDescription("")
-                    setTargetSummary("")
-                    setAlert(null)
-                  }}
-                >
-                  Clear Form
-                </Button>
-                <Button onClick={handleGenerate} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
+                    </div>
                   ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate{" "}
-                      {documentType === "resume"
-                        ? "Resume"
-                        : documentType === "cover_letter"
-                          ? "Cover Letter"
-                          : "Both Documents"}
-                    </>
+                    jobMatches.map((match) => {
+                      const normalized = normalizeJobMatch(match)
+                      return (
+                        <SelectItem key={match.id} value={match.id || ""}>
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{normalized.jobTitle}</span>
+                              <span className="text-sm text-muted-foreground">
+                                {normalized.companyName} • {normalized.location}
+                              </span>
+                            </div>
+                            <Badge variant="secondary" className="ml-2">
+                              {normalized.matchScore}%
+                            </Badge>
+                          </div>
+                        </SelectItem>
+                      )
+                    })
                   )}
-                </Button>
+                </SelectContent>
+              </Select>
+              {selectedMatch && (
+                <p className="text-sm text-muted-foreground">
+                  Match Score: {normalizeJobMatch(selectedMatch).matchScore}% • Analyzed{" "}
+                  {normalizeJobMatch(selectedMatch).analyzedAt
+                    ? new Date(normalizeJobMatch(selectedMatch).analyzedAt).toLocaleDateString()
+                    : "Recently"}
+                </p>
+              )}
+              {jobMatches.length === 0 && !loadingMatches && (
+                <p className="text-sm text-muted-foreground">
+                  💡 Tip: Use the Job Finder to analyze job postings and get AI-powered match
+                  scores.
+                </p>
+              )}
+            </div>
+
+            {/* Job Details */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-semibold">Job Details</h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="job-title">
+                  Job Title <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="job-title"
+                  value={customJobTitle}
+                  onChange={(e) => setCustomJobTitle(e.target.value)}
+                  placeholder="e.g., Senior Software Engineer"
+                />
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="space-y-2">
+                <Label htmlFor="company-name">
+                  Company Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="company-name"
+                  value={customCompanyName}
+                  onChange={(e) => setCustomCompanyName(e.target.value)}
+                  placeholder="e.g., Acme Corp"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="job-description">Job Description (Optional)</Label>
+                <Textarea
+                  id="job-description"
+                  value={customJobDescription}
+                  onChange={(e) => setCustomJobDescription(e.target.value)}
+                  placeholder="Paste the job description here for better customization..."
+                  rows={6}
+                />
+              </div>
+            </div>
+
+            {/* Customization */}
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-semibold">Customization (Optional)</h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="target-summary">Professional Summary Override</Label>
+                <Textarea
+                  id="target-summary"
+                  value={targetSummary}
+                  onChange={(e) => setTargetSummary(e.target.value)}
+                  placeholder="Customize your professional summary for this role..."
+                  rows={4}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Leave blank to use AI-generated summary based on job description
+                </p>
+              </div>
+            </div>
+
+            {/* Generate Button */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedJobMatchId("")
+                  setCustomJobTitle("")
+                  setCustomCompanyName("")
+                  setCustomJobDescription("")
+                  setTargetSummary("")
+                  setAlert(null)
+                }}
+              >
+                Clear Form
+              </Button>
+              <Button onClick={handleGenerate} disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate{" "}
+                    {documentType === "resume"
+                      ? "Resume"
+                      : documentType === "cover_letter"
+                        ? "Cover Letter"
+                        : "Both Documents"}
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Generation Progress - Positioned at bottom of page */}

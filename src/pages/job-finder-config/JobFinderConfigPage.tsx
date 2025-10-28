@@ -544,7 +544,7 @@ export function JobFinderConfigPage() {
                   <Select
                     value={aiSettings?.provider || "claude"}
                     onValueChange={(value) =>
-                      setAISettings((prev) =>
+                      setAISettings((prev: AISettings | null) =>
                         prev ? { ...prev, provider: value as "claude" | "openai" | "gemini" } : null
                       )
                     }
@@ -569,7 +569,9 @@ export function JobFinderConfigPage() {
                     id="model"
                     value={aiSettings?.model || "claude-sonnet-4"}
                     onChange={(e) =>
-                      setAISettings((prev) => (prev ? { ...prev, model: e.target.value } : null))
+                      setAISettings((prev: AISettings | null) =>
+                        prev ? { ...prev, model: e.target.value } : null
+                      )
                     }
                     placeholder="e.g., claude-sonnet-4, gpt-4, gemini-pro"
                   />
@@ -585,7 +587,7 @@ export function JobFinderConfigPage() {
                     max="100"
                     value={aiSettings?.minMatchScore || 70}
                     onChange={(e) =>
-                      setAISettings((prev) =>
+                      setAISettings((prev: AISettings | null) =>
                         prev ? { ...prev, minMatchScore: parseInt(e.target.value) || 70 } : null
                       )
                     }
@@ -604,7 +606,7 @@ export function JobFinderConfigPage() {
                     step="0.01"
                     value={aiSettings?.costBudgetDaily || 10.0}
                     onChange={(e) =>
-                      setAISettings((prev) =>
+                      setAISettings((prev: AISettings | null) =>
                         prev
                           ? { ...prev, costBudgetDaily: parseFloat(e.target.value) || 10.0 }
                           : null

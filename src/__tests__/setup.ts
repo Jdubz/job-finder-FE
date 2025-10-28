@@ -10,14 +10,14 @@ import { vi, beforeEach, afterEach } from "vitest"
 // React 19 compatibility - @testing-library/react expects act from react-dom/test-utils
 const actPolyfill = async (callback: () => void | Promise<void>) => {
   const result = callback()
-  if (result && typeof result === 'object' && 'then' in result) {
+  if (result && typeof result === "object" && "then" in result) {
     await result
   }
-  await new Promise(resolve => setTimeout(resolve, 0))
+  await new Promise((resolve) => setTimeout(resolve, 0))
 }
 
 // Mock react-dom/test-utils BEFORE importing anything else
-vi.mock('react-dom/test-utils', () => ({
+vi.mock("react-dom/test-utils", () => ({
   act: actPolyfill,
 }))
 
@@ -31,11 +31,6 @@ interface GlobalWithReactAct {
 }
 
 ;(globalThis as unknown as GlobalWithReactAct).IS_REACT_ACT_ENVIRONMENT = true
-
-
-
-
-
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {

@@ -2,7 +2,7 @@
  * AuthIcon Component Tests
  *
  * Tests for the AuthIcon component functionality
- * 
+ *
  * NOTE: These tests are temporarily skipped due to React 19 + @testing-library/react compatibility.
  * The issue is that @testing-library/react 16.3.0 uses react-dom/test-utils which expects React.act
  * from the React package, but React 19 changed how act is exported. These will be re-enabled when
@@ -184,10 +184,7 @@ describe("AuthIcon", () => {
       render(<AuthIcon {...defaultProps} />)
 
       const button = screen.getByRole("button", { name: /signed in as owner/i })
-      expect(button).toHaveAttribute(
-        "aria-label",
-        "Signed in as Owner - Click for account options"
-      )
+      expect(button).toHaveAttribute("aria-label", "Signed in as Owner - Click for account options")
       expect(button).toHaveAttribute("title", "Signed in as Owner - Click for account options")
     })
 

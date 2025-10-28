@@ -289,7 +289,12 @@ export function SettingsPage() {
               <Input
                 id="name"
                 value={userDefaults.name}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
                 placeholder="John Doe"
               />
             </div>
@@ -300,7 +305,12 @@ export function SettingsPage() {
                 id="email"
                 type="email"
                 value={userDefaults.email}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
                 placeholder="john@example.com"
               />
             </div>
@@ -310,7 +320,12 @@ export function SettingsPage() {
               <Input
                 id="phone"
                 value={userDefaults.phone || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, phone: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    phone: e.target.value,
+                  }))
+                }
                 placeholder="(123) 456-7890"
               />
             </div>
@@ -320,7 +335,12 @@ export function SettingsPage() {
               <Input
                 id="location"
                 value={userDefaults.location || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, location: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -330,7 +350,12 @@ export function SettingsPage() {
               <Input
                 id="linkedin"
                 value={userDefaults.linkedin || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, linkedin: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    linkedin: e.target.value,
+                  }))
+                }
                 placeholder="linkedin.com/in/johndoe"
               />
             </div>
@@ -340,7 +365,12 @@ export function SettingsPage() {
               <Input
                 id="github"
                 value={userDefaults.github || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, github: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    github: e.target.value,
+                  }))
+                }
                 placeholder="github.com/johndoe"
               />
             </div>
@@ -350,7 +380,12 @@ export function SettingsPage() {
               <Input
                 id="website"
                 value={userDefaults.website || ""}
-                onChange={(e) => setUserDefaults((prev) => ({ ...prev, website: e.target.value }))}
+                onChange={(e) =>
+                  setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                    ...prev,
+                    website: e.target.value,
+                  }))
+                }
                 placeholder="https://johndoe.com"
               />
             </div>
@@ -363,7 +398,10 @@ export function SettingsPage() {
                   type="color"
                   value={userDefaults.accentColor || "#3b82f6"}
                   onChange={(e) =>
-                    setUserDefaults((prev) => ({ ...prev, accentColor: e.target.value }))
+                    setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                      ...prev,
+                      accentColor: e.target.value,
+                    }))
                   }
                   className="h-10 w-20"
                 />
@@ -371,7 +409,10 @@ export function SettingsPage() {
                   type="text"
                   value={userDefaults.accentColor || "#3b82f6"}
                   onChange={(e) =>
-                    setUserDefaults((prev) => ({ ...prev, accentColor: e.target.value }))
+                    setUserDefaults((prev: Partial<PersonalInfo>) => ({
+                      ...prev,
+                      accentColor: e.target.value,
+                    }))
                   }
                   placeholder="#3b82f6"
                   pattern="^#[0-9A-Fa-f]{6}$"
