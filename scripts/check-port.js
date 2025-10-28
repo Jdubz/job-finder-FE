@@ -10,7 +10,6 @@
 import { execSync } from 'child_process'
 
 const PORT = 5173
-const PROJECT_NAME = 'job-finder-FE'
 
 function checkPort() {
   try {
