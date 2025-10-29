@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -7,73 +7,45 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Save, RotateCcw, Eye } from "lucide-react"
-import { promptsClient, type PromptConfig, DEFAULT_PROMPTS } from "@/api"
+import { useAIPrompts } from "@/hooks/useAIPrompts"
+import type { PromptConfig } from "@/api"
 
 export function AIPromptsPage() {
-  const { isOwner, user } = useAuth()
-  const [prompts, setPrompts] = useState<PromptConfig>(DEFAULT_PROMPTS)
-  const [originalPrompts, setOriginalPrompts] = useState<PromptConfig>(DEFAULT_PROMPTS)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const { isOwner } = useAuth()
+  const {
+    prompts: serverPrompts,
+    loading: isLoading,
+    error: loadError,
+    saving: isSaving,
+    savePrompts,
+    resetToDefaults: resetToDefaultsServer,
+  } = useAIPrompts()
+
+  // Local state for editing
+  const [editedPrompts, setEditedPrompts] = useState<PromptConfig>(serverPrompts)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<keyof PromptConfig>("resumeGeneration")
   const [showPreview, setShowPreview] = useState(false)
 
-  // Load prompts from Firestore on mount
-  useEffect(() => {
-    let mounted = true
+  // Sync server prompts to local editable state when they change
+  useMemo(() => {
+    setEditedPrompts(serverPrompts)
+  }, [serverPrompts])
 
-    const loadPrompts = async () => {
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        const loadedPrompts = await promptsClient.getPrompts()
-
-        // Only update state if component is still mounted
-        if (mounted) {
-          setPrompts(loadedPrompts)
-          setOriginalPrompts(loadedPrompts)
-        }
-      } catch (err) {
-        // Graceful error handling - don't crash the UI
-        if (mounted) {
-          setError("Unable to load prompts. Using defaults.")
-          console.error("Error loading prompts:", err)
-          // Set defaults on error
-          setPrompts(DEFAULT_PROMPTS)
-          setOriginalPrompts(DEFAULT_PROMPTS)
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false)
-        }
-      }
+  // Show load error if present
+  useMemo(() => {
+    if (loadError) {
+      setError("Unable to load prompts. Using defaults.")
     }
-
-    loadPrompts()
-
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      mounted = false
-    }
-  }, []) // Empty dependency array - only run once on mount
+  }, [loadError])
 
   const handleSave = async () => {
-    if (!user?.email) {
-      setError("User email not found")
-      return
-    }
-
-    setIsSaving(true)
     setError(null)
     setSuccess(null)
 
     try {
-      await promptsClient.savePrompts(prompts, user.email)
-
-      setOriginalPrompts(prompts)
+      await savePrompts(editedPrompts)
       setSuccess("AI prompts saved successfully!")
 
       // Clear success message after 3 seconds
@@ -81,25 +53,33 @@ export function AIPromptsPage() {
     } catch (err) {
       setError("Failed to save AI prompts")
       console.error("Error saving prompts:", err)
-    } finally {
-      setIsSaving(false)
     }
   }
 
   const handleReset = () => {
-    setPrompts(originalPrompts)
+    setEditedPrompts(serverPrompts)
     setSuccess(null)
     setError(null)
   }
 
-  const handleResetToDefaults = () => {
-    setPrompts(DEFAULT_PROMPTS)
-    setSuccess(null)
+  const handleResetToDefaults = async () => {
     setError(null)
+    setSuccess(null)
+
+    try {
+      await resetToDefaultsServer()
+      setSuccess("AI prompts reset to defaults!")
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err) {
+      setError("Failed to reset prompts")
+      console.error("Error resetting prompts:", err)
+    }
   }
 
   const handlePromptChange = (key: keyof PromptConfig, value: string) => {
-    setPrompts((prev) => ({
+    setEditedPrompts((prev) => ({
       ...prev,
       [key]: value,
     }))
@@ -143,7 +123,10 @@ export function AIPromptsPage() {
     )
   }
 
-  const hasChanges = JSON.stringify(prompts) !== JSON.stringify(originalPrompts)
+  const hasChanges = useMemo(
+    () => JSON.stringify(editedPrompts) !== JSON.stringify(serverPrompts),
+    [editedPrompts, serverPrompts]
+  )
 
   if (!isOwner) {
     return (
@@ -257,7 +240,7 @@ export function AIPromptsPage() {
                 <Label htmlFor="resumePrompt">Resume Generation Prompt</Label>
                 <Textarea
                   id="resumePrompt"
-                  value={prompts.resumeGeneration}
+                  value={editedPrompts.resumeGeneration}
                   onChange={(e) => handlePromptChange("resumeGeneration", e.target.value)}
                   rows={15}
                   className="mt-2 font-mono text-sm"
@@ -266,7 +249,7 @@ export function AIPromptsPage() {
               </div>
               {showPreview && (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  {renderVariablePreview(prompts.resumeGeneration)}
+                  {renderVariablePreview(editedPrompts.resumeGeneration)}
                 </div>
               )}
             </TabsContent>
@@ -276,7 +259,7 @@ export function AIPromptsPage() {
                 <Label htmlFor="coverLetterPrompt">Cover Letter Generation Prompt</Label>
                 <Textarea
                   id="coverLetterPrompt"
-                  value={prompts.coverLetterGeneration}
+                  value={editedPrompts.coverLetterGeneration}
                   onChange={(e) => handlePromptChange("coverLetterGeneration", e.target.value)}
                   rows={15}
                   className="mt-2 font-mono text-sm"
@@ -285,7 +268,7 @@ export function AIPromptsPage() {
               </div>
               {showPreview && (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  {renderVariablePreview(prompts.coverLetterGeneration)}
+                  {renderVariablePreview(editedPrompts.coverLetterGeneration)}
                 </div>
               )}
             </TabsContent>
@@ -295,7 +278,7 @@ export function AIPromptsPage() {
                 <Label htmlFor="jobScrapingPrompt">Job Scraping Prompt</Label>
                 <Textarea
                   id="jobScrapingPrompt"
-                  value={prompts.jobScraping}
+                  value={editedPrompts.jobScraping}
                   onChange={(e) => handlePromptChange("jobScraping", e.target.value)}
                   rows={15}
                   className="mt-2 font-mono text-sm"
@@ -304,7 +287,7 @@ export function AIPromptsPage() {
               </div>
               {showPreview && (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  {renderVariablePreview(prompts.jobScraping)}
+                  {renderVariablePreview(editedPrompts.jobScraping)}
                 </div>
               )}
             </TabsContent>
@@ -314,7 +297,7 @@ export function AIPromptsPage() {
                 <Label htmlFor="jobMatchingPrompt">Job Matching Prompt</Label>
                 <Textarea
                   id="jobMatchingPrompt"
-                  value={prompts.jobMatching}
+                  value={editedPrompts.jobMatching}
                   onChange={(e) => handlePromptChange("jobMatching", e.target.value)}
                   rows={15}
                   className="mt-2 font-mono text-sm"
@@ -323,7 +306,7 @@ export function AIPromptsPage() {
               </div>
               {showPreview && (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  {renderVariablePreview(prompts.jobMatching)}
+                  {renderVariablePreview(editedPrompts.jobMatching)}
                 </div>
               )}
             </TabsContent>
