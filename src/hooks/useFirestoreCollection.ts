@@ -72,7 +72,7 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
     return () => {
       unsubscribe()
     }
-  }, [collectionName, constraintsKey, cacheKey, enabled, subscribeToCollection, constraints, hasSubscriptionError])
+  }, [collectionName, constraintsKey, cacheKey, enabled, subscribeToCollection, constraints])
 
   const refetch = useCallback(async () => {
     setLoading(true)
