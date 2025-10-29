@@ -5,65 +5,40 @@
  * Manages stop lists, queue settings, and AI settings in Firestore.
  */
 
-import { db } from "@/config/firebase"
-import { doc, getDoc, setDoc, updateDoc, Timestamp } from "firebase/firestore"
+import { firestoreService } from "@/services/firestore"
+import { createUpdateMetadata } from "@/services/firestore/utils"
 import type { StopList, QueueSettings, AISettings } from "@jsdubzw/job-finder-shared-types"
 
 export class ConfigClient {
-  private collectionName = "job-finder-config"
-
-  /**
-   * Convert Firestore timestamps to Dates
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private convertTimestamps<T extends Record<string, any>>(data: T): T {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const converted = { ...data } as any
-    Object.keys(converted).forEach((key) => {
-      if (converted[key] instanceof Timestamp) {
-        converted[key] = converted[key].toDate()
-      }
-    })
-    return converted as T
-  }
+  private collectionName = "job-finder-config" as const
 
   /**
    * Get stop list configuration
    */
   async getStopList(): Promise<StopList | null> {
-    const docRef = doc(db, this.collectionName, "stop-list")
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return null
-    }
-
-    return this.convertTimestamps(docSnap.data() as StopList)
+    return (await firestoreService.getDocument(this.collectionName, "stop-list")) as StopList | null
   }
 
   /**
    * Update stop list configuration
    */
   async updateStopList(stopList: Partial<StopList>, userEmail: string): Promise<void> {
-    const docRef = doc(db, this.collectionName, "stop-list")
-    const docSnap = await getDoc(docRef)
+    const existing = await this.getStopList()
 
-    const updates = {
+    const data = {
+      // Default values if creating new
+      excludedCompanies: [],
+      excludedKeywords: [],
+      excludedDomains: [],
+      // Merge with existing
+      ...existing,
+      // Apply updates
       ...stopList,
-      updatedAt: new Date(),
-      updatedBy: userEmail,
+      // Add metadata
+      ...createUpdateMetadata(userEmail),
     }
 
-    if (docSnap.exists()) {
-      await updateDoc(docRef, updates)
-    } else {
-      await setDoc(docRef, {
-        excludedCompanies: [],
-        excludedKeywords: [],
-        excludedDomains: [],
-        ...updates,
-      })
-    }
+    await firestoreService.setDocument(this.collectionName, "stop-list", data)
   }
 
   /**
@@ -166,79 +141,65 @@ export class ConfigClient {
    * Get queue settings
    */
   async getQueueSettings(): Promise<QueueSettings | null> {
-    const docRef = doc(db, this.collectionName, "queue-settings")
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return null
-    }
-
-    return this.convertTimestamps(docSnap.data() as QueueSettings)
+    return (await firestoreService.getDocument(
+      this.collectionName,
+      "queue-settings"
+    )) as QueueSettings | null
   }
 
   /**
    * Update queue settings
    */
   async updateQueueSettings(settings: Partial<QueueSettings>, userEmail: string): Promise<void> {
-    const docRef = doc(db, this.collectionName, "queue-settings")
-    const docSnap = await getDoc(docRef)
+    const existing = await this.getQueueSettings()
 
-    const updates = {
+    const data = {
+      // Default values if creating new
+      maxRetries: 3,
+      retryDelaySeconds: 300,
+      processingTimeout: 600,
+      // Merge with existing
+      ...existing,
+      // Apply updates
       ...settings,
-      updatedAt: new Date(),
-      updatedBy: userEmail,
+      // Add metadata
+      ...createUpdateMetadata(userEmail),
     }
 
-    if (docSnap.exists()) {
-      await updateDoc(docRef, updates)
-    } else {
-      await setDoc(docRef, {
-        maxRetries: 3,
-        retryDelaySeconds: 300,
-        processingTimeout: 600,
-        ...updates,
-      })
-    }
+    await firestoreService.setDocument(this.collectionName, "queue-settings", data)
   }
 
   /**
    * Get AI settings
    */
   async getAISettings(): Promise<AISettings | null> {
-    const docRef = doc(db, this.collectionName, "ai-settings")
-    const docSnap = await getDoc(docRef)
-
-    if (!docSnap.exists()) {
-      return null
-    }
-
-    return this.convertTimestamps(docSnap.data() as AISettings)
+    return (await firestoreService.getDocument(
+      this.collectionName,
+      "ai-settings"
+    )) as AISettings | null
   }
 
   /**
    * Update AI settings
    */
   async updateAISettings(settings: Partial<AISettings>, userEmail: string): Promise<void> {
-    const docRef = doc(db, this.collectionName, "ai-settings")
-    const docSnap = await getDoc(docRef)
+    const existing = await this.getAISettings()
 
-    const updates = {
+    const data = {
+      // Default values if creating new
+      provider: "claude",
+      model: "claude-sonnet-4",
+      minMatchScore: 70,
+      costBudgetDaily: 10.0,
+      // Merge with existing
+      ...existing,
+      // Apply updates
       ...settings,
-      updatedAt: new Date(),
-      updatedBy: userEmail,
+      // Add metadata
+      ...createUpdateMetadata(userEmail),
     }
 
-    if (docSnap.exists()) {
-      await updateDoc(docRef, updates)
-    } else {
-      await setDoc(docRef, {
-        provider: "claude",
-        model: "claude-sonnet-4",
-        minMatchScore: 70,
-        costBudgetDaily: 10.0,
-        ...updates,
-      })
-    }
+    await firestoreService.setDocument(this.collectionName, "ai-settings", data)
   }
 }
 

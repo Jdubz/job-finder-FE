@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
-import { db } from "@/config/firebase"
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore"
+import { contentItemsClient } from "@/api"
 import type {
   ContentItem,
   ContentItemType,
@@ -339,20 +338,17 @@ export function ContentItemDialog({
           throw new Error(`Unsupported content item type: ${type}`)
       }
 
+      if (!user) {
+        throw new Error("User must be authenticated")
+      }
+
       if (item) {
-        // Update existing item in Firestore
-        await updateDoc(doc(db, "content-items", item.id), {
-          ...data,
-          updatedAt: serverTimestamp(),
-        })
+        // Update existing item using client
+        await contentItemsClient.updateContentItem(item.id, user.uid, data)
       } else {
-        // Create new item in Firestore
-        await addDoc(collection(db, "content-items"), {
-          ...data,
-          userId: user?.uid,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        })
+        // Create new item using client
+        const createData = data as CreateContentItemData
+        await contentItemsClient.createContentItem(user.uid, createData)
       }
 
       onSave()

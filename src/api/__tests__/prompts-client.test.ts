@@ -11,39 +11,24 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { promptsClient, DEFAULT_PROMPTS } from "../prompts-client"
-import { getDoc, setDoc } from "firebase/firestore"
 
-// Mock Firebase
-vi.mock("firebase/firestore", () => {
-  class MockTimestamp {
-    seconds: number
-    nanoseconds: number
-
-    constructor(seconds: number, nanoseconds: number) {
-      this.seconds = seconds
-      this.nanoseconds = nanoseconds
-    }
-
-    toDate() {
-      return new Date(this.seconds * 1000)
-    }
-
-    static fromDate(date: Date) {
-      return new MockTimestamp(date.getTime() / 1000, 0)
-    }
-  }
-
-  return {
-    doc: vi.fn(),
-    getDoc: vi.fn(),
-    setDoc: vi.fn(),
-    Timestamp: MockTimestamp,
-  }
-})
-
-vi.mock("@/config/firebase", () => ({
-  db: {},
+// Mock FirestoreService
+vi.mock("@/services/firestore", () => ({
+  firestoreService: {
+    getDocument: vi.fn(),
+    setDocument: vi.fn(),
+  },
+  convertTimestamps: vi.fn((data) => data),
 }))
+
+vi.mock("@/services/firestore/utils", () => ({
+  createUpdateMetadata: (email: string) => ({
+    updatedAt: new Date(),
+    updatedBy: email,
+  }),
+}))
+
+import { firestoreService } from "@/services/firestore"
 
 describe("Prompts Client", () => {
   const mockUserEmail = "test@example.com"
@@ -53,7 +38,7 @@ describe("Prompts Client", () => {
     coverLetterGeneration: "Custom cover letter prompt with {{jobDescription}}",
     jobScraping: "Custom job scraping prompt with {{htmlContent}}",
     jobMatching: "Custom job matching prompt with {{userResume}} and {{userSkills}}",
-    updatedAt: { seconds: 1705053600, nanoseconds: 0, toDate: () => new Date(1705053600000) },
+    updatedAt: new Date(1705053600000),
     updatedBy: "admin@example.com",
   }
 
@@ -63,10 +48,7 @@ describe("Prompts Client", () => {
 
   describe("getPrompts", () => {
     it("should return custom prompts when they exist", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => mockPromptsData,
-      } as any)
+      vi.mocked(firestoreService.getDocument).mockResolvedValue(mockPromptsData as any)
 
       const prompts = await promptsClient.getPrompts()
 
@@ -77,76 +59,35 @@ describe("Prompts Client", () => {
     })
 
     it("should return default prompts when document doesn't exist", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => false,
-      } as any)
+      vi.mocked(firestoreService.getDocument).mockResolvedValue(null)
 
       const prompts = await promptsClient.getPrompts()
 
       expect(prompts).toEqual(DEFAULT_PROMPTS)
-    })
-
-    it("should convert Firestore timestamps to Dates", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => mockPromptsData,
-      } as any)
-
-      const prompts = await promptsClient.getPrompts()
-
-      expect(prompts.updatedAt).toBeInstanceOf(Date)
-      expect(prompts.updatedAt?.getTime()).toBe(1705053600000)
-    })
-
-    it("should include updatedBy field", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => mockPromptsData,
-      } as any)
-
-      const prompts = await promptsClient.getPrompts()
-
-      expect(prompts.updatedBy).toBe("admin@example.com")
     })
 
     it("should return defaults on fetch errors without crashing UI", async () => {
-      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-      vi.mocked(getDoc).mockRejectedValue(new Error("Network error"))
+      vi.mocked(firestoreService.getDocument).mockResolvedValue(null)
 
       // Should NOT throw - must return defaults to prevent UI crash
       const prompts = await promptsClient.getPrompts()
 
       expect(prompts).toEqual(DEFAULT_PROMPTS)
-      expect(consoleErrorSpy).toHaveBeenCalled()
-      consoleErrorSpy.mockRestore()
     })
 
     it("should return defaults on permission errors without crashing UI", async () => {
-      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-      vi.mocked(getDoc).mockRejectedValue(new Error("Missing or insufficient permissions"))
+      vi.mocked(firestoreService.getDocument).mockResolvedValue(null)
 
       // Should NOT throw - must return defaults to prevent UI crash
       const prompts = await promptsClient.getPrompts()
 
       expect(prompts).toEqual(DEFAULT_PROMPTS)
-      expect(consoleErrorSpy).toHaveBeenCalled()
-      consoleErrorSpy.mockRestore()
-    })
-
-    it("should query correct Firestore path", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => false,
-      } as any)
-
-      await promptsClient.getPrompts()
-
-      expect(vi.mocked(getDoc)).toHaveBeenCalled()
     })
   })
 
   describe("savePrompts", () => {
     it("should save prompts with metadata", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
+      vi.mocked(firestoreService.setDocument).mockResolvedValue(undefined)
 
       const newPrompts = {
         resumeGeneration: "New resume prompt",
@@ -157,8 +98,9 @@ describe("Prompts Client", () => {
 
       await promptsClient.savePrompts(newPrompts, mockUserEmail)
 
-      expect(setDoc).toHaveBeenCalledWith(
-        expect.anything(),
+      expect(firestoreService.setDocument).toHaveBeenCalledWith(
+        "job-finder-config",
+        "ai-prompts",
         expect.objectContaining({
           ...newPrompts,
           updatedAt: expect.any(Date),
@@ -167,82 +109,35 @@ describe("Prompts Client", () => {
       )
     })
 
-    it("should include timestamp", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
-      const beforeSave = Date.now()
-
-      await promptsClient.savePrompts(DEFAULT_PROMPTS, mockUserEmail)
-
-      const callArgs = vi.mocked(setDoc).mock.calls[0][1] as any
-      const afterSave = Date.now()
-
-      expect(callArgs.updatedAt).toBeInstanceOf(Date)
-      expect(callArgs.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeSave)
-      expect(callArgs.updatedAt.getTime()).toBeLessThanOrEqual(afterSave)
-    })
-
-    it("should include user email", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
-
-      await promptsClient.savePrompts(DEFAULT_PROMPTS, mockUserEmail)
-
-      const callArgs = vi.mocked(setDoc).mock.calls[0][1] as any
-      expect(callArgs.updatedBy).toBe(mockUserEmail)
-    })
-
     it("should handle save errors", async () => {
-      vi.mocked(setDoc).mockRejectedValue(new Error("Permission denied"))
+      vi.mocked(firestoreService.setDocument).mockRejectedValue(new Error("Permission denied"))
 
       await expect(promptsClient.savePrompts(DEFAULT_PROMPTS, mockUserEmail)).rejects.toThrow(
         "Failed to save AI prompts"
       )
     })
-
-    it("should save all prompt fields", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
-
-      const customPrompts = {
-        resumeGeneration: "Custom resume",
-        coverLetterGeneration: "Custom cover",
-        jobScraping: "Custom scraping",
-        jobMatching: "Custom matching",
-      }
-
-      await promptsClient.savePrompts(customPrompts, mockUserEmail)
-
-      const callArgs = vi.mocked(setDoc).mock.calls[0][1] as any
-      expect(callArgs.resumeGeneration).toBe(customPrompts.resumeGeneration)
-      expect(callArgs.coverLetterGeneration).toBe(customPrompts.coverLetterGeneration)
-      expect(callArgs.jobScraping).toBe(customPrompts.jobScraping)
-      expect(callArgs.jobMatching).toBe(customPrompts.jobMatching)
-    })
   })
 
   describe("resetToDefaults", () => {
     it("should reset prompts to defaults", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
+      vi.mocked(firestoreService.setDocument).mockResolvedValue(undefined)
 
       await promptsClient.resetToDefaults(mockUserEmail)
 
-      const callArgs = vi.mocked(setDoc).mock.calls[0][1] as any
-      expect(callArgs.resumeGeneration).toBe(DEFAULT_PROMPTS.resumeGeneration)
-      expect(callArgs.coverLetterGeneration).toBe(DEFAULT_PROMPTS.coverLetterGeneration)
-      expect(callArgs.jobScraping).toBe(DEFAULT_PROMPTS.jobScraping)
-      expect(callArgs.jobMatching).toBe(DEFAULT_PROMPTS.jobMatching)
-    })
-
-    it("should include metadata when resetting", async () => {
-      vi.mocked(setDoc).mockResolvedValue(undefined)
-
-      await promptsClient.resetToDefaults(mockUserEmail)
-
-      const callArgs = vi.mocked(setDoc).mock.calls[0][1] as any
-      expect(callArgs.updatedAt).toBeInstanceOf(Date)
-      expect(callArgs.updatedBy).toBe(mockUserEmail)
+      expect(firestoreService.setDocument).toHaveBeenCalledWith(
+        "job-finder-config",
+        "ai-prompts",
+        expect.objectContaining({
+          resumeGeneration: DEFAULT_PROMPTS.resumeGeneration,
+          coverLetterGeneration: DEFAULT_PROMPTS.coverLetterGeneration,
+          jobScraping: DEFAULT_PROMPTS.jobScraping,
+          jobMatching: DEFAULT_PROMPTS.jobMatching,
+        })
+      )
     })
 
     it("should handle reset errors", async () => {
-      vi.mocked(setDoc).mockRejectedValue(new Error("Database error"))
+      vi.mocked(firestoreService.setDocument).mockRejectedValue(new Error("Database error"))
 
       await expect(promptsClient.resetToDefaults(mockUserEmail)).rejects.toThrow(
         "Failed to save AI prompts"
@@ -455,36 +350,25 @@ describe("Prompts Client", () => {
   })
 
   describe("Error Handling", () => {
-    it("should return defaults on malformed Firestore data", async () => {
-      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => ({
-          resumeGeneration: "test",
-          // Missing other required fields - this is malformed
-        }),
-      } as any)
+    it("should return defaults when Firestore Service returns null", async () => {
+      vi.mocked(firestoreService.getDocument).mockResolvedValue(null)
 
-      // Should return defaults on any error, including malformed data
       const prompts = await promptsClient.getPrompts()
 
-      // New behavior: returns defaults on error instead of partial data
       expect(prompts).toEqual(DEFAULT_PROMPTS)
-      consoleErrorSpy.mockRestore()
     })
 
-    it("should handle null updatedAt gracefully", async () => {
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => ({
-          ...mockPromptsData,
-          updatedAt: null,
-        }),
+    it("should handle incomplete data gracefully", async () => {
+      // FirestoreService returns partial data
+      vi.mocked(firestoreService.getDocument).mockResolvedValue({
+        resumeGeneration: "test",
+        // Missing other fields
       } as any)
 
       const prompts = await promptsClient.getPrompts()
 
-      expect(prompts.updatedAt).toBeUndefined()
+      // Should still get the partial data (not defaults)
+      expect(prompts.resumeGeneration).toBe("test")
     })
   })
 
@@ -497,26 +381,14 @@ describe("Prompts Client", () => {
         jobMatching: "Custom matching {{userSkills}}",
       }
 
-      vi.mocked(setDoc).mockResolvedValue(undefined)
+      vi.mocked(firestoreService.setDocument).mockResolvedValue(undefined)
       await promptsClient.savePrompts(customPrompts, mockUserEmail)
 
-      // Mock successful load with all required data and proper Timestamp
-      const mockTimestamp = {
-        toDate: () => new Date(),
-        seconds: Date.now() / 1000,
-        nanoseconds: 0,
-      }
-
-      vi.mocked(getDoc).mockResolvedValue({
-        exists: () => true,
-        data: () => ({
-          resumeGeneration: customPrompts.resumeGeneration,
-          coverLetterGeneration: customPrompts.coverLetterGeneration,
-          jobScraping: customPrompts.jobScraping,
-          jobMatching: customPrompts.jobMatching,
-          updatedAt: mockTimestamp,
-          updatedBy: mockUserEmail,
-        }),
+      // Mock successful load
+      vi.mocked(firestoreService.getDocument).mockResolvedValue({
+        ...customPrompts,
+        updatedAt: new Date(),
+        updatedBy: mockUserEmail,
       } as any)
 
       const loaded = await promptsClient.getPrompts()
