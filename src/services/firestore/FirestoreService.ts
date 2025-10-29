@@ -343,11 +343,7 @@ export class FirestoreService {
           error
         )
 
-        // Immediately unsubscribe on error to prevent retry loops
-        if (unsubscribeFn) {
-          unsubscribeFn()
-        }
-
+        // Do not unsubscribe here; let the returned unsubscribe function handle it
         onError(error as Error)
       }
     )
