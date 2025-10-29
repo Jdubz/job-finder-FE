@@ -262,7 +262,6 @@ export class FirestoreService {
 
     let hasError = false
     let unsubscribed = false
-    let unsubscribeFn: (() => void) | null = null
 
     const unsubscribe = onSnapshot(
       q,
@@ -285,16 +284,10 @@ export class FirestoreService {
         hasError = true
         console.error(`Firestore subscription error in ${collectionName}:`, error)
 
-        // Immediately unsubscribe on error to prevent retry loops
-        if (unsubscribeFn) {
-          unsubscribeFn()
-        }
-
+        // Do not unsubscribe here; let the returned unsubscribe function handle it
         onError(error as Error)
       }
     )
-
-    unsubscribeFn = unsubscribe
 
     // Return wrapped unsubscribe to prevent callbacks after unsubscribe
     return () => {
@@ -316,7 +309,6 @@ export class FirestoreService {
 
     let hasError = false
     let unsubscribed = false
-    let unsubscribeFn: (() => void) | null = null
 
     const unsubscribe = onSnapshot(
       docRef,
@@ -347,8 +339,6 @@ export class FirestoreService {
         onError(error as Error)
       }
     )
-
-    unsubscribeFn = unsubscribe
 
     // Return wrapped unsubscribe to prevent callbacks after unsubscribe
     return () => {
