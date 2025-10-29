@@ -279,20 +279,13 @@ export class FirestoreService {
         onData(documents)
       },
       (error) => {
-        if (unsubscribed) return
-        // Only call error handler once to prevent infinite loops
-        if (!hasError) {
-          hasError = true
-          console.error(`Firestore subscription error in ${collectionName}:`, error)
+        if (unsubscribed || hasError) return
+        
+        hasError = true
+        console.error(`Firestore subscription error in ${collectionName}:`, error)
 
-          // Surface permission-denied errors to avoid masking authorization issues
-          if (error.code === "permission-denied") {
-            console.warn(`Permission denied for ${collectionName}`)
-            onError(error as Error)
-          } else {
-            onError(error as Error)
-          }
-        }
+        // Do not unsubscribe here; let the returned unsubscribe function handle it
+        onError(error as Error)
       }
     )
 
@@ -334,23 +327,16 @@ export class FirestoreService {
         } as DocumentWithId<CollectionTypeMap[K]>)
       },
       (error) => {
-        if (unsubscribed) return
-        // Only call error handler once to prevent infinite loops
-        if (!hasError) {
-          hasError = true
-          console.error(
-            `Firestore document subscription error for ${collectionName}/${documentId}:`,
-            error
-          )
+        if (unsubscribed || hasError) return
+        
+        hasError = true
+        console.error(
+          `Firestore document subscription error for ${collectionName}/${documentId}:`,
+          error
+        )
 
-          // Surface permission errors to avoid masking authorization issues
-          if (error.code === "permission-denied") {
-            console.warn(`Permission denied for ${collectionName}/${documentId}`)
-            onError(error as Error)
-          } else {
-            onError(error as Error)
-          }
-        }
+        // Do not unsubscribe here; let the returned unsubscribe function handle it
+        onError(error as Error)
       }
     )
 

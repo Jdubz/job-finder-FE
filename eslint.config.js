@@ -17,6 +17,7 @@ export default defineConfig([
     "tests/**",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "docs/shared/**",
   ]),
   {
     files: ["**/*.{ts,tsx}"],
@@ -67,3 +68,4 @@ export default defineConfig([
     },
   },
 ])
+EOF}

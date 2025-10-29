@@ -39,12 +39,13 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
   const [data, setData] = useState<DocumentWithId<CollectionTypeMap[K]>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const [hasSubscriptionError, setHasSubscriptionError] = useState(false)
 
   // Memoize the stringified constraints to avoid unnecessary re-renders
   const constraintsKey = useMemo(() => JSON.stringify(constraints), [constraints])
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || hasSubscriptionError) {
       setLoading(false)
       return
     }
@@ -57,10 +58,12 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
       (newData) => {
         setData(newData)
         setLoading(false)
+        // setHasSubscriptionError(false) // Removed to prevent duplicate subscriptions
       },
       (err) => {
         setError(err)
         setLoading(false)
+        setHasSubscriptionError(true)
       },
       constraints,
       cacheKey
@@ -74,6 +77,7 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
   const refetch = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setHasSubscriptionError(false)
 
     try {
       const newData = await service.getDocuments(collectionName, constraints)
