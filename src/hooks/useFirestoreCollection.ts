@@ -58,7 +58,7 @@ export function useFirestoreCollection<K extends keyof CollectionTypeMap>({
       (newData) => {
         setData(newData)
         setLoading(false)
-        setHasSubscriptionError(false)
+        // setHasSubscriptionError(false) // Removed to prevent duplicate subscriptions
       },
       (err) => {
         setError(err)
