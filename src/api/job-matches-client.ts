@@ -23,21 +23,18 @@ export class JobMatchesClient {
    * Build query constraints from filters
    */
   private buildConstraints(filters?: JobMatchFilters): QueryConstraints {
-    const constraints: QueryConstraints = {
-      where: [],
-      orderBy: [],
-    }
+    const whereConstraints: QueryConstraints["where"] = []
 
     // Apply score filters
     if (filters?.minScore !== undefined) {
-      constraints.where!.push({
+      whereConstraints.push({
         field: "matchScore",
         operator: ">=",
         value: filters.minScore,
       })
     }
     if (filters?.maxScore !== undefined) {
-      constraints.where!.push({
+      whereConstraints.push({
         field: "matchScore",
         operator: "<=",
         value: filters.maxScore,
@@ -46,11 +43,16 @@ export class JobMatchesClient {
 
     // Apply company filter
     if (filters?.companyName) {
-      constraints.where!.push({
+      whereConstraints.push({
         field: "companyName",
         operator: "==",
         value: filters.companyName,
       })
+    }
+
+    const constraints: QueryConstraints = {
+      where: whereConstraints.length > 0 ? whereConstraints : undefined,
+      orderBy: [],
     }
 
     // Apply limit

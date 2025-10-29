@@ -19,20 +19,15 @@ class ContentItemsClient {
   /**
    * Create a new content item
    */
-  async createContentItem(
-    userId: string,
-    data: Omit<
-      ContentItemDocument,
-      "id" | "userId" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
-    >
-  ): Promise<string> {
+  async createContentItem(userId: string, data: Record<string, unknown>): Promise<string> {
     const docData = {
       ...data,
       userId,
       ...createDocumentMetadata(userId),
-    } as any
+    }
 
-    return firestoreService.createDocument(CONTENT_ITEMS_COLLECTION, docData)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return firestoreService.createDocument(CONTENT_ITEMS_COLLECTION, docData as any)
   }
 
   /**
@@ -41,14 +36,15 @@ class ContentItemsClient {
   async updateContentItem(
     id: string,
     userId: string,
-    data: Partial<ContentItemDocument>
+    data: Record<string, unknown>
   ): Promise<void> {
     const updateData = {
       ...data,
       ...createUpdateMetadata(userId),
-    } as any
+    }
 
-    await firestoreService.updateDocument(CONTENT_ITEMS_COLLECTION, id, updateData)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await firestoreService.updateDocument(CONTENT_ITEMS_COLLECTION, id, updateData as any)
   }
 
   /**

@@ -338,12 +338,17 @@ export function ContentItemDialog({
           throw new Error(`Unsupported content item type: ${type}`)
       }
 
+      if (!user) {
+        throw new Error("User must be authenticated")
+      }
+
       if (item) {
         // Update existing item using client
-        await contentItemsClient.updateContentItem(item.id, user!.uid, data as any)
+        await contentItemsClient.updateContentItem(item.id, user.uid, data)
       } else {
         // Create new item using client
-        await contentItemsClient.createContentItem(user!.uid, data as any)
+        const createData = data as CreateContentItemData
+        await contentItemsClient.createContentItem(user.uid, createData)
       }
 
       onSave()

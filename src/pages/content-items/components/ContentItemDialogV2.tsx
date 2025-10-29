@@ -93,12 +93,12 @@ export function ContentItemDialogV2({
 
       if (item) {
         // Update existing item using client
-        const updateData = {
+        const updateData: UpdateContentItemData = {
           ...baseData,
           ...formData,
         }
 
-        await contentItemsClient.updateContentItem(item.id, user.uid, updateData as any)
+        await contentItemsClient.updateContentItem(item.id, user.uid, updateData)
 
         await logger.info("database", "completed", `Updated content item: ${item.id}`, {
           details: { itemType: type, itemId: item.id },
@@ -108,9 +108,11 @@ export function ContentItemDialogV2({
         const createData = {
           ...baseData,
           ...formData,
+          parentId: null,
+          order: 0,
         }
 
-        await contentItemsClient.createContentItem(user.uid, createData as any)
+        await contentItemsClient.createContentItem(user.uid, createData)
 
         await logger.info("database", "completed", `Created content item: ${type}`, {
           details: { itemType: type },
